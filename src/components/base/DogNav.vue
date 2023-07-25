@@ -1,28 +1,24 @@
-<script setup lang="ts">
-import { useI18n } from 'vue-i18n'
-const { t } = useI18n()
-console.log(t('message.hello'))
-</script>
+<script setup lang="ts"></script>
 
 <template>
   <div>
     <nav class="nav">
       <div class="nav-wrap">
         <div class="logo-wrap">
-          <span class="nav-login">logo</span>
-          <span class="nav-title">title</span>
+          <span class="nav-logo"></span>
+          <span class="nav-title">Dogescan</span>
         </div>
-        <input type="checkbox" id="show-search-bar" />
-        <label for="show-search-bar" class="nav-search-icon">显示</label>
-        <div class="nav-search-wrap">
+        <!-- <input type="checkbox" id="show-search-bar" /> -->
+        <!-- <label for="show-search-bar" class="nav-search-icon">显示</label> -->
+        <!-- <div class="nav-search-wrap">
           <div class="nav-search">
             <input type="text" placeholder="Search for transactions, addresses, blocks and embedded text data..." class="nav-search-input" />
           </div>
-        </div>
+        </div> -->
         <ul class="nav-active">
-          <li class="nav-active-item">Explorers</li>
-          <li class="nav-active-item">Features</li>
-          <li class="nav-active-item">cn</li>
+          <!-- <li class="nav-active-item">Explorers</li> -->
+          <!-- <li class="nav-active-item">Features</li> -->
+          <!-- <li class="nav-active-item">cn</li> -->
         </ul>
       </div>
     </nav>
@@ -36,13 +32,23 @@ console.log(t('message.hello'))
   top: 0;
   left: 0;
   width: 100%;
-  background-color: var(--nav-bg-color);
+  background-color: #fff;
+  border-bottom: 1px solid #000;
+  z-index: 99;
+}
+.nav-logo {
+  --size: 29px;
+  display: inline-block;
+  background: url('/logo.png');
+  background-size: 100%;
+  width: var(--size);
+  height: var(--size);
 }
 #show-search-bar {
   display: none;
 }
 .nav-place {
-  height: var(--nav-height);
+  height: 45px;
 }
 .nav-wrap {
   display: flex;
@@ -79,7 +85,13 @@ console.log(t('message.hello'))
   cursor: pointer;
 }
 .logo-wrap {
+  display: flex;
+  align-items: center;
   order: 0;
+}
+
+.nav-title {
+  margin-left: 20px;
 }
 
 @media screen and (max-width: 1280px) {

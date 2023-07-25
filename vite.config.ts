@@ -14,6 +14,7 @@ export default defineConfig({
         // './hooks',
         // './composables' // only root modules
         './src/components/**/*.vue',
+        './src/utils/**/*.ts',
       ],
       dts: './src/auto-imports.d.ts',
       eslintrc: {
