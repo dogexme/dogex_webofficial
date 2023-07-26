@@ -9,9 +9,15 @@ declare module 'vue' {
   export interface GlobalComponents {
     DogNav: typeof import('./components/base/DogNav.vue')['default']
     DogTable: typeof import('./components/base/DogTable.vue')['default']
+    ElButton: typeof import('element-plus/es')['ElButton']
+    ElEmpty: typeof import('element-plus/es')['ElEmpty']
+    ElIcon: typeof import('element-plus/es')['ElIcon']
     ElPagination: typeof import('element-plus/es')['ElPagination']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+  }
+  export interface ComponentCustomProperties {
+    vLoading: typeof import('element-plus/es')['ElLoadingDirective']
   }
 }

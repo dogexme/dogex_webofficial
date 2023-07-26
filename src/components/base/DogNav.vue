@@ -91,7 +91,9 @@
 }
 
 .nav-title {
+  font-family: Arial;
   margin-left: 20px;
+  font-weight: bold;
 }
 
 @media screen and (max-width: 1280px) {

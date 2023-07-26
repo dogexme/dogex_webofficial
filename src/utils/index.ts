@@ -1,8 +1,8 @@
-type CollectionParam<T> = (T & { txid: string }) | (T & { txid: string }[])
-
-export function setCollectionLogo<T>(collection: CollectionParam<T>) {
+export function setCollectionLogo(collection: any) {
   const nfts = JSON.parse(localStorage.getItem('nfts')!)
   const txs = nfts.txs
+
+  console.log(txs)
 
   function merge(c: { txid: string }, txid: string) {
     return Object.assign({}, c, txs[txid] ?? {})

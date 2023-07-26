@@ -9,7 +9,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["element-plus/global"],
+    "types": ["element-plus/global.d.ts", "./src/types.d.ts"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
