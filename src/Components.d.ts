@@ -7,8 +7,9 @@ export {}
 
 declare module 'vue' {
   export interface GlobalComponents {
-    Dognav: typeof import('./components/base/dognav.vue')['default']
     DogNav: typeof import('./components/base/DogNav.vue')['default']
+    DogTable: typeof import('./components/base/DogTable.vue')['default']
+    ElPagination: typeof import('element-plus/es')['ElPagination']
     HelloWorld: typeof import('./components/HelloWorld.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']

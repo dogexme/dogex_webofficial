@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { omitCenterString } from '@/utils'
 const route = useRoute()
 const { type } = route.params
 const curTabValue = ref(type)
@@ -22,7 +23,9 @@ function changeTab(val: string) {
   console.log(val)
 }
 
-const _omitCenterString = omitCenterString
+function change(page: number) {
+  console.log(page)
+}
 </script>
 <template>
   <div id="home">
@@ -35,7 +38,7 @@ const _omitCenterString = omitCenterString
           <router-link :to="`/home/${t.value}`">{{ t.label }}</router-link>
         </li>
       </ul>
-      <div class="coll-content" :style="[curTabValue != 'overview' ? { border: 'none' } : {}]">
+      <div class="coll-content" :style="[curTabValue != 'overview' ? { border: 'none', padding: 0 } : {}]">
         <div class="coll-info" v-if="curTabValue == 'overview'">
           <div class="coll-info_item">
             <div class="coll-info_item_label">Logo</div>
@@ -65,7 +68,7 @@ const _omitCenterString = omitCenterString
           </div>
         </div>
         <div class="coll-info" v-if="curTabValue == 'holders'">
-          <table style="width: 100%">
+          <DogTable :total="1000">
             <thead>
               <tr>
                 <td></td>
@@ -78,17 +81,18 @@ const _omitCenterString = omitCenterString
                 <td>
                   <span class="table-index">1</span>
                 </td>
-                <td>{{ _omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
+                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
                 <td>12321321</td>
               </tr>
             </tbody>
-          </table>
+          </DogTable>
         </div>
         <div class="coll-info" v-if="curTabValue == 'transfers'">
-          <table style="width: 100%">
+          <DogTable :total="1000">
             <thead>
               <tr>
                 <td></td>
+                <td>Txid</td>
                 <td>Sender</td>
                 <td>Receiver</td>
                 <td>op</td>
@@ -98,17 +102,19 @@ const _omitCenterString = omitCenterString
               </tr>
             </thead>
             <tbody>
-              <tr v-for="_ in 100">
+              <tr v-for="_ in 10">
                 <td><span class="table-index">1</span></td>
-                <td>{{ _omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
-                <td>{{ _omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
+                <td>{{ omitCenterString('72725120f2fa1b5b2986e09f24cdb581a4a364b15d330fccdf88383d7fc099cc') }}</td>
+                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
+                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
+                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
                 <td>mint</td>
                 <td>link</td>
                 <td>Content</td>
                 <td>2023-07-24T16:45:42.000Z</td>
               </tr>
             </tbody>
-          </table>
+          </DogTable>
         </div>
       </div>
     </div>
@@ -164,7 +170,6 @@ const _omitCenterString = omitCenterString
   padding: 20px;
   border: 1px solid #000;
   border-radius: 6px;
-  overflow: auto;
 }
 
 .coll-info {
@@ -178,54 +183,6 @@ const _omitCenterString = omitCenterString
     &--link {
       cursor: pointer;
       // color: rgb(220, 200, 244);
-    }
-  }
-  &_item_value {
-  }
-}
-
-table {
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 14px;
-  border-spacing: 0 1em;
-}
-
-thead {
-  font-weight: bold;
-  height: 36px;
-  vertical-align: top;
-}
-
-tbody > tr {
-  height: 60px;
-  td {
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
-    padding: 5px;
-    &:first-child {
-      position: relative;
-      border: none;
-      .table-index {
-        position: absolute;
-        right: 0;
-        top: 50%;
-        width: 30px;
-        line-height: 30px;
-        transform: translateY(-15px);
-        text-align: center;
-        border-radius: 50% 0 0 50%;
-        border: 1px solid #000;
-        border-right: none;
-      }
-    }
-    &:nth-child(2) {
-      border-left: 1px solid #000;
-      border-radius: 10px 0 0 10px;
-    }
-    &:last-child {
-      border-right: 1px solid #000;
-      border-radius: 0 10px 10px 0;
     }
   }
 }
