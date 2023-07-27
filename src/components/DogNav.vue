@@ -16,7 +16,7 @@
           </div>
         </div> -->
         <ul class="nav-active">
-          <!-- <li class="nav-active-item">Explorers</li> -->
+          <router-link to="/home" class="nav-active-item" tag="li">Home</router-link>
           <!-- <li class="nav-active-item">Features</li> -->
           <!-- <li class="nav-active-item">cn</li> -->
         </ul>
@@ -32,7 +32,7 @@
   left: 0;
   width: 100%;
   background-color: #fff;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #333;
   z-index: 99;
 }
 .nav-logo {
@@ -47,7 +47,7 @@
   display: none;
 }
 .nav-place {
-  height: 45px;
+  height: 53px;
 }
 .nav-wrap {
   display: flex;
@@ -55,7 +55,7 @@
   justify-content: space-between;
   max-width: 1280px;
   margin: 0 auto;
-  padding: 8px;
+  padding: 12px;
 }
 .nav-search {
   width: 500px;

@@ -18,9 +18,9 @@ onMounted(async () => {
 @font-face {
   font-family: 'nft';
   src:
-    url('./assets/font/iconfont.woff2?t=1690418580557') format('woff2'),
-    url('./assets/font/iconfont.woff?t=1690418580557') format('woff'),
-    url('./assets/font/iconfont.ttf?t=1690418580557') format('truetype');
+    url('./assets/font/iconfont.woff2?t=1690466046653') format('woff2'),
+    url('./assets/font/iconfont.woff?t=1690466046653') format('woff'),
+    url('./assets/font/iconfont.ttf?t=1690466046653') format('truetype');
 }
 
 .nftfont {

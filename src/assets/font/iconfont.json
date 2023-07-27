@@ -6,6 +6,13 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "27365027",
+      "name": "discord",
+      "font_class": "discord",
+      "unicode": "ebf8",
+      "unicode_decimal": 60408
+    },
+    {
       "icon_id": "1467351",
       "name": "github",
       "font_class": "github",

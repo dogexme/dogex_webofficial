@@ -24,3 +24,13 @@ export function omitCenterString(str: string, minLen = 12, omitStr = '...') {
 
   return str.slice(0, i) + omitStr + str.slice(strLen - i)
 }
+
+export function dateFormat(date: Date) {
+  const yy = date.getFullYear()
+  const mm = date.getMonth() + 1
+  const dd = date.getDate()
+  const hh = date.getHours()
+  const mf = date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()
+  const ss = date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds()
+  return yy + '-' + mm + '-' + dd + ' ' + hh + ':' + mf + ':' + ss
+}

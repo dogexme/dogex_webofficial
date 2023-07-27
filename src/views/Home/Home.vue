@@ -1,17 +1,24 @@
 <script setup lang="ts">
-import { omitCenterString } from '@/utils'
+import { omitCenterString, dateFormat } from '@/utils'
 import { queryAssetsByTxid, queryColl, queryHoldersByTxid, queryTransferByTxid } from '@/services/nft'
-import { CircleCheck, Search, Loading, CircleCloseFilled } from '@element-plus/icons-vue'
+import { CircleCheck, Search, Loading, CircleCloseFilled, CopyDocument } from '@element-plus/icons-vue'
+import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
+import clipboard3 from 'vue-clipboard3'
 
-const curTabValue = ref<ParamsKey>('overview')
+const { toClipboard } = clipboard3()
+const curTabValue = ref<CollInfoType>('overview')
 const txid = ref('')
-const txidCope = ref('')
+const txidCopy = ref('')
 const loadingSearch = ref(false)
 const showContent = ref(false)
 const isError = ref(false)
 const total = ref(0)
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const data = ref<any[]>([])
 const loadingPage = ref(false)
+const collInfo = ref<Partial<CollInfo>>({})
+const page = ref(1)
+const tableRef = ref<HTMLElement>()
 
 const tabs = [
   {
@@ -34,73 +41,86 @@ const tabs = [
 
 const tabsData = {
   holders: {
-    async handler(params: Partial<PageResult & { txid: string }>) {
+    async handler(params: RequestPageParams) {
       if (!params.page || !params.pageSize) {
         Object.assign(params, { page: 1, pageSize: 15 })
       }
       const res = await queryHoldersByTxid(params)
       total.value = res.data.total
       data.value = res.data.data
+      isError.value = !res.data.total
     },
   },
   transfers: {
-    async handler(params: Partial<PageResult & { txid: string }>) {
+    async handler(params: RequestPageParams) {
       if (!params.page || !params.pageSize) {
         Object.assign(params, { page: 1, pageSize: 15 })
       }
       const res = await queryTransferByTxid(params)
       total.value = res.data.total
       data.value = res.data.data
+      isError.value = !res.data.total
     },
   },
   assets: {
-    async handler(params: Partial<PageResult & { txid: string }>) {
+    async handler(params: RequestPageParams) {
       if (!params.page || !params.pageSize) {
         Object.assign(params, { page: 1, pageSize: 15 })
       }
       const res = await queryAssetsByTxid(params)
       total.value = res.data.total
-      data.value = setCollectionLogo(res.data.data.map((d) => Object.assign(d, { txid: params.txid })))
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      data.value = setCollectionLogo(res.data.data.map((d: any) => Object.assign(d, { txid: params.txid })))
+      isError.value = !res.data.total
       console.log(data.value)
     },
   },
   overview: {
-    async handler(params: Partial<PageResult & { txid: string }>) {
-      const res = await queryColl(params)
+    async handler(params: RequestPageParams) {
+      const res = await queryColl({ txid: params.txid! })
       if (res?.data.length) {
         collInfo.value = setCollectionLogo(Object.assign(res.data[0], { txid: params.txid }))
         console.log(collInfo.value)
-        txidCope.value = params.txid!
+        txidCopy.value = params.txid!
+        isError.value = false
+      } else {
+        isError.value = true
       }
     },
   },
 }
 
-const collInfo = ref<Partial<CollInfo>>({})
-
-async function getData(type: ParamsKey, params: Partial<PageResult & { txid: string }>) {
+async function getData(type: CollInfoType, params: RequestPageParams) {
   curTabValue.value = type
   const { handler } = tabsData[type]
   try {
-    await handler(params)
     loadingPage.value = true
+    await handler(params)
+  } catch (e) {
+    isError.value = true
+    throw e
   } finally {
+    window.scrollTo(0, 0)
+    tableRef.value?.scrollTo(0, 0)
     loadingPage.value = false
   }
 }
 
-function nextPage(page: number) {
+function nextPage(pageNumber: number) {
+  page.value = pageNumber
   getData(curTabValue.value, {
-    page,
+    page: pageNumber,
     pageSize: 15,
-    txid: txidCope.value,
+    txid: txidCopy.value,
   })
 }
 
-function changeTab(tabVal: ParamsKey) {
+function changeTab(tabVal: CollInfoType) {
+  if (curTabValue.value == tabVal) return
   curTabValue.value = tabVal
-  if (!txidCope.value) return
-  getData(curTabValue.value, { txid: txidCope.value })
+  if (!txidCopy.value) return
+  page.value = 1
+  getData(curTabValue.value, { txid: txidCopy.value })
 }
 
 async function search() {
@@ -109,10 +129,9 @@ async function search() {
   loadingSearch.value = true
   try {
     await getData(curTabValue.value, { txid: hash })
-    isError.value = false
+    txidCopy.value = hash
   } catch {
-    isError.value = true
-    txid.value = ''
+    txidCopy.value = txid.value = ''
   } finally {
     loadingSearch.value = false
     showContent.value = true
@@ -121,15 +140,16 @@ async function search() {
 </script>
 <template>
   <div id="home">
+    <h1 class="home-title" v-if="!showContent">dogex.me</h1>
     <div class="nav-search" :class="[!showContent && 'nav-search--center']">
       <el-icon><Search /></el-icon>
       <input class="nav-search-input" type="text" maxlength="128" placeholder="Address / TxHash / Collection Name / .eth / .bit" v-model="txid" @keydown.enter="search" />
       <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
       <el-icon v-if="!loadingSearch && txid.length" style="cursor: pointer" @click="txid = ''"><CircleCloseFilled /></el-icon>
     </div>
-    <div class="coll-wrapper" v-if="showContent">
+    <div class="coll-wrapper" v-loading="loadingPage" v-if="showContent">
       <ul class="coll-tab">
-        <li class="coll-tab-item" :class="[curTabValue == t.value && 'coll-tab-item--hover']" v-for="t in tabs" :key="t.value" @click="changeTab(t.value as ParamsKey)">
+        <li class="coll-tab-item" :class="[curTabValue == t.value && 'coll-tab-item--hover']" v-for="t in tabs" :key="t.value" @click="changeTab(t.value as CollInfoType)">
           {{ t.label }}
         </li>
       </ul>
@@ -158,7 +178,9 @@ async function search() {
           </div>
           <div class="coll-info_item">
             <div class="coll-info_item_label">Deployer</div>
-            <div class="coll-info_item_value">{{ collInfo.deployer }}</div>
+            <div class="coll-info_item_value">
+              {{ collInfo.deployer }}<el-icon class="copy-icon" @click="toClipboard(collInfo.deployer)"><CopyDocument /></el-icon>
+            </div>
           </div>
           <div class="coll-info_item">
             <div class="coll-info_item_label">Holders</div>
@@ -170,16 +192,16 @@ async function search() {
           </div>
           <div class="coll-info_item">
             <div class="coll-info_item_label">Date</div>
-            <div class="coll-info_item_value">{{ collInfo.date }}</div>
+            <div class="coll-info_item_value">{{ collInfo.date && dateFormat(new Date(collInfo.date)) }}</div>
           </div>
         </div>
         <div class="coll-info" v-else>
-          <DogTable :total="total" @current-change="nextPage">
+          <DogTable ref="tableRef" :current-page="page" :total="total" @current-change="nextPage">
             <template v-if="curTabValue == 'holders'">
               <thead>
                 <tr>
                   <td></td>
-                  <td>Holder</td>
+                  <td style="width: 300px">Holder</td>
                   <td>Count</td>
                 </tr>
               </thead>
@@ -188,7 +210,9 @@ async function search() {
                   <td>
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
-                  <td>{{ omitCenterString(d.nft_owner) }}</td>
+                  <td>
+                    {{ d.nft_owner }}<el-icon v-if="d.nft_owner" class="copy-icon" @click="toClipboard(d.nft_owner)"><CopyDocument /></el-icon>
+                  </td>
                   <td>{{ d.nft_count }}</td>
                 </tr>
               </tbody>
@@ -201,7 +225,6 @@ async function search() {
                   <td>Sender</td>
                   <td>Receiver</td>
                   <td>op</td>
-                  <td>Buri</td>
                   <td>Date</td>
                 </tr>
               </thead>
@@ -210,12 +233,17 @@ async function search() {
                   <td>
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
-                  <td>{{ omitCenterString(d.txid) }}</td>
-                  <td>{{ omitCenterString(d.sender) }}</td>
-                  <td>{{ omitCenterString(d.receiver) }}</td>
+                  <td>
+                    {{ omitCenterString(d.txid, 18) }}<el-icon v-if="d.txid" class="copy-icon" @click="toClipboard(d.txid)"><CopyDocument /></el-icon>
+                  </td>
+                  <td>
+                    {{ omitCenterString(d.sender, 18) }}<el-icon v-if="d.sender" class="copy-icon" @click="toClipboard(d.sender)"><CopyDocument /></el-icon>
+                  </td>
+                  <td>
+                    {{ omitCenterString(d.receiver, 18) }}<el-icon v-if="d.receiver" class="copy-icon" @click="toClipboard(d.receiver)"><CopyDocument /></el-icon>
+                  </td>
                   <td>{{ d.op }}</td>
-                  <td>{{ d.buri }}</td>
-                  <td>{{ d.date }}</td>
+                  <td>{{ d.date && dateFormat(new Date(d.date)) }}</td>
                 </tr>
               </tbody>
             </template>
@@ -233,24 +261,38 @@ async function search() {
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
                   <td><img style="width: 60px; height: 60px; border-radius: 5px; display: block" v-if="d.baseuri" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" alt="" /></td>
-                  <td>{{ omitCenterString(d.address) }}</td>
+                  <td>
+                    {{ d.address }}<el-icon v-if="d.address" class="copy-icon" @click="toClipboard(d.address)"><CopyDocument /></el-icon>
+                  </td>
                 </tr>
               </tbody>
             </template>
           </DogTable>
         </div>
       </div>
+      <el-empty v-else></el-empty>
     </div>
-    <el-empty v-if="isError"></el-empty>
   </div>
 </template>
 
 <style lang="scss">
+.el-empty {
+  --el-empty-padding: 70px 0 !important;
+}
+
 #home {
   position: relative;
   box-sizing: border-box;
-  padding: 20px 6%;
+  padding: 20px 4%;
   min-height: 80vh;
+}
+
+.home-title {
+  width: 200px;
+  text-align: center;
+  margin: 0 auto;
+  margin-top: 150px;
+  font-size: 42px;
 }
 
 .nav-search {
@@ -306,18 +348,11 @@ async function search() {
     border-radius: 10px;
     font-size: 14px;
     margin-right: 10px;
+    margin-bottom: 10px;
+    text-align: center;
     cursor: pointer;
     &:hover {
       @extend .coll-tab-item--hover;
-    }
-  }
-
-  @media screen and (max-width: 480px) {
-    & {
-      display: flex;
-    }
-    .coll-tab-item {
-      flex: 1;
     }
   }
 }
@@ -374,5 +409,10 @@ async function search() {
       transform: rotate(360deg);
     }
   }
+}
+
+.copy-icon {
+  margin-left: 12px;
+  cursor: pointer;
 }
 </style>

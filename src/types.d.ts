@@ -1,9 +1,11 @@
-type PageResult = {
+type PageParams = {
   pageSize: number
   page: number
 }
 
-interface CollInfo {
+export type PageResult = PageParams
+
+export interface CollInfo {
   tick: string
   max: number
   buri: string
@@ -15,4 +17,6 @@ interface CollInfo {
   valid: number
 }
 
-type ParamsKey = 'overview' | 'holders' | 'transfers' | 'assets'
+export type CollInfoType = 'overview' | 'holders' | 'transfers' | 'assets'
+
+export type RequestPageParams = Partial<PageParams & { txid: string }>

@@ -14,10 +14,7 @@
           <a href="https://twitter.com/" target="_blank" class="nftfont link-list_item_a">&#xe652;</a>
         </li>
         <li class="link-list_item">
-          <a href="" target="_blank" class="nftfont link-list_item_a">&#xe652;</a>
-        </li>
-        <li class="link-list_item">
-          <a href="" target="_blank" class="nftfont link-list_item_a">&#xe652;</a>
+          <a href="https://discord.com/" target="_blank" class="nftfont link-list_item_a">&#xebf8;</a>
         </li>
       </ul>
       <span style="font-size: 12px">Copyright © 2023 Dogescan</span>
@@ -34,10 +31,15 @@
 #footer {
   display: flex;
   flex-direction: column;
-  height: 100px;
-  border-top: 1px solid #000;
+  height: 130px;
+  border-top: 1px solid #333;
   justify-content: center;
   align-items: center;
+  @media screen and (max-width: 375px) {
+    & {
+      height: 100px;
+    }
+  }
 }
 .link-list {
   margin-bottom: 12px;
@@ -45,7 +47,8 @@
     display: inline-block;
     margin: 0 12px;
     &_a {
-      font-size: 16px !important;
+      font-size: 18px !important;
+      color: #333 !important;
     }
   }
 }

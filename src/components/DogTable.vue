@@ -13,17 +13,30 @@ const props = defineProps({
     default: 15,
     required: true,
   },
+  currentPage: {
+    type: Number,
+    required: true,
+  },
 })
 const emit = defineEmits(['current-change'])
+const containerRef = ref<HTMLElement>()
+
+function scrollTo(x: number, y: number) {
+  containerRef.value?.scrollTo(x, y)
+}
+
+defineExpose({
+  scrollTo,
+})
 </script>
 <template>
   <div class="table-wrapper">
-    <div class="table-container">
+    <div class="table-container" ref="containerRef">
       <table>
         <slot></slot>
       </table>
     </div>
-    <el-pagination :layout="props.layout" :default-page-size="props.defaultPageSize" :total="props.total" @current-change="emit('current-change', $event)" />
+    <el-pagination :current-page="currentPage" :layout="props.layout" :default-page-size="props.defaultPageSize" :total="props.total" @current-change="emit('current-change', $event)" />
   </div>
 </template>
 
@@ -70,6 +83,21 @@ tbody > tr {
   height: 60px;
   position: relative;
 
+  .table-index {
+    position: relative;
+    overflow: hidden;
+    &::after {
+      content: '';
+      bottom: 0;
+      right: 0;
+      position: absolute;
+      display: block;
+      height: 5px;
+      width: 100%;
+      background-color: #f5f5f5;
+    }
+  }
+
   &::after {
     content: '';
     bottom: 1px;
@@ -77,13 +105,13 @@ tbody > tr {
     position: absolute;
     display: block;
     height: 5px;
-    width: calc(100% - 40px);
+    width: calc(100% - 50px);
     background-color: #f5f5f5;
   }
   td {
     border-top: 1px solid #000;
     border-bottom: 1px solid #000;
-    padding: 5px;
+    padding: 12px;
     &:first-child {
       width: 0;
       position: relative;
