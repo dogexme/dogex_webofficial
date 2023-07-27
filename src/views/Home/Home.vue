@@ -1,17 +1,17 @@
 <script setup lang="ts">
 import { omitCenterString } from '@/utils'
 import { queryAssetsByTxid, queryColl, queryHoldersByTxid, queryTransferByTxid } from '@/services/nft'
-import { CircleCheck, Search, Loading } from '@element-plus/icons-vue'
+import { CircleCheck, Search, Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 
-type ParamsKey = 'overview' | 'holders' | 'transfers' | 'assets'
-
-const route = useRoute()
-const { type } = route.params as { type: ParamsKey }
-const curTabValue = ref(type)
+const curTabValue = ref<ParamsKey>('overview')
 const txid = ref('')
-const loading = ref(false)
+const txidCope = ref('')
+const loadingSearch = ref(false)
 const showContent = ref(false)
 const isError = ref(false)
+const total = ref(0)
+const data = ref<any[]>([])
+const loadingPage = ref(false)
 
 const tabs = [
   {
@@ -34,82 +34,106 @@ const tabs = [
 
 const tabsData = {
   holders: {
-    data: ref([]),
-    async getData(params: PageResult & { txid: string }) {
-      const r = await queryHoldersByTxid(params)
-      console.log(r)
+    async handler(params: Partial<PageResult & { txid: string }>) {
+      if (!params.page || !params.pageSize) {
+        Object.assign(params, { page: 1, pageSize: 15 })
+      }
+      const res = await queryHoldersByTxid(params)
+      total.value = res.data.total
+      data.value = res.data.data
     },
-    total: ref(0),
   },
   transfers: {
-    data: ref([]),
-    async getData(params: PageResult & { txid: string }) {
-      const r = await queryTransferByTxid(params)
-      console.log(r)
+    async handler(params: Partial<PageResult & { txid: string }>) {
+      if (!params.page || !params.pageSize) {
+        Object.assign(params, { page: 1, pageSize: 15 })
+      }
+      const res = await queryTransferByTxid(params)
+      total.value = res.data.total
+      data.value = res.data.data
     },
-    total: ref(0),
   },
   assets: {
-    data: ref([]),
-    async getData(params: PageResult & { txid: string }) {
-      const r = await queryAssetsByTxid(params)
-      console.log(r)
+    async handler(params: Partial<PageResult & { txid: string }>) {
+      if (!params.page || !params.pageSize) {
+        Object.assign(params, { page: 1, pageSize: 15 })
+      }
+      const res = await queryAssetsByTxid(params)
+      total.value = res.data.total
+      data.value = setCollectionLogo(res.data.data.map((d) => Object.assign(d, { txid: params.txid })))
+      console.log(data.value)
     },
-    total: ref(0),
+  },
+  overview: {
+    async handler(params: Partial<PageResult & { txid: string }>) {
+      const res = await queryColl(params)
+      if (res?.data.length) {
+        collInfo.value = setCollectionLogo(Object.assign(res.data[0], { txid: params.txid }))
+        console.log(collInfo.value)
+        txidCope.value = params.txid!
+      }
+    },
   },
 }
 
 const collInfo = ref<Partial<CollInfo>>({})
 
-function changeTab(val: ParamsKey) {
-  curTabValue.value = val
+async function getData(type: ParamsKey, params: Partial<PageResult & { txid: string }>) {
+  curTabValue.value = type
+  const { handler } = tabsData[type]
+  try {
+    await handler(params)
+    loadingPage.value = true
+  } finally {
+    loadingPage.value = false
+  }
 }
 
-function change(page: number) {
-  console.log(curTabValue.value)
-  tabsData[curTabValue.value]?.getData({
+function nextPage(page: number) {
+  getData(curTabValue.value, {
     page,
     pageSize: 15,
-    txid: txid.value.trim(),
+    txid: txidCope.value,
   })
+}
+
+function changeTab(tabVal: ParamsKey) {
+  curTabValue.value = tabVal
+  if (!txidCope.value) return
+  getData(curTabValue.value, { txid: txidCope.value })
 }
 
 async function search() {
   const hash = txid.value.trim()
-  if (!hash || loading.value) return
-  loading.value = true
+  if (!hash || loadingSearch.value) return
+  loadingSearch.value = true
   try {
-    const res = await queryColl(hash)
-    if (res?.data.length) {
-      collInfo.value = setCollectionLogo(Object.assign(res.data[0], { txid: hash }))
-      console.log(collInfo.value)
-    }
+    await getData(curTabValue.value, { txid: hash })
+    isError.value = false
   } catch {
     isError.value = true
+    txid.value = ''
   } finally {
-    loading.value = false
+    loadingSearch.value = false
     showContent.value = true
   }
 }
-
-// onMounted(() => {
-//   tabsData[curTabValue.value]?.getData({})
-// })
 </script>
 <template>
   <div id="home">
     <div class="nav-search" :class="[!showContent && 'nav-search--center']">
       <el-icon><Search /></el-icon>
       <input class="nav-search-input" type="text" maxlength="128" placeholder="Address / TxHash / Collection Name / .eth / .bit" v-model="txid" @keydown.enter="search" />
-      <el-icon v-if="loading" class="loading-icon"><Loading /></el-icon>
+      <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
+      <el-icon v-if="!loadingSearch && txid.length" style="cursor: pointer" @click="txid = ''"><CircleCloseFilled /></el-icon>
     </div>
-    <div class="coll-wrapper" v-if="showContent && !isError">
+    <div class="coll-wrapper" v-if="showContent">
       <ul class="coll-tab">
         <li class="coll-tab-item" :class="[curTabValue == t.value && 'coll-tab-item--hover']" v-for="t in tabs" :key="t.value" @click="changeTab(t.value as ParamsKey)">
-          <router-link :to="`/home/${t.value}`">{{ t.label }}</router-link>
+          {{ t.label }}
         </li>
       </ul>
-      <div class="coll-content" :style="[curTabValue != 'overview' ? { border: 'none', padding: 0 } : {}]">
+      <div class="coll-content" :style="[curTabValue != 'overview' ? { border: 'none', padding: 0 } : {}]" v-if="!isError">
         <div class="coll-info" v-if="curTabValue == 'overview'">
           <div class="coll-info_item">
             <div class="coll-info_item_label">Logo</div>
@@ -149,80 +173,70 @@ async function search() {
             <div class="coll-info_item_value">{{ collInfo.date }}</div>
           </div>
         </div>
-        <div class="coll-info" v-if="curTabValue == 'holders'">
-          <DogTable :total="1000" @current-change="change">
-            <thead>
-              <tr>
-                <td></td>
-                <td>Holder</td>
-                <td>Count</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <span class="table-index">1</span>
-                </td>
-                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
-                <td>12321321</td>
-              </tr>
-            </tbody>
-          </DogTable>
-        </div>
-        <div class="coll-info" v-if="curTabValue == 'transfers'">
-          <DogTable :total="1000" @current-change="change">
-            <thead>
-              <tr>
-                <td></td>
-                <td>Txid</td>
-                <td>Sender</td>
-                <td>Receiver</td>
-                <td>op</td>
-                <td>Buri</td>
-                <td>Content</td>
-                <td>Date</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="_ in 10">
-                <td><span class="table-index">1</span></td>
-                <td>{{ omitCenterString('72725120f2fa1b5b2986e09f24cdb581a4a364b15d330fccdf88383d7fc099cc') }}</td>
-                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
-                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
-                <td>mint</td>
-                <td>link</td>
-                <td>Content</td>
-                <td>2023-07-24T16:45:42.000Z</td>
-              </tr>
-            </tbody>
-          </DogTable>
-        </div>
-        <div class="coll-info" v-if="curTabValue == 'assets'">
-          <DogTable :total="1000" @current-change="change">
-            <thead>
-              <tr>
-                <td></td>
-                <td>Txid</td>
-                <td>Sender</td>
-                <td>Receiver</td>
-                <td>op</td>
-                <td>Buri</td>
-                <td>Content</td>
-                <td>Date</td>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="_ in 10">
-                <td><span class="table-index">1</span></td>
-                <td>{{ omitCenterString('72725120f2fa1b5b2986e09f24cdb581a4a364b15d330fccdf88383d7fc099cc') }}</td>
-                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
-                <td>{{ omitCenterString('DCrMPftYWb3AD3MArHkwf89AKXJTEkPBnQ') }}</td>
-                <td>mint</td>
-                <td>link</td>
-                <td>Content</td>
-                <td>2023-07-24T16:45:42.000Z</td>
-              </tr>
-            </tbody>
+        <div class="coll-info" v-else>
+          <DogTable :total="total" @current-change="nextPage">
+            <template v-if="curTabValue == 'holders'">
+              <thead>
+                <tr>
+                  <td></td>
+                  <td>Holder</td>
+                  <td>Count</td>
+                </tr>
+              </thead>
+              <tbody v-if="data.length">
+                <tr v-for="(d, i) in data" :key="d.nft_owner">
+                  <td>
+                    <span class="table-index">{{ i + 1 }}</span>
+                  </td>
+                  <td>{{ omitCenterString(d.nft_owner) }}</td>
+                  <td>{{ d.nft_count }}</td>
+                </tr>
+              </tbody>
+            </template>
+            <template v-if="curTabValue == 'transfers'">
+              <thead>
+                <tr>
+                  <td></td>
+                  <td>Txid</td>
+                  <td>Sender</td>
+                  <td>Receiver</td>
+                  <td>op</td>
+                  <td>Buri</td>
+                  <td>Date</td>
+                </tr>
+              </thead>
+              <tbody v-if="data.length">
+                <tr v-for="(d, i) in data" :key="i">
+                  <td>
+                    <span class="table-index">{{ i + 1 }}</span>
+                  </td>
+                  <td>{{ omitCenterString(d.txid) }}</td>
+                  <td>{{ omitCenterString(d.sender) }}</td>
+                  <td>{{ omitCenterString(d.receiver) }}</td>
+                  <td>{{ d.op }}</td>
+                  <td>{{ d.buri }}</td>
+                  <td>{{ d.date }}</td>
+                </tr>
+              </tbody>
+            </template>
+            <template v-if="curTabValue == 'assets'">
+              <thead>
+                <tr>
+                  <td></td>
+                  <td>Nft</td>
+                  <td>Address</td>
+                </tr>
+              </thead>
+              <tbody v-if="data.length">
+                <tr v-for="(d, i) in data" :key="i">
+                  <td>
+                    <span class="table-index">{{ i + 1 }}</span>
+                  </td>
+                  <td><img style="width: 60px; height: 60px; border-radius: 5px; display: block" v-if="d.baseuri" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" alt="" /></td>
+                  <td>{{ omitCenterString(d.address) }}</td>
+                </tr>
+              </tbody>
+            </template>
           </DogTable>
         </div>
       </div>
@@ -234,14 +248,16 @@ async function search() {
 <style lang="scss">
 #home {
   position: relative;
+  box-sizing: border-box;
   padding: 20px 6%;
   min-height: 80vh;
 }
 
 .nav-search {
-  position: absolute;
-  top: 0;
+  position: fixed;
+  top: 50px;
   left: 50%;
+  z-index: 99;
   display: flex;
   align-items: center;
   max-width: 500px;
@@ -257,18 +273,21 @@ async function search() {
   transition: top 0.2s;
 
   &--center {
+    margin-top: 0;
     top: 50%;
     left: 50%;
     transition: top 0.2s;
+    transform: translate(-50%, -50%) translateZ(0);
   }
 
   .nav-search-input {
+    flex: 1;
     width: 100%;
     border: none;
     outline: none;
     font-size: 14px;
-    flex: 1;
-    text-indent: 10px;
+    margin-right: 10px;
+    margin-left: 10px;
   }
 }
 

@@ -1,12 +1,12 @@
 <script setup lang="ts"></script>
 
 <template>
-  <div>
+  <div class="nav-place">
     <nav class="nav">
       <div class="nav-wrap">
         <div class="logo-wrap">
-          <span class="nav-logo"></span>
-          <span class="nav-title">Dogescan</span>
+          <!-- <span class="nav-logo"></span> -->
+          <span class="nav-title">dogex.me</span>
         </div>
         <!-- <input type="checkbox" id="show-search-bar" /> -->
         <!-- <label for="show-search-bar" class="nav-search-icon">显示</label> -->
@@ -22,7 +22,6 @@
         </ul>
       </div>
     </nav>
-    <div class="nav-place"></div>
   </div>
 </template>
 
@@ -94,6 +93,7 @@
   font-family: Arial;
   margin-left: 20px;
   font-weight: bold;
+  font-size: 24px;
 }
 
 @media screen and (max-width: 1280px) {

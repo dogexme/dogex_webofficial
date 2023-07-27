@@ -46,6 +46,7 @@ const emit = defineEmits(['current-change'])
 
 .table-container {
   width: 100%;
+  min-height: 400px;
   overflow: auto;
 }
 

@@ -14,3 +14,5 @@ interface CollInfo {
   logo: string
   valid: number
 }
+
+type ParamsKey = 'overview' | 'holders' | 'transfers' | 'assets'

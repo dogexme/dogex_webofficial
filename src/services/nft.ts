@@ -1,4 +1,7 @@
+import apis from '../../apis'
 import axios from 'axios'
+
+const { queryCollApi } = apis
 
 // 添加请求拦截器
 axios.interceptors.request.use(
@@ -28,7 +31,7 @@ axios.interceptors.response.use(
  * 查询集合
  * @param txid
  */
-export function queryColl(txid: string) {
+export function queryColl({ txid }: { txid: string }) {
   return axios.get<CollInfo[]>('https://p2vpvyhw00.execute-api.ap-east-1.amazonaws.com/beta/api', {
     params: { txid },
   })

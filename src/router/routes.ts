@@ -5,10 +5,10 @@ export default [
   {
     path: '/',
     component: BaseLayout,
-    redirect: '/home/overview',
+    redirect: '/home',
     children: [
       {
-        path: 'home/:type',
+        path: 'home',
         name: 'home',
         component: () => import('@/views/Home/Home.vue'),
       },

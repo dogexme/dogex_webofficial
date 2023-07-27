@@ -12,6 +12,7 @@ export function setCollectionLogo(collection: any) {
 }
 
 export function omitCenterString(str: string, minLen = 12, omitStr = '...') {
+  if (!str) return ''
   const strLen = str.length
   let i = 0
 
