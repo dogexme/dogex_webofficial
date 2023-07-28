@@ -15,4 +15,8 @@ onMounted(async () => {
 <style lang="scss">
 @import url('./reset.css');
 @import url('./assets/font/iconfont.css');
+@font-face {
+  font-family: 'SistemnyjC';
+  src: url('./assets/font/SistemnyjC.otf') format('opentype');
+}
 </style>

@@ -70,3 +70,11 @@ export function queryAssetsByTxid(params: PageResult & { txid: string }) {
 export function collMap() {
   return axios.get('https://raw.githubusercontent.com/dpalwallet/conf/main/nft.json')
 }
+
+/**
+ * 获取链数
+ * @returns
+ */
+export function getBlocksCount() {
+  return axios.get('https://2jb7brabz7.execute-api.ap-east-1.amazonaws.com/beta/api')
+}

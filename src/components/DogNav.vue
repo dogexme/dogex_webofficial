@@ -17,7 +17,7 @@
         </div> -->
         <ul class="nav-active">
           <router-link to="/home" class="nav-active-item" tag="li">Home</router-link>
-          <li class="nav-active-item" style="background-color: currentColor; color: rgb(238, 181, 15)">
+          <li class="nav-active-item nav-active-item--weblink">
             <a href="https://dpalwallet.io" target="_blank">Dpalwallet</a>
           </li>
         </ul>
@@ -34,7 +34,17 @@
   width: 100%;
   background-color: #fff;
   border-bottom: 1px solid #333;
-  z-index: 99;
+  z-index: 9999;
+  &::after {
+    content: '';
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    display: block;
+    height: 5px;
+    width: 100%;
+    background-color: #f5f5f5;
+  }
 }
 .nav-logo {
   --size: 29px;
@@ -48,9 +58,10 @@
   display: none;
 }
 .nav-place {
-  height: 53px;
+  height: 58px;
 }
 .nav-wrap {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -75,15 +86,36 @@
   display: none;
 }
 .nav-active {
+  display: flex;
+  align-items: center;
   order: 2;
 }
 .nav-active-item {
+  position: relative;
   display: inline-block;
   padding: 4px 12px;
   border-radius: 20px;
   border: 1px solid #000;
   margin: 0 6px;
   cursor: pointer;
+  overflow: hidden;
+  &::after {
+    content: '';
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    display: block;
+    height: 3px;
+    width: 100%;
+    background-color: #f5f5f5;
+  }
+  &--weblink {
+    background-color: currentColor;
+    color: rgb(238, 181, 15);
+    &::after {
+      background-color: rgb(218, 167, 14) !important;
+    }
+  }
 }
 .logo-wrap {
   display: flex;
@@ -92,7 +124,7 @@
 }
 
 .nav-title {
-  font-family: Arial;
+  font-family: SistemnyjC;
   margin-left: 20px;
   font-weight: bold;
   font-size: 24px;

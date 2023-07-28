@@ -67,12 +67,13 @@ table {
   width: 100%;
   min-width: 960px;
   border-collapse: separate;
-  padding-left: 25px;
+  padding: 0 25px;
   border-spacing: 0;
   font-size: 14px;
   border-spacing: 0 1em;
   td {
     padding: 12px;
+    white-space: nowrap;
   }
 }
 

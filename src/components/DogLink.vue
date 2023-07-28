@@ -7,13 +7,14 @@ const props = defineProps<{
   label?: string
   value?: string
   isCopy?: boolean
+  disabledTooltip?: boolean
 }>()
 
 const { toClipboard } = clipboard3()
 const isCopySuccess = ref(false)
 
-async function copy(value: string) {
-  if (isCopySuccess.value) return
+async function copy(value?: string) {
+  if (isCopySuccess.value || !value) return
   await toClipboard(value)
   isCopySuccess.value = true
   setTimeout(() => {
@@ -23,9 +24,11 @@ async function copy(value: string) {
 </script>
 
 <template>
-  <div class="doglink" v-if="props.value">
-    <a v-if="props.to" :href="props.to" target="_blank">{{ props.label }}</a>
-    <span v-else>{{ props.label }}</span>
+  <div class="doglink" v-if="value">
+    <el-tooltip :hide-after="0" :disabled="disabledTooltip" effect="dark" :content="props.value" placement="top">
+      <a v-if="props.to" :href="props.to" target="_blank">{{ props.label }}</a>
+      <span v-else>{{ props.label }}</span>
+    </el-tooltip>
     <el-icon class="copy-icon" @click="copy(props.value)" v-if="props.isCopy && !isCopySuccess">
       <CopyDocument />
     </el-icon>

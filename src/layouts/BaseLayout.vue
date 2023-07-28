@@ -32,16 +32,22 @@
   overflow: hidden;
 }
 #footer {
+  position: relative;
   display: flex;
   flex-direction: column;
   height: 130px;
   border-top: 1px solid #333;
   justify-content: center;
   align-items: center;
-  @media screen and (max-width: 375px) {
-    & {
-      height: 100px;
-    }
+  &::before {
+    content: '';
+    top: 0;
+    right: 0;
+    position: absolute;
+    display: block;
+    height: 5px;
+    width: 100%;
+    background-color: #f5f5f5;
   }
 }
 .link-list {
