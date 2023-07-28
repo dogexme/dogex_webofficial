@@ -1,13 +1,11 @@
 <script setup lang="ts">
 import { omitCenterString, dateFormat } from '@/utils'
 import { queryAssetsByTxid, queryColl, queryHoldersByTxid, queryTransferByTxid } from '@/services/nft'
-import { CircleCheck, Search, Loading, CircleCloseFilled, CopyDocument } from '@element-plus/icons-vue'
+import { Search, Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
-import clipboard3 from 'vue-clipboard3'
 
-const { toClipboard } = clipboard3()
 const curTabValue = ref<CollInfoType>('overview')
-const txid = ref('')
+const txid = ref('72725120f2fa1b5b2986e09f24cdb581a4a364b15d330fccdf88383d7fc099cc')
 const txidCopy = ref('')
 const loadingSearch = ref(false)
 const showContent = ref(false)
@@ -47,7 +45,9 @@ const tabsData = {
       }
       const res = await queryHoldersByTxid(params)
       total.value = res.data.total
-      data.value = res.data.data
+      const totalCount = res.data.data.reduce((p: number, n: { nft_count: number }) => p + n.nft_count, 0)
+      data.value = res.data.data.map((d: { nft_count: number }) => ({ ...d, ratio: d.nft_count / totalCount }))
+      console.log(data.value)
       isError.value = !res.data.total
     },
   },
@@ -143,7 +143,7 @@ async function search() {
     <h1 class="home-title" v-if="!showContent">dogex.me</h1>
     <div class="nav-search" :class="[!showContent && 'nav-search--center']">
       <el-icon><Search /></el-icon>
-      <input class="nav-search-input" type="text" maxlength="128" placeholder="Address / TxHash / Collection Name / .eth / .bit" v-model="txid" @keydown.enter="search" />
+      <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="txid" @keydown.enter="search" />
       <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
       <el-icon v-if="!loadingSearch && txid.length" style="cursor: pointer" @click="txid = ''"><CircleCloseFilled /></el-icon>
     </div>
@@ -160,7 +160,7 @@ async function search() {
             <div class="coll-info_item_value">
               <div class="coll-logo-wrap" v-if="collInfo.logo">
                 <img :src="collInfo.logo" class="coll-logo-img" alt="" />
-                <el-icon color="#1E90FF" class="valid-icon"><CircleCheck /></el-icon>
+                <DogValidSvgIcon class="valid-icon" style="fill: rgb(29, 155, 240); width: 24px; height: 24px"></DogValidSvgIcon>
               </div>
             </div>
           </div>
@@ -179,17 +179,17 @@ async function search() {
           <div class="coll-info_item">
             <div class="coll-info_item_label">Deployer</div>
             <div class="coll-info_item_value">
-              {{ collInfo.deployer }}<el-icon class="copy-icon" @click="toClipboard(collInfo.deployer)"><CopyDocument /></el-icon>
+              <DogLink is-copy :label="collInfo.deployer" :value="collInfo.deployer"></DogLink>
             </div>
           </div>
           <div class="coll-info_item">
             <div class="coll-info_item_label">Holders</div>
             <div class="coll-info_item_value">{{ collInfo.holders }}</div>
           </div>
-          <div class="coll-info_item">
+          <!-- <div class="coll-info_item">
             <div class="coll-info_item_label">Buri</div>
             <div class="coll-info_item_value">{{ collInfo.buri }}</div>
-          </div>
+          </div> -->
           <div class="coll-info_item">
             <div class="coll-info_item_label">Date</div>
             <div class="coll-info_item_value">{{ collInfo.date && dateFormat(new Date(collInfo.date)) }}</div>
@@ -201,7 +201,7 @@ async function search() {
               <thead>
                 <tr>
                   <td></td>
-                  <td style="width: 300px">Holder</td>
+                  <td style="width: 350px">Holder</td>
                   <td>Count</td>
                 </tr>
               </thead>
@@ -211,9 +211,13 @@ async function search() {
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
                   <td>
-                    {{ d.nft_owner }}<el-icon v-if="d.nft_owner" class="copy-icon" @click="toClipboard(d.nft_owner)"><CopyDocument /></el-icon>
+                    <DogLink is-copy :label="d.nft_owner" :value="d.nft_owner"></DogLink>
                   </td>
-                  <td>{{ d.nft_count }}</td>
+                  <td>
+                    {{ d.nft_count }}
+                    <span style="color: #606266">{{ `(${+(d.ratio * 100).toFixed(2)}%)` }}</span>
+                    <el-progress style="width: 120px; margin-top: 5px" :stroke-width="5" :percentage="+(d.ratio * 100)" :show-text="false" />
+                  </td>
                 </tr>
               </tbody>
             </template>
@@ -234,13 +238,13 @@ async function search() {
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
                   <td>
-                    {{ omitCenterString(d.txid, 18) }}<el-icon v-if="d.txid" class="copy-icon" @click="toClipboard(d.txid)"><CopyDocument /></el-icon>
+                    <DogLink is-copy :to="`https://chain.so/tx/DOGE/${d.txid}`" :label="omitCenterString(d.txid, 24)" :value="d.txid"></DogLink>
                   </td>
                   <td>
-                    {{ omitCenterString(d.sender, 18) }}<el-icon v-if="d.sender" class="copy-icon" @click="toClipboard(d.sender)"><CopyDocument /></el-icon>
+                    <DogLink is-copy :label="omitCenterString(d.sender)" :value="d.sender"></DogLink>
                   </td>
                   <td>
-                    {{ omitCenterString(d.receiver, 18) }}<el-icon v-if="d.receiver" class="copy-icon" @click="toClipboard(d.receiver)"><CopyDocument /></el-icon>
+                    <DogLink is-copy :label="omitCenterString(d.receiver)" :value="d.receiver"></DogLink>
                   </td>
                   <td>{{ d.op }}</td>
                   <td>{{ d.date && dateFormat(new Date(d.date)) }}</td>
@@ -252,6 +256,7 @@ async function search() {
                 <tr>
                   <td></td>
                   <td>Nft</td>
+                  <td>Tokenid</td>
                   <td>Address</td>
                 </tr>
               </thead>
@@ -262,7 +267,10 @@ async function search() {
                   </td>
                   <td><img style="width: 60px; height: 60px; border-radius: 5px; display: block" v-if="d.baseuri" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" alt="" /></td>
                   <td>
-                    {{ d.address }}<el-icon v-if="d.address" class="copy-icon" @click="toClipboard(d.address)"><CopyDocument /></el-icon>
+                    {{ d.tokenid && `#${d.tokenid}` }}
+                  </td>
+                  <td>
+                    <DogLink is-copy :label="d.address" :value="d.address"></DogLink>
                   </td>
                 </tr>
               </tbody>
@@ -296,10 +304,9 @@ async function search() {
 }
 
 .nav-search {
-  position: fixed;
-  top: 50px;
+  position: absolute;
+  top: 0;
   left: 50%;
-  z-index: 99;
   display: flex;
   align-items: center;
   max-width: 500px;
@@ -387,14 +394,15 @@ async function search() {
   position: relative;
   display: inline-flex;
   .coll-logo-img {
-    width: 35px;
-    height: 35px;
+    --size: 75px;
+    width: var(--size);
+    height: var(--size);
     border-radius: 50%;
   }
   .valid-icon {
     position: absolute;
-    right: -7px;
-    bottom: -5px;
+    right: -12px;
+    bottom: -6px;
   }
 }
 
@@ -409,10 +417,5 @@ async function search() {
       transform: rotate(360deg);
     }
   }
-}
-
-.copy-icon {
-  margin-left: 12px;
-  cursor: pointer;
 }
 </style>

@@ -1,10 +1,17 @@
 {
   "id": "4185132",
   "name": "nft",
-  "font_family": "iconfont",
+  "font_family": "nft",
   "css_prefix_text": "icon-",
   "description": "",
   "glyphs": [
+    {
+      "icon_id": "27365309",
+      "name": "telegram",
+      "font_class": "telegram",
+      "unicode": "ec25",
+      "unicode_decimal": 60453
+    },
     {
       "icon_id": "27365027",
       "name": "discord",

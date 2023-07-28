@@ -71,6 +71,9 @@ table {
   border-spacing: 0;
   font-size: 14px;
   border-spacing: 0 1em;
+  td {
+    padding: 12px;
+  }
 }
 
 thead {
@@ -111,7 +114,6 @@ tbody > tr {
   td {
     border-top: 1px solid #000;
     border-bottom: 1px solid #000;
-    padding: 12px;
     &:first-child {
       width: 0;
       position: relative;

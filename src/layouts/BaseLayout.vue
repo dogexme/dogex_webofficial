@@ -8,16 +8,19 @@
     <footer id="footer">
       <ul class="link-list">
         <li class="link-list_item">
-          <a href="https://github.com/" target="_blank" class="nftfont link-list_item_a">&#xe691;</a>
+          <a href="https://twitter.com/dpalofficial" target="_blank" class="nft link-list_item_a">&#xe652;</a>
         </li>
         <li class="link-list_item">
-          <a href="https://twitter.com/" target="_blank" class="nftfont link-list_item_a">&#xe652;</a>
+          <a href="https://github.com/dpalwallet" target="_blank" class="nft link-list_item_a">&#xe691;</a>
         </li>
+        <!-- <li class="link-list_item">
+          <a href="https://discord.com/dpalwallet" target="_blank" class="nft link-list_item_a">&#xebf8;</a>
+        </li> -->
         <li class="link-list_item">
-          <a href="https://discord.com/" target="_blank" class="nftfont link-list_item_a">&#xebf8;</a>
+          <a href="https://t.me/dpalwallet" target="_blank" class="nft link-list_item_a">&#xec25;</a>
         </li>
       </ul>
-      <span style="font-size: 12px">Copyright © 2023 Dogescan</span>
+      <span style="font-size: 12px">Copyright © 2023 dogex.me</span>
     </footer>
   </div>
 </template>

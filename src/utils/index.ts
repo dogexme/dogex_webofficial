@@ -11,7 +11,7 @@ export function setCollectionLogo(collection: any) {
   return Array.isArray(collection) ? collection.map((c) => merge(c, c.txid)) : merge(collection, collection.txid)
 }
 
-export function omitCenterString(str: string, minLen = 12, omitStr = '...') {
+export function omitCenterString(str?: string, minLen = 12, omitStr = '...') {
   if (!str) return ''
   const strLen = str.length
   let i = 0

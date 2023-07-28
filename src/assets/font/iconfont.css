@@ -1,16 +1,20 @@
 @font-face {
-  font-family: "iconfont"; /* Project id 4185132 */
-  src: url('iconfont.woff2?t=1690465861685') format('woff2'),
-       url('iconfont.woff?t=1690465861685') format('woff'),
-       url('iconfont.ttf?t=1690465861685') format('truetype');
+  font-family: "nft"; /* Project id 4185132 */
+  src: url('iconfont.woff2?t=1690520202931') format('woff2'),
+       url('iconfont.woff?t=1690520202931') format('woff'),
+       url('iconfont.ttf?t=1690520202931') format('truetype');
 }
 
-.iconfont {
-  font-family: "iconfont" !important;
+.nft {
+  font-family: "nft" !important;
   font-size: 16px;
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-telegram:before {
+  content: "\ec25";
 }
 
 .icon-discord:before {

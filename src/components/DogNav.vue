@@ -17,8 +17,9 @@
         </div> -->
         <ul class="nav-active">
           <router-link to="/home" class="nav-active-item" tag="li">Home</router-link>
-          <!-- <li class="nav-active-item">Features</li> -->
-          <!-- <li class="nav-active-item">cn</li> -->
+          <li class="nav-active-item" style="background-color: currentColor; color: rgb(238, 181, 15)">
+            <a href="https://dpalwallet.io" target="_blank">Dpalwallet</a>
+          </li>
         </ul>
       </div>
     </nav>
@@ -78,9 +79,10 @@
 }
 .nav-active-item {
   display: inline-block;
-  padding: 4px 8px;
-  border-radius: 5px;
+  padding: 4px 12px;
+  border-radius: 20px;
   border: 1px solid #000;
+  margin: 0 6px;
   cursor: pointer;
 }
 .logo-wrap {
