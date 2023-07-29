@@ -11,7 +11,7 @@ ul,li {
 /*去除a标签下划线*/
 a {
 	text-decoration: none;
-  color: #000;
+  color: #333;
 }
 /*去除未被访问的a标签的下划线*/
 a:link {
@@ -24,12 +24,12 @@ a:visited {
 /*去除鼠标悬停时的a标签的下划线*/
 a:hover {
 	text-decoration: none;
-  color: #000;
+  color: #333;
 }
 /*去除正在点击的a标签的下划线（鼠标按下，尚未松开）*/
 a:active {
 	text-decoration: none;
-  color: #000;
+  color: #333;
 }
 /*去除获得焦点的a标签的下划线（被鼠标点击过）*/
 a:focus {

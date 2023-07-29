@@ -96,7 +96,7 @@
   position: relative;
   display: inline-block;
   border-radius: 20px;
-  border: 1px solid #000;
+  border: 1px solid #333;
   margin: 0 6px;
   overflow: hidden;
   a {

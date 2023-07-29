@@ -46,8 +46,7 @@ const tabsData = {
       }
       const res = await queryHoldersByTxid(params)
       total.value = res.data.total
-      const totalCount = res.data.data.reduce((p: number, n: { nft_count: number }) => p + n.nft_count, 0)
-      data.value = res.data.data.map((d: { nft_count: number }) => ({ ...d, ratio: d.nft_count / totalCount }))
+      data.value = res.data.data.map((d: { nft_count: number }) => ({ ...d, ratio: d.nft_count / collInfo.value.max! }))
       console.log(data.value)
       isError.value = !res.data.total
     },
@@ -96,9 +95,13 @@ const tabsData = {
   },
 }
 
-async function getData(type: CollInfoType, params: RequestPageParams) {
-  curTabValue.value = type
+async function getData(type: CollInfoType, params: RequestPageParams, isChange = true) {
+  if (isChange) {
+    curTabValue.value = type
+  }
+
   const { handler } = tabsData[type]
+
   try {
     loadingPage.value = true
     await handler(params)
@@ -132,8 +135,12 @@ function changeTab(tabVal: CollInfoType) {
 async function search() {
   const hash = txid.value.trim()
   if (!hash || loadingSearch.value) return
+  page.value = 1
   loadingSearch.value = true
   try {
+    if (curTabValue.value == 'holders') {
+      await getData('overview', { txid: hash }, false)
+    }
     await getData(curTabValue.value, { txid: hash })
     txidCopy.value = hash
   } catch {
@@ -144,10 +151,20 @@ async function search() {
   }
 }
 
-onMounted(() => {
+function getBlocksCountHandler() {
   getBlocksCount().then((r) => {
     blockCount.value = r.data?.data?.[0]?.block || 0
+    setTimeout(
+      () => {
+        getBlocksCountHandler()
+      },
+      1000 * 60 * 5
+    )
   })
+}
+
+onMounted(() => {
+  getBlocksCountHandler()
 })
 </script>
 <template>
@@ -244,8 +261,8 @@ onMounted(() => {
               <thead>
                 <tr>
                   <td></td>
-                  <td>Txid</td>
                   <td>Protocol</td>
+                  <td>Txid</td>
                   <td>Op</td>
                   <td>Sender</td>
                   <td>Receiver</td>
@@ -259,12 +276,14 @@ onMounted(() => {
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
                   <td>
-                    <DogLink is-copy :to="`https://chain.so/tx/DOGE/${d.txid}`" :label="omitCenterString(d.txid, 24)" :value="d.txid"></DogLink>
+                    <el-image v-if="d.id" style="width: 60px; height: 60px; border-radius: 5px" :src="`${d.buri}/${d.id}.png`" fit="cover">
+                      <template #error>
+                        <div class="el-image__error">#{{ d.id }}</div>
+                      </template>
+                    </el-image>
                   </td>
                   <td>
-                    <el-tag v-if="d.p" type="info" effect="plain">
-                      {{ d.p }}
-                    </el-tag>
+                    <DogLink is-copy :to="`https://chain.so/tx/DOGE/${d.txid}`" :label="omitCenterString(d.txid, 24)" :value="d.txid"></DogLink>
                   </td>
                   <td>{{ d.op }}</td>
                   <td>
@@ -293,7 +312,11 @@ onMounted(() => {
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
                   <td>
-                    <el-image style="width: 60px; height: 60px; border-radius: 5px" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" fit="cover" />
+                    <el-image v-if="d.tokenid" style="width: 60px; height: 60px; border-radius: 5px" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" fit="cover">
+                      <template #error>
+                        <div class="el-image__error">#{{ d.tokenid }}</div>
+                      </template>
+                    </el-image>
                   </td>
                   <td>
                     {{ d.tokenid && `#${d.tokenid}` }}
@@ -345,8 +368,8 @@ onMounted(() => {
   position: absolute;
   top: 0;
   left: 50%;
-  width: 90%;
-  padding: 50px 10px;
+  width: calc(100% - 40px);
+  padding: 50px 0;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
@@ -357,6 +380,7 @@ onMounted(() => {
   background-size: cover;
   background-position: center;
   border-radius: 20px;
+  overflow: hidden;
 
   &--center {
     margin-top: 0;
@@ -444,7 +468,7 @@ onMounted(() => {
 .coll-content {
   margin-top: 20px;
   padding: 20px;
-  border: 1px solid #000;
+  border: 1px solid #333;
   border-radius: 6px;
 }
 

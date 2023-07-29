@@ -113,8 +113,8 @@ tbody > tr {
     background-color: #f5f5f5;
   }
   td {
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
+    border-top: 1px solid #333;
+    border-bottom: 1px solid #333;
     &:first-child {
       width: 0;
       position: relative;
@@ -128,13 +128,13 @@ tbody > tr {
         transform: translateY(-15px);
         text-align: center;
         border-radius: 50% 0 0 50%;
-        border: 1px solid #000;
+        border: 1px solid #333;
         border-right: none;
       }
     }
     &:nth-child(2) {
       position: relative;
-      border-left: 1px solid #000;
+      border-left: 1px solid #333;
       border-radius: 10px 0 0 10px;
       overflow: hidden;
       &::after {
@@ -150,7 +150,7 @@ tbody > tr {
     }
     &:last-child {
       position: relative;
-      border-right: 1px solid #000;
+      border-right: 1px solid #333;
       border-radius: 0 10px 10px 0;
       overflow: hidden;
       &::after {

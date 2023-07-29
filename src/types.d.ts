@@ -19,4 +19,4 @@ export interface CollInfo {
 
 export type CollInfoType = 'overview' | 'holders' | 'transfers' | 'assets'
 
-export type RequestPageParams = Partial<PageParams & { txid: string }>
+export type RequestPageParams = Partial<PageParams & { txid?: string }>

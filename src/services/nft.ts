@@ -1,7 +1,5 @@
-import apis from '../../apis'
+import { CollInfo, RequestPageParams } from '@/types'
 import axios from 'axios'
-
-const { queryCollApi } = apis
 
 // 添加请求拦截器
 axios.interceptors.request.use(
@@ -40,7 +38,7 @@ export function queryColl({ txid }: { txid: string }) {
 /**
  * 查询集合下holders
  */
-export function queryHoldersByTxid(params: PageResult & { txid: string }) {
+export function queryHoldersByTxid(params: RequestPageParams) {
   return axios.get('https://u4d9olw81e.execute-api.ap-east-1.amazonaws.com/beta/api', {
     params,
   })
@@ -49,7 +47,7 @@ export function queryHoldersByTxid(params: PageResult & { txid: string }) {
 /**
  * 查询集合的所有交易
  */
-export function queryTransferByTxid(params: PageResult & { txid: string }) {
+export function queryTransferByTxid(params: RequestPageParams) {
   return axios.get('https://l8bhelwrlg.execute-api.ap-east-1.amazonaws.com/beta/api', {
     params,
   })
@@ -58,7 +56,7 @@ export function queryTransferByTxid(params: PageResult & { txid: string }) {
 /**
  * 用户持有该集合所有资产
  */
-export function queryAssetsByTxid(params: PageResult & { txid: string }) {
+export function queryAssetsByTxid(params: RequestPageParams) {
   return axios.get('https://cy0ol5pah0.execute-api.ap-east-1.amazonaws.com/beta/api', {
     params,
   })
