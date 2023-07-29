@@ -356,7 +356,7 @@ onMounted(() => {
   position: absolute;
   top: -100px;
   left: 50%;
-  width: 200px;
+  width: 250px;
   transform: translateX(-50%);
   font-family: SistemnyjC;
   text-align: center;
@@ -380,7 +380,6 @@ onMounted(() => {
   background-size: cover;
   background-position: center;
   border-radius: 20px;
-  overflow: hidden;
 
   &--center {
     margin-top: 0;
@@ -406,7 +405,7 @@ onMounted(() => {
     display: flex;
     align-items: center;
     align-self: center;
-    width: 100%;
+    width: 95%;
     max-width: 500px;
     box-sizing: border-box;
     background: #fff;
