@@ -6,7 +6,7 @@
       <div class="nav-wrap">
         <div class="logo-wrap">
           <!-- <span class="nav-logo"></span> -->
-          <span class="nav-title">dogex.me</span>
+          <a href="/" class="nav-title">dogex.me</a>
         </div>
         <!-- <input type="checkbox" id="show-search-bar" /> -->
         <!-- <label for="show-search-bar" class="nav-search-icon">显示</label> -->
@@ -16,7 +16,9 @@
           </div>
         </div> -->
         <ul class="nav-active">
-          <router-link to="/home" class="nav-active-item" tag="li">Home</router-link>
+          <li class="nav-active-item">
+            <a href="/">Home</a>
+          </li>
           <li class="nav-active-item nav-active-item--weblink">
             <a href="https://dpalwallet.io" target="_blank">Dpalwallet</a>
           </li>
@@ -93,12 +95,14 @@
 .nav-active-item {
   position: relative;
   display: inline-block;
-  padding: 4px 12px;
   border-radius: 20px;
   border: 1px solid #000;
   margin: 0 6px;
-  cursor: pointer;
   overflow: hidden;
+  a {
+    display: block;
+    padding: 4px 12px;
+  }
   &::after {
     content: '';
     bottom: 0;

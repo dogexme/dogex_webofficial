@@ -148,8 +148,8 @@ onMounted(() => {
 </script>
 <template>
   <div id="home">
-    <h1 class="home-title" v-if="!showContent">dogex.me</h1>
     <div class="nav-search" :class="[!showContent && 'nav-search--center']">
+      <h1 class="home-title" v-if="!showContent">dogex.me</h1>
       <div class="nav-search_inputwrap">
         <el-icon><Search /></el-icon>
         <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="txid" @keydown.enter="search" />
@@ -172,7 +172,7 @@ onMounted(() => {
             <div class="coll-info_item_label">Logo</div>
             <div class="coll-info_item_value">
               <div class="coll-logo-wrap" v-if="collInfo.logo">
-                <img :src="collInfo.logo" class="coll-logo-img" alt="" />
+                <el-image class="coll-logo-img" :src="collInfo.logo" fit="cover" />
                 <DogValidSvgIcon class="valid-icon" style="fill: rgb(29, 155, 240); width: 24px; height: 24px"></DogValidSvgIcon>
               </div>
             </div>
@@ -288,7 +288,9 @@ onMounted(() => {
                   <td>
                     <span class="table-index">{{ i + 1 }}</span>
                   </td>
-                  <td><img style="width: 60px; height: 60px; border-radius: 5px; display: block" v-if="d.baseuri" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" alt="" /></td>
+                  <td>
+                    <el-image style="width: 60px; height: 60px; border-radius: 5px" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" fit="cover" />
+                  </td>
                   <td>
                     {{ d.tokenid && `#${d.tokenid}` }}
                   </td>
@@ -319,16 +321,19 @@ onMounted(() => {
 #home {
   position: relative;
   box-sizing: border-box;
-  padding: 20px 4%;
+  padding: 20px;
   min-height: 80vh;
 }
 
 .home-title {
+  position: absolute;
+  top: -100px;
+  left: 50%;
   width: 200px;
+  transform: translateX(-50%);
   font-family: SistemnyjC;
   text-align: center;
   margin: 0 auto;
-  margin-top: 10%;
   font-size: 42px;
 }
 
@@ -365,6 +370,7 @@ onMounted(() => {
     font-size: 14px;
     margin-right: 10px;
     margin-left: 10px;
+    font-family: SistemnyjC;
   }
 
   .nav-search_inputwrap {
