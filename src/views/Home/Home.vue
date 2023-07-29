@@ -59,7 +59,11 @@ const tabsData = {
       }
       const res = await queryTransferByTxid(params)
       total.value = res.data.total
-      data.value = res.data.data.map((item: { content: string }) => Object.assign(item, JSON.parse(item.content)))
+      data.value = res.data.data.map((item: { content: string }) => {
+        const content = JSON.parse(item.content)
+        delete content.txid
+        return Object.assign(item, content)
+      })
       console.log(data.value)
       isError.value = !res.data.total
     },
