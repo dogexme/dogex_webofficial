@@ -340,11 +340,6 @@ onMounted(() => {
   --el-empty-padding: 70px 0 !important;
 }
 
-.el-tag {
-  --el-tag-border-color: #333 !important;
-  --el-color-info: #333;
-}
-
 #home {
   position: relative;
   box-sizing: border-box;

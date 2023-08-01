@@ -1,34 +1,81 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const isShowDrawer = ref(false)
+const doge = window?.DogeApi
+
+async function connectDpal() {
+  if (doge) {
+    if (await doge.isEnabled()) {
+      const { userAddress } = await doge.userAddress()
+      console.log(userAddress, '展示地址')
+      // const { network } = await doge.network();
+    } else {
+      const { status } = await doge.enable()
+      if (status === 'success') {
+        const { userAddress } = await doge.userAddress()
+        // const { network } = await doge.network();
+      }
+    }
+  } else {
+    console.log(`please install dpal wallet`)
+  }
+}
+
+connectDpal()
+</script>
 
 <template>
   <div class="nav-place">
     <nav class="nav">
       <div class="nav-wrap">
         <div class="logo-wrap">
+          <a class="nav-more" href="javascript:void(0)" @click="isShowDrawer = !isShowDrawer">&#xe66c;</a>
           <!-- <span class="nav-logo"></span> -->
           <a href="/" class="nav-title">dogex.me</a>
+          <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
-        <!-- <input type="checkbox" id="show-search-bar" /> -->
-        <!-- <label for="show-search-bar" class="nav-search-icon">显示</label> -->
-        <!-- <div class="nav-search-wrap">
-          <div class="nav-search">
-            <input type="text" placeholder="Search for transactions, addresses, blocks and embedded text data..." class="nav-search-input" />
-          </div>
-        </div> -->
+        <el-menu class="nav-menu" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
+          <el-menu-item index="1">Home</el-menu-item>
+          <el-sub-menu index="2" popper-class="nav-popper">
+            <template #title>Address</template>
+            <el-menu-item index="2-1">Assets</el-menu-item>
+            <el-menu-item index="2-2">Transfers</el-menu-item>
+          </el-sub-menu>
+        </el-menu>
         <ul class="nav-active">
           <li class="nav-active-item">
-            <a href="/">Home</a>
+            <a href="javascript:void(0)" @click="connectDpal">Connect Dpal</a>
           </li>
           <li class="nav-active-item nav-active-item--weblink">
             <a href="https://dpalwallet.io" target="_blank">Dpalwallet</a>
           </li>
         </ul>
+        <el-popover popper-class="nav-popper" placement="bottom-end" title="Title" :width="200" trigger="hover" content="this is content, this is content, this is content">
+          <template #reference>
+            <a class="nav-active-more" href="javascript:void(0)">&#xeb10;</a>
+          </template>
+        </el-popover>
       </div>
     </nav>
+    <el-drawer append-to-body :show-close="false" :with-header="false" size="70%" v-model="isShowDrawer" direction="ltr" modal-class="nav-drawer">
+      <span>Hi, there!</span>
+    </el-drawer>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.el-menu--horizontal {
+  --el-menu-item-height: 31px;
+  margin-left: 15px;
+  border: none;
+  flex: 1;
+}
+
+.nav-protocol-tag {
+  padding: 2px 8px;
+  font-weight: bold;
+  font-size: 16px;
+}
+
 .nav {
   position: fixed;
   top: 0;
@@ -61,6 +108,14 @@
 }
 .nav-place {
   height: 58px;
+}
+.nav-more {
+  font-family: nft;
+  font-size: 28px;
+  display: none;
+  @media screen and (max-width: 876px) {
+    display: block;
+  }
 }
 .nav-wrap {
   position: relative;
@@ -97,7 +152,7 @@
   display: inline-block;
   border-radius: 20px;
   border: 1px solid #333;
-  margin: 0 6px;
+  margin: 0 3px;
   overflow: hidden;
   a {
     display: block;
@@ -121,6 +176,12 @@
     }
   }
 }
+
+.nav-active-more {
+  font-family: nft;
+  display: none;
+  font-size: 26px;
+}
 .logo-wrap {
   display: flex;
   align-items: center;
@@ -132,6 +193,18 @@
   margin-left: 20px;
   font-weight: bold;
   font-size: 24px;
+}
+
+@media screen and (max-width: 876px) {
+  .nav-menu {
+    display: none;
+  }
+  .nav-active {
+    display: none;
+  }
+  .nav-active + .nav-active-more {
+    display: block;
+  }
 }
 
 @media screen and (max-width: 1280px) {

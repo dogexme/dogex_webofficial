@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "2418243",
+      "name": "更多",
+      "font_class": "gengduo",
+      "unicode": "e66c",
+      "unicode_decimal": 58988
+    },
+    {
+      "icon_id": "7596589",
+      "name": "24gf-ellipsis",
+      "font_class": "24gf-ellipsis",
+      "unicode": "eb10",
+      "unicode_decimal": 60176
+    },
+    {
       "icon_id": "27365309",
       "name": "telegram",
       "font_class": "telegram",

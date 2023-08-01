@@ -19,4 +19,9 @@ onMounted(async () => {
   font-family: 'SistemnyjC';
   src: url('./assets/font/SistemnyjC.otf') format('opentype');
 }
+
+.nav-popper,
+.nav-drawer {
+  z-index: 10000 !important;
+}
 </style>
