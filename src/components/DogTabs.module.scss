@@ -1,6 +1,5 @@
-.dog-tabs {
-}
-.dot-tabmenu {
+.dog-tabs {}
+.dog-tabmenu {
   margin-bottom: 20px;
   &_item {
     display: inline-block;
@@ -13,7 +12,7 @@
     margin-right: 12px;
     cursor: pointer;
     &:hover {
-      @extend .dot-tabmenu_item--active;
+      @extend .dog-tabmenu_item--active;
     }
     &--active {
       background-color: #ddc2f9;

@@ -26,8 +26,8 @@ async function copy(value?: string) {
 <template>
   <div class="doglink" v-if="value">
     <el-tooltip :hide-after="0" :disabled="disabledTooltip" effect="dark" :content="props.value" placement="top">
-      <a v-if="props.to" :href="props.to" target="_blank">{{ props.label }}</a>
-      <span v-else>{{ props.label }}</span>
+      <a class="doglink_link" v-if="props.to" :href="props.to" target="_blank">{{ props.label }}</a>
+      <span class="doglink_link" v-else>{{ props.label }}</span>
     </el-tooltip>
     <el-icon class="copy-icon" @click="copy(props.value)" v-if="props.isCopy && !isCopySuccess">
       <CopyDocument />
@@ -42,6 +42,9 @@ async function copy(value?: string) {
 .doglink {
   display: flex;
   align-items: center;
+  &_link {
+    color: #f9b864;
+  }
 }
 .copy-icon {
   margin-left: 12px;

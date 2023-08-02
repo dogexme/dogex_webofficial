@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { omitCenterString, dateFormat } from '@/utils'
-import { queryAssetsByTxid, queryColl, queryHoldersByTxid, queryTransferByTxid, getBlocksCount } from '@/services/nft'
+import { dateFormat } from '@/utils'
+import { queryColl, getBlocksCount } from '@/services/nft'
 import { Search, Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
 
@@ -9,15 +9,12 @@ const txid = ref('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6df
 const txidCopy = ref('')
 const loadingSearch = ref(false)
 const showContent = ref(false)
-const isError = ref(false)
-const total = ref(0)
+const isNotFount = ref(false)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const data = ref<any[]>([])
-const loadingPage = ref(false)
 const collInfo = ref<Partial<CollInfo>>({})
 const page = ref(1)
-const tableRef = ref<HTMLElement>()
 const blockCount = ref(0)
+const table = ref()
 
 const tabs = [
   {
@@ -38,98 +35,35 @@ const tabs = [
   },
 ]
 
-const tabsData = {
-  holders: {
-    async handler(params: RequestPageParams) {
-      if (!params.page || !params.pageSize) {
-        Object.assign(params, { page: 1, pageSize: 15 })
-      }
-      const res = await queryHoldersByTxid(params)
-      total.value = res.data.total
-      data.value = res.data.data.map((d: { nft_count: number }) => ({ ...d, ratio: d.nft_count / collInfo.value.max! }))
-      console.log(data.value)
-      isError.value = !res.data.total
-    },
-  },
-  transfers: {
-    async handler(params: RequestPageParams) {
-      if (!params.page || !params.pageSize) {
-        Object.assign(params, { page: 1, pageSize: 15 })
-      }
-      const res = await queryTransferByTxid(params)
-      total.value = res.data.total
-      data.value = res.data.data.map((item: { content: string }) => {
-        const content = JSON.parse(item.content)
-        delete content.txid
-        return Object.assign(item, content)
-      })
-      console.log(data.value)
-      isError.value = !res.data.total
-    },
-  },
-  assets: {
-    async handler(params: RequestPageParams) {
-      if (!params.page || !params.pageSize) {
-        Object.assign(params, { page: 1, pageSize: 15 })
-      }
-      const res = await queryAssetsByTxid(params)
-      total.value = res.data.total
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      data.value = setCollectionLogo(res.data.data.map((d: any) => Object.assign(d, { txid: params.txid })))
-      isError.value = !res.data.total
-      console.log(data.value)
-    },
-  },
-  overview: {
-    async handler(params: RequestPageParams) {
-      const res = await queryColl({ txid: params.txid! })
-      if (res?.data.length) {
-        collInfo.value = setCollectionLogo(Object.assign(res.data[0], { txid: params.txid }))
-        console.log(collInfo.value)
-        txidCopy.value = params.txid!
-        isError.value = false
-      } else {
-        isError.value = true
-      }
-    },
-  },
-}
-
-async function getData(type: CollInfoType, params: RequestPageParams, isChange = true) {
-  if (isChange) {
-    curTabValue.value = type
-  }
-
-  const { handler } = tabsData[type]
-
+async function getOverview(params: RequestPageParams) {
+  loadingSearch.value = true
   try {
-    loadingPage.value = true
-    await handler(params)
-  } catch (e) {
-    isError.value = true
-    throw e
+    const res = await queryColl({ txid: params.txid! })
+    if (res?.data.length) {
+      collInfo.value = setCollectionLogo(Object.assign(res.data[0], { txid: params.txid }))
+      console.log(collInfo.value)
+      txidCopy.value = params.txid!
+      isNotFount.value = false
+    } else {
+      isNotFount.value = true
+    }
+  } catch {
+    isNotFount.value = true
   } finally {
-    window.scrollTo(0, 0)
-    tableRef.value?.scrollTo(0, 0)
-    loadingPage.value = false
+    loadingSearch.value = false
   }
 }
 
-function nextPage(pageNumber: number) {
-  page.value = pageNumber
-  getData(curTabValue.value, {
-    page: pageNumber,
-    pageSize: 15,
-    txid: txidCopy.value,
-  })
+function handleNotFount() {
+  isNotFount.value = true
 }
 
-function changeTab(tabVal: CollInfoType) {
-  if (curTabValue.value == tabVal) return
-  curTabValue.value = tabVal
+function changeTab() {
   if (!txidCopy.value) return
   page.value = 1
-  getData(curTabValue.value, { txid: txidCopy.value })
+  if (curTabValue.value == 'overview') {
+    getOverview({ txid: txidCopy.value })
+  }
 }
 
 async function search() {
@@ -138,10 +72,12 @@ async function search() {
   page.value = 1
   loadingSearch.value = true
   try {
-    if (curTabValue.value == 'holders') {
-      await getData('overview', { txid: hash }, false)
+    if (curTabValue.value == 'holders' || curTabValue.value == 'overview') {
+      await getOverview({ txid: hash })
     }
-    await getData(curTabValue.value, { txid: hash })
+    if (table.value?.reload) {
+      table.value?.reload()
+    }
     txidCopy.value = hash
   } catch {
     txidCopy.value = txid.value = ''
@@ -181,157 +117,69 @@ onMounted(() => {
         Processed Blocks: <span>{{ blockCount }}</span>
       </div>
     </div>
-    <div class="coll-wrapper" v-loading="loadingPage" v-if="showContent">
-      <ul class="coll-tab">
-        <li class="coll-tab-item" :class="[curTabValue == t.value && 'coll-tab-item--hover']" v-for="t in tabs" :key="t.value" @click="changeTab(t.value as CollInfoType)">
-          {{ t.label }}
-        </li>
-      </ul>
-      <DogCard v-if="!isError">
-        <div class="coll-info" v-if="curTabValue == 'overview'">
-          <div class="coll-info_item">
-            <div class="coll-info_item_label">Logo</div>
-            <div class="coll-info_item_value">
-              <div class="coll-logo-wrap" v-if="collInfo.logo">
-                <el-image class="coll-logo-img" :src="collInfo.logo" fit="cover" />
-                <DogValidSvgIcon class="valid-icon" style="fill: rgb(29, 155, 240); width: 24px; height: 24px"></DogValidSvgIcon>
+    <div class="coll-wrapper" v-if="showContent">
+      <DogTabs v-if="!isNotFount" v-model="curTabValue" :tabs="tabs" @change="changeTab">
+        <DogTabsItem value="overview">
+          <div class="coll-info" v-loading="loadingSearch">
+            <div class="coll-info_item">
+              <div class="coll-info_item_label">Logo</div>
+              <div class="coll-info_item_value">
+                <div class="coll-logo-wrap" v-if="collInfo.logo">
+                  <el-image class="coll-logo-img" :src="collInfo.logo" fit="cover" />
+                  <DogValidSvgIcon class="valid-icon" style="fill: rgb(29, 155, 240); width: 16px; height: 16px"></DogValidSvgIcon>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="coll-info_item">
-            <div class="coll-info_item_label">Tick</div>
-            <div class="coll-info_item_value">{{ collInfo.tick }}</div>
-          </div>
-          <div class="coll-info_item">
-            <div class="coll-info_item_label">Max</div>
-            <div class="coll-info_item_value">{{ collInfo.max }}</div>
-          </div>
-          <div class="coll-info_item">
-            <div class="coll-info_item_label">Mintval</div>
-            <div class="coll-info_item_value">{{ collInfo.mintval }}</div>
-          </div>
-          <div class="coll-info_item">
-            <div class="coll-info_item_label">Deployer</div>
-            <div class="coll-info_item_value">
-              <DogLink is-copy :label="collInfo.deployer" :value="collInfo.deployer"></DogLink>
+            <div class="coll-info_item">
+              <div class="coll-info_item_label">Tick</div>
+              <div class="coll-info_item_value">{{ collInfo.tick }}</div>
             </div>
-          </div>
-          <div class="coll-info_item">
-            <div class="coll-info_item_label">Holders</div>
-            <div class="coll-info_item_value">{{ collInfo.holders }}</div>
-          </div>
-          <!-- <div class="coll-info_item">
+            <div class="coll-info_item">
+              <div class="coll-info_item_label">Max</div>
+              <div class="coll-info_item_value">{{ collInfo.max }}</div>
+            </div>
+            <div class="coll-info_item">
+              <div class="coll-info_item_label">Mintval</div>
+              <div class="coll-info_item_value">{{ collInfo.mintval }}</div>
+            </div>
+            <div class="coll-info_item">
+              <div class="coll-info_item_label">Deployer</div>
+              <div class="coll-info_item_value">
+                <DogLink is-copy :label="collInfo.deployer" :value="collInfo.deployer"></DogLink>
+              </div>
+            </div>
+            <div class="coll-info_item">
+              <div class="coll-info_item_label">Holders</div>
+              <div class="coll-info_item_value">{{ collInfo.holders }}</div>
+            </div>
+            <!-- <div class="coll-info_item">
             <div class="coll-info_item_label">Buri</div>
             <div class="coll-info_item_value">{{ collInfo.buri }}</div>
           </div> -->
-          <div class="coll-info_item">
-            <div class="coll-info_item_label">Date</div>
-            <div class="coll-info_item_value">{{ collInfo.date && dateFormat(new Date(collInfo.date)) }}</div>
+            <div class="coll-info_item">
+              <div class="coll-info_item_label">Date</div>
+              <div class="coll-info_item_value">{{ collInfo.date && dateFormat(new Date(collInfo.date)) }}</div>
+            </div>
           </div>
-        </div>
-        <div class="coll-info" v-else>
-          <DogTable ref="tableRef" :current-page="page" :total="total" @current-change="nextPage">
-            <template v-if="curTabValue == 'holders'">
-              <thead>
-                <tr>
-                  <td></td>
-                  <td style="width: 350px">Holder</td>
-                  <td>Count</td>
-                </tr>
-              </thead>
-              <tbody v-if="data.length">
-                <tr v-for="(d, i) in data" :key="d.nft_owner">
-                  <td>
-                    <span class="table-index">{{ i + 1 }}</span>
-                  </td>
-                  <td>
-                    <DogLink is-copy :label="d.nft_owner" :value="d.nft_owner"></DogLink>
-                  </td>
-                  <td>
-                    <div v-if="d.nft_count">
-                      {{ d.nft_count }}
-                      <span style="color: #606266">{{ `(${+(d.ratio * 100).toFixed(2)}%)` }}</span>
-                      <el-progress style="width: 120px; margin-top: 5px" :stroke-width="5" :percentage="+(d.ratio * 100)" :show-text="false" />
-                    </div>
-                  </td>
-                </tr>
-              </tbody>
-            </template>
-            <template v-if="curTabValue == 'transfers'">
-              <thead>
-                <tr>
-                  <td></td>
-                  <td>Protocol</td>
-                  <td>Txid</td>
-                  <td>Op</td>
-                  <td>Sender</td>
-                  <td>Receiver</td>
-                  <td>Date</td>
-                  <td>Content</td>
-                </tr>
-              </thead>
-              <tbody v-if="data.length">
-                <tr v-for="(d, i) in data" :key="i">
-                  <td>
-                    <span class="table-index">{{ i + 1 }}</span>
-                  </td>
-                  <td>
-                    <el-image v-if="d.id" style="width: 60px; height: 60px; border-radius: 5px" :src="`${d.buri}/${d.id}.png`" fit="cover">
-                      <template #error>
-                        <div class="el-image__error">#{{ d.id }}</div>
-                      </template>
-                    </el-image>
-                  </td>
-                  <td>
-                    <DogLink is-copy :to="`https://chain.so/tx/DOGE/${d.txid}`" :label="omitCenterString(d.txid, 24)" :value="d.txid"></DogLink>
-                  </td>
-                  <td>{{ d.op }}</td>
-                  <td>
-                    <DogLink is-copy :label="omitCenterString(d.sender)" :value="d.sender"></DogLink>
-                  </td>
-                  <td>
-                    <DogLink is-copy :label="omitCenterString(d.receiver)" :value="d.receiver"></DogLink>
-                  </td>
-                  <td>{{ d.date && dateFormat(new Date(d.date)) }}</td>
-                  <td>{{ d.content }}</td>
-                </tr>
-              </tbody>
-            </template>
-            <template v-if="curTabValue == 'assets'">
-              <thead>
-                <tr>
-                  <td></td>
-                  <td>Nft</td>
-                  <td>Tokenid</td>
-                  <td>Address</td>
-                </tr>
-              </thead>
-              <tbody v-if="data.length">
-                <tr v-for="(d, i) in data" :key="i">
-                  <td>
-                    <span class="table-index">{{ i + 1 }}</span>
-                  </td>
-                  <td>
-                    <el-image v-if="d.tokenid" style="width: 60px; height: 60px; border-radius: 5px" :src="`${d.baseuri}/${d.txid}/${d.tokenid}.png`" fit="cover">
-                      <template #error>
-                        <div class="el-image__error">#{{ d.tokenid }}</div>
-                      </template>
-                    </el-image>
-                  </td>
-                  <td>
-                    {{ d.tokenid && `#${d.tokenid}` }}
-                  </td>
-                  <td>
-                    <DogLink is-copy :label="d.address" :value="d.address"></DogLink>
-                  </td>
-                </tr>
-              </tbody>
-            </template>
-          </DogTable>
-        </div>
-      </DogCard>
+        </DogTabsItem>
+        <DogTabsItem value="holders">
+          <HolderTable ref="table" :collInfo="collInfo" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
+        </DogTabsItem>
+        <DogTabsItem value="transfers">
+          <TransfersTable ref="table" :collInfo="collInfo" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></TransfersTable>
+        </DogTabsItem>
+        <DogTabsItem value="assets">
+          <AssetsTable ref="table" :collInfo="collInfo" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
+        </DogTabsItem>
+      </DogTabs>
       <el-empty v-else></el-empty>
-      <DogTabs :tabs="[]">123</DogTabs>
+      <!-- <h2 style="margin-top: 30px; margin-bottom: 16px"></h2>
+      <DogCard>
+        <div class="content-json">
+          <div class="content-num"></div>
+          <div class="content-field"></div>
+        </div>
+      </DogCard> -->
     </div>
   </div>
 </template>
@@ -464,10 +312,12 @@ onMounted(() => {
 .coll-info {
   &_item {
     display: flex;
-    line-height: 2;
     font-size: 14px;
+    margin-bottom: 20px;
   }
   &_item_label {
+    display: flex;
+    align-items: center;
     flex: 1;
     &--link {
       cursor: pointer;
@@ -484,15 +334,15 @@ onMounted(() => {
   position: relative;
   display: inline-flex;
   .coll-logo-img {
-    --size: 75px;
+    --size: 48px;
     width: var(--size);
     height: var(--size);
-    border-radius: 50%;
+    border-radius: 5px;
   }
   .valid-icon {
     position: absolute;
-    right: -12px;
-    bottom: -6px;
+    right: -8px;
+    bottom: -7px;
   }
 }
 
