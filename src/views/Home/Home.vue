@@ -5,7 +5,7 @@ import { Search, Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
 
 const curTabValue = ref<CollInfoType>('overview')
-const txid = ref('')
+const txid = ref('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff')
 const txidCopy = ref('')
 const loadingSearch = ref(false)
 const showContent = ref(false)
@@ -187,7 +187,7 @@ onMounted(() => {
           {{ t.label }}
         </li>
       </ul>
-      <div class="coll-content" :style="[curTabValue != 'overview' ? { border: 'none', padding: 0 } : {}]" v-if="!isError">
+      <DogCard v-if="!isError">
         <div class="coll-info" v-if="curTabValue == 'overview'">
           <div class="coll-info_item">
             <div class="coll-info_item_label">Logo</div>
@@ -329,8 +329,9 @@ onMounted(() => {
             </template>
           </DogTable>
         </div>
-      </div>
+      </DogCard>
       <el-empty v-else></el-empty>
+      <DogTabs :tabs="[]">123</DogTabs>
     </div>
   </div>
 </template>
@@ -440,30 +441,24 @@ onMounted(() => {
 }
 
 .coll-tab {
-  .coll-tab-item--hover {
-    background-color: rgb(220, 200, 244);
-  }
+  margin-bottom: 20px;
   .coll-tab-item {
     display: inline-block;
-    padding: 4px 12px;
-    border: 1px solid #333;
-    border-radius: 10px;
+    padding: 4px 10px 5px 8px;
+    border-radius: 8px;
+    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+    border: solid 1px #000;
+    background-color: #fafafa;
     font-size: 14px;
-    margin-right: 10px;
-    margin-bottom: 10px;
-    text-align: center;
+    margin-right: 12px;
     cursor: pointer;
     &:hover {
       @extend .coll-tab-item--hover;
     }
   }
-}
-
-.coll-content {
-  margin-top: 20px;
-  padding: 20px;
-  border: 1px solid #333;
-  border-radius: 6px;
+  .coll-tab-item--hover {
+    background-color: #ddc2f9;
+  }
 }
 
 .coll-info {

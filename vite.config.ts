@@ -5,17 +5,20 @@ import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 import removeConsole from 'vite-plugin-remove-console'
+import vueJsx from '@vitejs/plugin-vue-jsx'
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     vue(),
+    vueJsx(),
     AutoImport({
       imports: ['vue', 'vue-router', 'vuex'],
       dirs: [
         // './hooks',
         // './composables' // only root modules
         './src/components/**/*.vue',
+        './src/components/**/*.tsx',
         './src/utils/**/*.ts',
       ],
       dts: './src/auto-imports.d.ts',

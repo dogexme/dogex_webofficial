@@ -12,6 +12,11 @@ export default [
         name: 'home',
         component: () => import('@/views/Home/Home.vue'),
       },
+      {
+        name: 'address',
+        path: 'address',
+        component: () => import('@/views/Address/Address.vue'),
+      },
     ],
   },
 ] as RouteRecordRaw[]

@@ -28,6 +28,7 @@
 .content {
   width: 100%;
   max-width: 1280px;
+  min-height: 750px;
   margin: 0 auto;
   overflow: hidden;
 }

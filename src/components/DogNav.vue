@@ -1,18 +1,18 @@
 <script setup lang="ts">
 const isShowDrawer = ref(false)
+const address = ref('')
 const doge = window?.DogeApi
 
 async function connectDpal() {
   if (doge) {
     if (await doge.isEnabled()) {
       const { userAddress } = await doge.userAddress()
-      console.log(userAddress, '展示地址')
-      // const { network } = await doge.network();
+      address.value = userAddress
     } else {
       const { status } = await doge.enable()
       if (status === 'success') {
         const { userAddress } = await doge.userAddress()
-        // const { network } = await doge.network();
+        address.value = userAddress
       }
     }
   } else {
@@ -33,20 +33,27 @@ connectDpal()
           <a href="/" class="nav-title">dogex.me</a>
           <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
-        <el-menu class="nav-menu" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
-          <el-menu-item index="1">Home</el-menu-item>
-          <el-sub-menu index="2" popper-class="nav-popper">
+        <el-menu class="nav-menu" router default-active="/home" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
+          <el-menu-item index="/home">
+            <a href="/home">Home</a>
+          </el-menu-item>
+          <!-- <el-sub-menu index="2" popper-class="nav-popper">
             <template #title>Address</template>
             <el-menu-item index="2-1">Assets</el-menu-item>
             <el-menu-item index="2-2">Transfers</el-menu-item>
-          </el-sub-menu>
+          </el-sub-menu> -->
         </el-menu>
         <ul class="nav-active">
-          <li class="nav-active-item">
-            <a href="javascript:void(0)" @click="connectDpal">Connect Dpal</a>
+          <!-- <li class="nav-active-item">
+            <a href="/home" @click="connectDpal">Home</a>
+          </li> -->
+          <li class="nav-active-item nav-active-item--weblink" v-if="!address">
+            <a href="javascript:void(0)" @click="connectDpal">Dpalwallet</a>
           </li>
-          <li class="nav-active-item nav-active-item--weblink">
-            <a href="https://dpalwallet.io" target="_blank">Dpalwallet</a>
+          <li style="margin-left: 12px" v-if="address">
+            <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to info" placement="bottom">
+              <router-link to="/address">{{ address }} ></router-link>
+            </el-tooltip>
           </li>
         </ul>
         <el-popover popper-class="nav-popper" placement="bottom-end" title="Title" :width="200" trigger="hover" content="this is content, this is content, this is content">
