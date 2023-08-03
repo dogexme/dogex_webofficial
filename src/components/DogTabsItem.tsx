@@ -10,13 +10,9 @@ export default defineComponent({
       default: true,
     },
   },
-  setup(props, { slots }) {
+  setup(_props, { slots }) {
     return () => {
-      return (
-        <div class="s" style={{ display: props.show ? 'block' : 'none' }}>
-          {slots.default?.()}
-        </div>
-      )
+      return <div class="dog-tabs-item">{slots.default?.()}</div>
     }
   },
 })

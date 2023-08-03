@@ -30,13 +30,6 @@ export default defineComponent({
       },
     })
 
-    function changeTab(value: TabOptions['value']) {
-      if (value === tabValue.value) {
-        return
-      }
-      tabValue.value = value
-    }
-
     return () => {
       const children = slots.default?.().filter((vnode) => {
         return tabValue.value === vnode.props?.value
@@ -47,7 +40,7 @@ export default defineComponent({
           <ul class={s['dog-tabmenu']}>
             {props.tabs.map((t) => {
               return (
-                <li class={[s['dog-tabmenu_item'], tabValue.value == t.value && s['dog-tabmenu_item--active']]} key={t.value} onClick={() => changeTab(t.value)}>
+                <li class={[s['dog-tabmenu_item'], tabValue.value == t.value && s['dog-tabmenu_item--active']]} key={t.value} onClick={() => emit('change', t.value)}>
                   {t.label}
                 </li>
               )

@@ -16,13 +16,25 @@ export default defineComponent({
     tabVal: {
       type: String,
     },
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
     error: Function as PropType<(e: Error) => void>,
   },
-  setup(props, { expose }) {
+  emits: ['update:isLoading'],
+  setup(props, { emit, expose }) {
     const data = ref([])
     const total = ref(0)
     const page = ref(1)
-    const loading = ref(false)
+    const loading = computed({
+      get() {
+        return props.isLoading
+      },
+      set(isLoading) {
+        emit('update:isLoading', isLoading)
+      },
+    })
     const columns = [
       {
         title: 'item',
@@ -79,16 +91,6 @@ export default defineComponent({
         dataIndex: 'content',
       },
     ]
-
-    watch(
-      () => props.txid,
-      () => {
-        getData()
-      },
-      {
-        immediate: true,
-      }
-    )
 
     function nextPage(pageNumber: number) {
       page.value = pageNumber

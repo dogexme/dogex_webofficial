@@ -16,13 +16,25 @@ export default defineComponent({
     tabVal: {
       type: String,
     },
+    isLoading: {
+      type: Boolean,
+      default: false,
+    },
     error: Function as PropType<(e: Error) => void>,
   },
-  setup(props, { expose }) {
+  emits: ['update:isLoading'],
+  setup(props, { expose, emit }) {
     const data = ref([])
     const total = ref(0)
     const page = ref(1)
-    const loading = ref(false)
+    const loading = computed({
+      get() {
+        return props.isLoading
+      },
+      set(isLoading) {
+        emit('update:isLoading', isLoading)
+      },
+    })
     const columns = [
       {
         title: 'item',
@@ -30,7 +42,7 @@ export default defineComponent({
         render: (_text: unknown, r: any) => {
           return (
             <>
-              {r.tokenid && r.txid && (
+              {r.txid && (
                 <el-image
                   v-slots={{ error: () => <div class="el-image__error">#{r.tokenid}</div> }}
                   style="width: 40px; height: 40px; border-radius: 5px"
@@ -59,16 +71,6 @@ export default defineComponent({
       },
     ]
 
-    watch(
-      () => props.txid,
-      () => {
-        getData()
-      },
-      {
-        immediate: true,
-      }
-    )
-
     function nextPage(pageNumber: number) {
       page.value = pageNumber
       getData()
@@ -85,7 +87,7 @@ export default defineComponent({
         total.value = res.data.total
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         data.value = setCollectionLogo(res.data.data.map((d: any) => Object.assign(d, { txid: props.txid })))
-        console.log(data.value)
+        console.log('assets', data.value)
       } catch (e: unknown) {
         props.error?.(e as Error)
       } finally {
