@@ -17,6 +17,11 @@ export default [
         path: 'address',
         component: () => import('@/views/Address/Address.vue'),
       },
+      {
+        name: 'tokens',
+        path: 'tokens/:address/:txid',
+        component: () => import('@/views/Address/Tokens'),
+      },
     ],
   },
 ] as RouteRecordRaw[]

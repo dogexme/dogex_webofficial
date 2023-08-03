@@ -1,5 +1,5 @@
 import s from './DogTabs.module.scss'
-import DogCard from './DogCard.vue'
+import DogCard from '../DogCard.vue'
 
 interface TabOptions {
   label: string

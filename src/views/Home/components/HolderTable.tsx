@@ -1,5 +1,5 @@
 import DogLink from '@/components/DogLink.vue'
-import DogTable from '@/components/DogTable'
+import DogTable from '@/components/DogTable/DogTable'
 import { queryHoldersByTxid } from '@/services/nft'
 import { CollInfo } from '@/types'
 

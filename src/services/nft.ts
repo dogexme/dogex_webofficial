@@ -1,3 +1,4 @@
+import { PageResult } from './../types.d'
 import { CollInfo, RequestPageParams } from '@/types'
 import axios from 'axios'
 
@@ -75,4 +76,19 @@ export function collMap() {
  */
 export function getBlocksCount() {
   return axios.get('https://2jb7brabz7.execute-api.ap-east-1.amazonaws.com/beta/api')
+}
+
+/**
+ * 查询地址下的集合
+ */
+export function queryAdrCollections(params: PageResult & { address: string }) {
+  return axios.get('https://oxw4a7be1c.execute-api.ap-east-1.amazonaws.com/beta/api', {
+    params,
+  })
+}
+
+export function queryAdrTokensByHash(params: PageResult & { address: string; txid: string }) {
+  return axios.get('https://ujut4cr0vc.execute-api.ap-east-1.amazonaws.com/beta/api', {
+    params,
+  })
 }

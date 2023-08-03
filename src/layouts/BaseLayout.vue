@@ -28,7 +28,9 @@
 .content {
   width: 100%;
   max-width: 1280px;
-  min-height: 750px;
+  min-height: 80vh;
+  box-sizing: border-box;
+  padding: 20px;
   margin: 0 auto;
   overflow: hidden;
 }

@@ -1,4 +1,4 @@
-import './DogTable.scss'
+import s from './DogTable.module.scss'
 
 interface ColumnProps {
   dataIndex?: string
@@ -78,7 +78,7 @@ export default defineComponent({
           const text = record[dataIndex!]
           const render = props.columns[columnsIndex].render
           return (
-            <td class="dog-table-td" key={dataIndex}>
+            <td class={s['dog-table-td']} key={dataIndex}>
               {render ? render(text, record, i) : text}
             </td>
           )
@@ -87,24 +87,24 @@ export default defineComponent({
 
     return () => {
       return (
-        <div class="table-wrapper" v-loading={props.loading}>
-          <div class="table-container" ref="containerRef">
-            <table class="dog-table">
-              <thead class="dog-table-th">
-                <tr class="dog-table-tr">
+        <div class={s['table-wrapper']} v-loading={props.loading}>
+          <div class={s['table-container']} ref="containerRef">
+            <table class={s['dog-table']}>
+              <thead class={s['dog-table-th']}>
+                <tr class={s['dog-table-tr']}>
                   {props.columns.map((c) => {
                     return (
-                      <td class="dog-table-td" style={[{ textAlign: c.align || 'left' }, c.width! && { width: c.width }]} key={c.dataIndex}>
+                      <td class={s['dog-table-td']} style={[{ textAlign: c.align || 'left' }, c.width! && { width: c.width }]} key={c.dataIndex}>
                         {c.title}
                       </td>
                     )
                   })}
                 </tr>
               </thead>
-              <tbody class="dog-table-tb">
+              <tbody class={s['dog-table-tb']}>
                 {props.dataSource.map((record, i) => {
                   return (
-                    <tr class="dog-table-tr" key={record[props.rowkey]}>
+                    <tr class={s['dog-table-tr']} key={record[props.rowkey]}>
                       {renderTbodyTd(record, i)}
                     </tr>
                   )

@@ -202,7 +202,6 @@ onMounted(() => {
 #home {
   position: relative;
   box-sizing: border-box;
-  padding: 20px;
   min-height: 80vh;
 }
 
@@ -222,12 +221,12 @@ onMounted(() => {
   position: absolute;
   top: 0;
   left: 50%;
-  width: calc(100% - 40px);
+  width: 100%;
+  box-sizing: border-box;
   padding: 50px 0;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  margin-top: 20px;
   transform: translateX(-50%) translateZ(0);
   transition: top 0.2s;
   background: url(/src/assets/img/bg.png) no-repeat;
@@ -246,9 +245,11 @@ onMounted(() => {
   .nav-search-input {
     flex: 1;
     width: 100%;
+    height: 100%;
+    background: transparent;
     border: none;
     outline: none;
-    font-size: 14px;
+    font-size: 16px;
     margin-right: 10px;
     margin-left: 10px;
     font-family: SistemnyjC;
@@ -260,30 +261,22 @@ onMounted(() => {
     align-items: center;
     align-self: center;
     width: 95%;
-    max-width: 500px;
-    box-sizing: border-box;
+    max-width: 740px;
+    height: 66px;
     background: #fff;
-    padding: 12px 12px;
+    padding: 0 24px;
     border-radius: 40px;
+    box-sizing: border-box;
     border: 1px solid #333;
     outline: 3px solid rgb(221, 194, 249);
+    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
     overflow: hidden;
-    &::after {
-      content: '';
-      bottom: 0;
-      right: 0;
-      position: absolute;
-      display: block;
-      height: 5px;
-      width: 100%;
-      background-color: #f5f5f5;
-    }
   }
 }
 
 .blocks-number {
   display: inline-block;
-  margin-top: 24px;
+  margin-top: 16px;
   align-self: center;
   border-radius: 6px;
   padding: 8px 10px;
@@ -295,28 +288,7 @@ onMounted(() => {
 }
 
 .coll-wrapper {
-  margin-top: 230px;
-}
-
-.coll-tab {
-  margin-bottom: 20px;
-  .coll-tab-item {
-    display: inline-block;
-    padding: 4px 10px 5px 8px;
-    border-radius: 8px;
-    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
-    border: solid 1px #000;
-    background-color: #fafafa;
-    font-size: 14px;
-    margin-right: 12px;
-    cursor: pointer;
-    &:hover {
-      @extend .coll-tab-item--hover;
-    }
-  }
-  .coll-tab-item--hover {
-    background-color: #ddc2f9;
-  }
+  padding-top: 230px;
 }
 
 .coll-info {
