@@ -3,6 +3,7 @@ import { dateFormat } from '@/utils'
 import { queryColl, getBlocksCount } from '@/services/nft'
 import { Search, Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
+import AssetsTable from './components/AssetsTable'
 
 const curTabValue = ref<CollInfoType>('overview')
 const txid = ref('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff')
@@ -46,8 +47,9 @@ async function getOverview(params: RequestPageParams) {
     } else {
       isNotFount.value = true
     }
-  } catch {
+  } catch (e) {
     isNotFount.value = true
+    throw e
   } finally {
     loadingSearch.value = false
   }
@@ -84,13 +86,11 @@ async function search() {
 
     txidCopy.value = hash
 
-    nextTick(() => {
+    await nextTick(async () => {
       if (table.value?.reload) {
-        table.value?.reload()
+        await table.value?.reload()
       }
     })
-  } catch {
-    txidCopy.value = txid.value = ''
   } finally {
     loadingSearch.value = false
     showContent.value = true
@@ -262,7 +262,8 @@ onMounted(() => {
     align-self: center;
     width: 95%;
     max-width: 740px;
-    height: 66px;
+    height: 12vmin;
+    max-height: 66px;
     background: #fff;
     padding: 0 24px;
     border-radius: 40px;

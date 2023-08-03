@@ -37,7 +37,7 @@ export default defineComponent({
     })
     const columns = [
       {
-        title: 'item',
+        title: 'Item',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render: (_text: unknown, r: any) => {
           return (
@@ -90,6 +90,7 @@ export default defineComponent({
         console.log('assets', data.value)
       } catch (e: unknown) {
         props.error?.(e as Error)
+        throw e
       } finally {
         loading.value = false
       }

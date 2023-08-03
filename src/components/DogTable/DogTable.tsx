@@ -1,3 +1,4 @@
+import DogPagination from '../DogPagination.vue'
 import s from './DogTable.module.scss'
 
 interface ColumnProps {
@@ -46,10 +47,13 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    totalText: String,
   },
   emits: ['current-change'],
   setup(props, { emit }) {
     const containerRef = ref<HTMLElement>()
+    const currentPage = ref(props.currentPage)
+    const jumpPage = ref('')
 
     watch(
       () => props.loading,
@@ -85,10 +89,27 @@ export default defineComponent({
         })
     }
 
+    let prevPage = -1
+
+    function changePage(page: number) {
+      if (page == prevPage) return
+      prevPage = page
+      emit('current-change', page)
+    }
+
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
-          <div class={s['table-container']} ref="containerRef">
+          <DogPagination
+            style="margin-bottom: 20px"
+            totalText={props.totalText}
+            v-model:currentPage={currentPage.value}
+            v-model:jumpPage={jumpPage.value}
+            defaultPageSize={props.defaultPageSize}
+            total={props.total}
+            onCurrent-change={changePage}
+          />
+          <div class={s['table-container']} ref={containerRef}>
             <table class={s['dog-table']}>
               <thead class={s['dog-table-th']}>
                 <tr class={s['dog-table-tr']}>
@@ -112,12 +133,13 @@ export default defineComponent({
               </tbody>
             </table>
           </div>
-          <el-pagination
-            currentPage={props.currentPage}
-            layout={props.layout}
+          <DogPagination
+            style="margin-top: 20px"
+            v-model:currentPage={currentPage.value}
+            v-model:jumpPage={jumpPage.value}
             defaultPageSize={props.defaultPageSize}
             total={props.total}
-            onCurrentChange={($event: Event) => emit('current-change', $event)}
+            onCurrent-change={changePage}
           />
         </div>
       )

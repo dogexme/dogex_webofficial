@@ -37,7 +37,7 @@ export default defineComponent({
     })
     const columns = [
       {
-        title: 'rank',
+        title: 'Rank',
         render: (_text: unknown, _record: unknown, i: number) => <span class="table-index">{i + 1}</span>,
       },
       {
@@ -59,7 +59,7 @@ export default defineComponent({
                 <div>
                   {text}
                   <span style="color: #606266">{`(${+(record.ratio * 100).toFixed(2)}%)`}</span>
-                  <el-progress style="width: 120px; margin-top: 5px" stroke-width={5} percentage={+(record.ratio * 100)} show-text={false} />
+                  <el-progress style="width: 100%; margin-top: 5px;border:1px solid #000;border-radius:5px" stroke-width={10} percentage={+(record.ratio * 100)} show-text={false} />
                 </div>
               )}
             </>

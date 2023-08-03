@@ -1,6 +1,7 @@
 import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import { queryAdrCollections } from '@/services/nft'
+import { View } from '@element-plus/icons-vue'
 
 export default defineComponent({
   props: {
@@ -54,7 +55,16 @@ export default defineComponent({
         dataIndex: 'tokenCount',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render(text: number, r: any) {
-          return <router-link to={`/tokens/${props.address}/${r.txid}`}>{text}</router-link>
+          return (
+            <div style="display:flex;align-items: center">
+              {text}
+              <router-link to={`/tokens/${props.address}/${r.txid}`}>
+                <el-icon style="font-size: 18px;margin-left:7px;">
+                  <View />
+                </el-icon>
+              </router-link>
+            </div>
+          )
         },
       },
       {

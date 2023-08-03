@@ -30,7 +30,7 @@
   max-width: 1280px;
   min-height: 80vh;
   box-sizing: border-box;
-  padding: 20px;
+  padding: 12px;
   margin: 0 auto;
   overflow: hidden;
 }

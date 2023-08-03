@@ -40,8 +40,7 @@ async function copy(value?: string) {
 
 <style lang="scss">
 .doglink {
-  display: flex;
-  align-items: center;
+  display: inline;
   &_link {
     color: #f9b864;
   }
