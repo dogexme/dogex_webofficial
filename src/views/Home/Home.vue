@@ -155,7 +155,7 @@ onMounted(() => {
             <div class="coll-info_item">
               <div class="coll-info_item_label">Deployer</div>
               <div class="coll-info_item_value">
-                <DogLink is-copy :label="collInfo.deployer" :value="collInfo.deployer"></DogLink>
+                <DogLink route :to="`/address/${collInfo.deployer}`" is-copy :label="collInfo.deployer" :value="collInfo.deployer"></DogLink>
               </div>
             </div>
             <div class="coll-info_item">

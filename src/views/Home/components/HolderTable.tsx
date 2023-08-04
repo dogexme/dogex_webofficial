@@ -44,8 +44,9 @@ export default defineComponent({
         title: 'Holder',
         dataIndex: 'nft_owner',
         width: '350px',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render(text: string) {
-          return <DogLink is-copy label={text} value={text}></DogLink>
+          return <DogLink route to={`/address/${text}`} is-copy label={text} value={text}></DogLink>
         },
       },
       {

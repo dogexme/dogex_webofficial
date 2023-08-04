@@ -52,7 +52,7 @@ connectDpal()
           </li>
           <li style="margin-left: 12px" v-if="address">
             <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to info" placement="bottom">
-              <router-link to="/address">{{ address }} ></router-link>
+              <router-link :to="`/address/${address}`">{{ address }} ></router-link>
             </el-tooltip>
           </li>
         </ul>

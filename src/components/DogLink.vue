@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import clipboard3 from 'vue-clipboard3'
 import { CopyDocument, Select } from '@element-plus/icons-vue'
+import { RouterLink } from 'vue-router'
 
 const props = defineProps<{
   to?: string
@@ -8,6 +9,7 @@ const props = defineProps<{
   value?: string
   isCopy?: boolean
   disabledTooltip?: boolean
+  route?: boolean
 }>()
 
 const { toClipboard } = clipboard3()
@@ -26,7 +28,8 @@ async function copy(value?: string) {
 <template>
   <div class="doglink" v-if="value">
     <el-tooltip :hide-after="0" :disabled="disabledTooltip" effect="dark" :content="props.value" placement="top">
-      <a class="doglink_link" v-if="props.to" :href="props.to" target="_blank">{{ props.label }}</a>
+      <router-link class="doglink_link" v-if="props.to && props.route" :to="props.to">{{ props.label }}</router-link>
+      <a class="doglink_link" v-else-if="props.to" :href="props.to" target="_blank">{{ props.label }}</a>
       <span class="doglink_link" v-else>{{ props.label }}</span>
     </el-tooltip>
     <el-icon class="copy-icon" @click="copy(props.value)" v-if="props.isCopy && !isCopySuccess">

@@ -66,7 +66,7 @@ export default defineComponent({
         title: 'Address',
         dataIndex: 'address',
         render(text: string) {
-          return <DogLink is-copy label={text} value={text}></DogLink>
+          return <DogLink route to={`/address/${text}`} is-copy label={text} value={text}></DogLink>
         },
       },
     ]

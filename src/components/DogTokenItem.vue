@@ -26,8 +26,7 @@ const props = defineProps<{
 
 <style lang="scss" scoped>
 .dog-token-item {
-  height: 250px;
-  padding: 12px 12px 24px 12px;
+  padding: 12px;
   border-radius: 8px;
   box-shadow: inset 0 -5px 0 0 rgba(0, 0, 0, 0.1);
   border: solid 1px #000;

@@ -1,5 +1,7 @@
 <script setup lang="ts">
 import AssetsTable from './components/AssetsTable'
+const route = useRoute()
+const { address } = route.params as { address: string }
 const curTabValue = ref('assets')
 const loading = ref(false)
 const tabs = [
@@ -17,7 +19,7 @@ function changeTab() {}
 <template>
   <DogTabs v-model="curTabValue" :tabs="tabs" @change="changeTab">
     <DogTabsItem value="assets">
-      <AssetsTable address="DRGssUYww69oKMJHeXBJZjB46cCkEhwxia" v-model:isLoading="loading"></AssetsTable>
+      <AssetsTable :address="address" v-model:isLoading="loading"></AssetsTable>
     </DogTabsItem>
   </DogTabs>
 </template>

@@ -100,15 +100,18 @@ export default defineComponent({
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
-          <DogPagination
-            style="margin-bottom: 20px"
-            totalText={props.totalText}
-            v-model:currentPage={currentPage.value}
-            v-model:jumpPage={jumpPage.value}
-            defaultPageSize={props.defaultPageSize}
-            total={props.total}
-            onCurrent-change={changePage}
-          />
+          {!!props.dataSource.length && (
+            <DogPagination
+              style="margin-bottom: 20px"
+              totalText={props.totalText}
+              v-model:currentPage={currentPage.value}
+              v-model:jumpPage={jumpPage.value}
+              defaultPageSize={props.defaultPageSize}
+              total={props.total}
+              onCurrent-change={changePage}
+            />
+          )}
+
           <div class={s['table-container']} ref={containerRef}>
             <table class={s['dog-table']}>
               <thead class={s['dog-table-th']}>
@@ -132,15 +135,18 @@ export default defineComponent({
                 })}
               </tbody>
             </table>
+            {!props.dataSource.length && <el-empty></el-empty>}
           </div>
-          <DogPagination
-            style="margin-top: 20px"
-            v-model:currentPage={currentPage.value}
-            v-model:jumpPage={jumpPage.value}
-            defaultPageSize={props.defaultPageSize}
-            total={props.total}
-            onCurrent-change={changePage}
-          />
+          {!!props.dataSource.length && (
+            <DogPagination
+              style="margin-top: 20px"
+              v-model:currentPage={currentPage.value}
+              v-model:jumpPage={jumpPage.value}
+              defaultPageSize={props.defaultPageSize}
+              total={props.total}
+              onCurrent-change={changePage}
+            />
+          )}
         </div>
       )
     }

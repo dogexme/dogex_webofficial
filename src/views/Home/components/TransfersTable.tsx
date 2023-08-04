@@ -69,14 +69,14 @@ export default defineComponent({
         title: 'Sender',
         dataIndex: 'sender',
         render(text: string) {
-          return <DogLink is-copy label={omitCenterString(text)} value={text}></DogLink>
+          return <DogLink route to={`/address/${text}`} is-copy label={omitCenterString(text)} value={text}></DogLink>
         },
       },
       {
         title: 'Receiver',
         dataIndex: 'receiver',
         render(text: string) {
-          return <DogLink is-copy label={omitCenterString(text)} value={text}></DogLink>
+          return <DogLink route to={`/address/${text}`} is-copy label={omitCenterString(text)} value={text}></DogLink>
         },
       },
       {

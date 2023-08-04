@@ -12,13 +12,14 @@ export default defineComponent({
     const total = ref(0)
     const page = ref(1)
     const loading = ref(false)
+    const defaultPageSize = 18
 
     async function getData() {
       try {
         loading.value = true
         const res = await queryAdrTokensByHash({
           page: page.value,
-          pageSize: 15,
+          pageSize: defaultPageSize,
           txid,
           address,
         })
@@ -29,14 +30,20 @@ export default defineComponent({
         loading.value = false
       }
     }
-    getData()
+
+    function changePage(pageNumber: number) {
+      page.value = pageNumber
+      getData()
+    }
+
+    onMounted(() => getData())
 
     return () => (
       <DogCard is-back title="Address Details">
-        <DogList currentPage={page.value} defaultPageSize={15} loading={loading.value} total={total.value}>
+        <DogList currentPage={page.value} defaultPageSize={18} loading={loading.value} total={total.value} onCurrent-change={changePage}>
           <div class={s['dog-token-grid']}>
             {data.value.map(({ tokenid, txid, baseuri }) => (
-              <DogTokenItem tokenId={tokenid} owner={txid} baseUrl={baseuri} imgSrc={`${baseuri}/${txid}/${tokenid}.png`}></DogTokenItem>
+              <DogTokenItem key={tokenid} tokenId={tokenid} owner={txid} baseUrl={baseuri} imgSrc={`${baseuri}/${txid}/${tokenid}.png`}></DogTokenItem>
             ))}
           </div>
         </DogList>

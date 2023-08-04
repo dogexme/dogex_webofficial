@@ -5,16 +5,37 @@ export default [
   {
     path: '/',
     component: BaseLayout,
-    redirect: '/home',
     children: [
       {
-        path: 'home',
+        path: '',
         name: 'home',
         component: () => import('@/views/Home/Home.vue'),
+        children: [
+          {
+            path: '/overview',
+            name: 'overview',
+            component: () => import('@/views/Home/components/Overview'),
+          },
+          {
+            path: '/holders',
+            name: 'holders',
+            component: () => import('@/views/Home/components/HolderTable'),
+          },
+          {
+            path: '/transfers',
+            name: 'transfers',
+            component: () => import('@/views/Home/components/TransfersTable'),
+          },
+          {
+            path: '/assets',
+            name: 'transfers',
+            component: () => import('@/views/Home/components/AssetsTable'),
+          },
+        ],
       },
       {
         name: 'address',
-        path: 'address',
+        path: 'address/:address',
         component: () => import('@/views/Address/Address.vue'),
       },
       {
