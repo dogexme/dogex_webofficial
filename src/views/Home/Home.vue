@@ -67,12 +67,8 @@ async function changeTab(tabVal: CollInfoType) {
 
   curTabValue.value = tabVal
 
-  if (curTabValue.value == 'overview') {
-    return await getOverview({ txid: txidCopy.value })
-  }
-
-  if (curTabValue.value == 'holders' && isNotFount.value) {
-    return await getOverview({ txid: txidCopy.value })
+  if (curTabValue.value == 'overview' || curTabValue.value == 'holders') {
+    await getOverview({ txid: txidCopy.value })
   }
 
   nextTick(() => {
@@ -89,11 +85,7 @@ async function search() {
   try {
     console.log(curTabValue.value)
 
-    if (curTabValue.value == 'overview') {
-      await getOverview({ txid: hash })
-    }
-
-    if (curTabValue.value == 'holders' && (isNotFount.value || hash != txidCopy.value)) {
+    if (curTabValue.value == 'overview' || curTabValue.value == 'holders') {
       await getOverview({ txid: hash })
     }
 
