@@ -39,7 +39,7 @@ export default defineComponent({
     const columns = [
       {
         title: 'Rank',
-        render: (_text: unknown, _record: unknown, i: number) => <span class="table-index">{i + 1}</span>,
+        render: (_text: unknown, _record: unknown, i: number) => <span class="table-index">{(page.value - 1) * 15 + i + 1}</span>,
       },
       {
         title: 'Holder',
@@ -75,9 +75,12 @@ export default defineComponent({
       getData()
     }
 
-    async function getData() {
+    async function getData(isReload = false) {
       loading.value = true
       try {
+        if (isReload) {
+          page.value = 1
+        }
         const res = await queryHoldersByTxid({
           txid: props.txid,
           pageSize: 15,
@@ -94,7 +97,7 @@ export default defineComponent({
     }
 
     expose({
-      reload: getData,
+      reload: () => getData(true),
     })
 
     return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />

@@ -71,6 +71,10 @@ async function changeTab(tabVal: CollInfoType) {
     return await getOverview({ txid: txidCopy.value })
   }
 
+  if (curTabValue.value == 'holders' && isNotFount.value) {
+    return await getOverview({ txid: txidCopy.value })
+  }
+
   nextTick(() => {
     if (table.value?.reload) {
       table.value?.reload()
@@ -83,7 +87,13 @@ async function search() {
   if (!hash || loadingSearch.value) return
   loadingSearch.value = true
   try {
-    if (curTabValue.value == 'holders' || curTabValue.value == 'overview') {
+    console.log(curTabValue.value)
+
+    if (curTabValue.value == 'overview') {
+      await getOverview({ txid: hash })
+    }
+
+    if (curTabValue.value == 'holders' && (isNotFount.value || hash != txidCopy.value)) {
       await getOverview({ txid: hash })
     }
 
@@ -134,7 +144,7 @@ onMounted(() => {
     <div class="coll-wrapper" v-if="showContent">
       <DogTabs v-if="!isNotFount" v-model="curTabValue" :tabs="tabs" @change="changeTab">
         <DogTabsItem value="overview">
-          <Overview v-loading="loadingSearch" :collInfo="collInfo!"></Overview>
+          <Overview v-loading="loadingSearch" :collInfo="collInfo"></Overview>
         </DogTabsItem>
         <DogTabsItem value="holders">
           <HolderTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>

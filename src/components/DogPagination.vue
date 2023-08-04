@@ -5,38 +5,26 @@ const props = withDefaults(
     defaultPageSize?: number
     total?: number
     totalText?: string
-    jumpPage?: string | number
   }>(),
   {
     defaultPageSize: 15,
     currentPage: 1,
     total: 0,
-    jumpPage: '',
   }
 )
-const emit = defineEmits(['current-change', 'update:currentPage', 'update:jumpPage'])
+const emit = defineEmits(['current-change', 'update:currentPage'])
 const currentPage = computed({
   get() {
     return props.currentPage
   },
   set(page) {
     emit('update:currentPage', page)
+    emit('current-change', page)
   },
 })
 
-const jumpPage = computed({
-  get() {
-    return props.jumpPage
-  },
-  set(jumpPage) {
-    emit('update:jumpPage', jumpPage)
-  },
-})
+const jumpPage = ref('')
 const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
-
-watch(currentPage, (page) => {
-  emit('current-change', page)
-})
 
 function handlerJumpPage() {
   if (!/^-?\d+$/.test(String(jumpPage.value))) {
@@ -53,7 +41,11 @@ function handlerJumpPage() {
     jumpNumber = pages.value
   }
 
-  jumpPage.value = currentPage.value = jumpNumber
+  currentPage.value = jumpNumber
+  jumpPage.value = String(jumpNumber)
+  nextTick(() => {
+    jumpPage.value = ''
+  })
 }
 </script>
 
@@ -123,7 +115,7 @@ function handlerJumpPage() {
     }
   }
   &_input-item {
-    max-width: 103px;
+    max-width: 120px;
     box-shadow: none;
     border: solid 1px #ccc;
     background-color: #f5f5f5;

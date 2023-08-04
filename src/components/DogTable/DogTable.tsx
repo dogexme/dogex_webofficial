@@ -26,10 +26,6 @@ export default defineComponent({
       type: String,
       default: 'id',
     },
-    layout: {
-      type: String,
-      default: 'prev, pager, next',
-    },
     defaultPageSize: {
       type: Number,
       default: 15,
@@ -52,8 +48,7 @@ export default defineComponent({
   emits: ['current-change'],
   setup(props, { emit }) {
     const containerRef = ref<HTMLElement>()
-    const currentPage = ref(props.currentPage)
-    const jumpPage = ref('')
+    const currentPage = ref(1)
 
     watch(
       () => props.loading,
@@ -63,6 +58,10 @@ export default defineComponent({
         }
       }
     )
+
+    watch(currentPage, (page: number) => {
+      emit('current-change', page)
+    })
 
     function resetPositionTop() {
       const resetPosition: ScrollToOptions = {
@@ -89,27 +88,11 @@ export default defineComponent({
         })
     }
 
-    let prevPage = -1
-
-    function changePage(page: number) {
-      if (page == prevPage) return
-      prevPage = page
-      emit('current-change', page)
-    }
-
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
           {!!props.dataSource.length && (
-            <DogPagination
-              style="margin-bottom: 20px"
-              totalText={props.totalText}
-              v-model:currentPage={currentPage.value}
-              v-model:jumpPage={jumpPage.value}
-              defaultPageSize={props.defaultPageSize}
-              total={props.total}
-              onCurrent-change={changePage}
-            />
+            <DogPagination style="margin-bottom: 20px" totalText={props.totalText} v-model:currentPage={currentPage.value} defaultPageSize={props.defaultPageSize} total={props.total} />
           )}
 
           <div class={s['table-container']} ref={containerRef}>
@@ -137,17 +120,7 @@ export default defineComponent({
             </table>
             {!props.dataSource.length && <el-empty></el-empty>}
           </div>
-          {!!props.dataSource.length && (
-            <DogPagination
-              totalText={' '}
-              style="margin-top: 20px"
-              v-model:currentPage={currentPage.value}
-              v-model:jumpPage={jumpPage.value}
-              defaultPageSize={props.defaultPageSize}
-              total={props.total}
-              onCurrent-change={changePage}
-            />
-          )}
+          {!!props.dataSource.length && <DogPagination totalText={' '} style="margin-top: 20px" v-model:currentPage={currentPage.value} defaultPageSize={props.defaultPageSize} total={props.total} />}
         </div>
       )
     }

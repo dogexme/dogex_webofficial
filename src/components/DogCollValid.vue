@@ -3,17 +3,19 @@ const props = withDefaults(
   defineProps<{
     color?: string
     size?: string
+    show?: boolean
   }>(),
   {
     color: 'rgb(29, 155, 240)',
     size: '16px',
+    show: false,
   }
 )
 </script>
 <template>
   <div class="dog-coll-valid">
     <slot></slot>
-    <DogValidSvgIcon class="valid-icon" :style="{ fill: props.color, width: props.size, height: props.size }"></DogValidSvgIcon>
+    <DogValidSvgIcon v-if="props.show" class="valid-icon" :style="{ fill: props.color, width: props.size, height: props.size }"></DogValidSvgIcon>
   </div>
 </template>
 

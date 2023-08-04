@@ -77,9 +77,12 @@ export default defineComponent({
       getData()
     }
 
-    async function getData() {
+    async function getData(isReload = false) {
       loading.value = true
       try {
+        if (isReload) {
+          page.value = 1
+        }
         const res = await queryAssetsByTxid({
           txid: props.txid,
           pageSize: 15,
@@ -98,7 +101,7 @@ export default defineComponent({
     }
 
     expose({
-      reload: getData,
+      reload: () => getData(true),
     })
 
     return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />

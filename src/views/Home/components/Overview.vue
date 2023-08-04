@@ -2,9 +2,14 @@
 import { CollInfo } from '@/types'
 import { dateFormat, omitCenterString, numberFormat } from '@/utils'
 
-const props = defineProps<{
-  collInfo: CollInfo
-}>()
+const props = withDefaults(
+  defineProps<{
+    collInfo?: Partial<CollInfo>
+  }>(),
+  {
+    collInfo: () => ({}),
+  }
+)
 </script>
 
 <template>
@@ -13,7 +18,7 @@ const props = defineProps<{
       <div class="coll-info_item_label">Logo</div>
       <div class="coll-info_item_value">
         <div class="coll-logo-wrap" v-if="props.collInfo.logo">
-          <DogCollValid>
+          <DogCollValid :show="collInfo.valid == 1">
             <el-image class="coll-logo-img" :src="props.collInfo.logo" fit="cover" />
           </DogCollValid>
         </div>
