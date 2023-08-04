@@ -2,6 +2,7 @@ import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import DogCollValid from '@/components/DogCollValid.vue'
 import { queryAdrCollections } from '@/services/nft'
+import { ElImage, ElIcon } from 'element-plus'
 import { View } from '@element-plus/icons-vue'
 
 export default defineComponent({
@@ -39,7 +40,7 @@ export default defineComponent({
         render: (_text: unknown, r: any) => {
           return (
             <DogCollValid>
-              <el-image v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={r.logo} fit="cover"></el-image>
+              <ElImage v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={r.logo} fit="cover"></ElImage>
             </DogCollValid>
           )
         },
@@ -63,9 +64,9 @@ export default defineComponent({
           return (
             <router-link style="display:flex;align-items: center" to={`/tokens/${props.address}/${r.txid}`}>
               {numberFormat(text)}
-              <el-icon style="font-size: 18px;margin-left:7px;">
+              <ElIcon style="font-size: 18px;margin-left:7px;">
                 <View />
-              </el-icon>
+              </ElIcon>
             </router-link>
           )
         },

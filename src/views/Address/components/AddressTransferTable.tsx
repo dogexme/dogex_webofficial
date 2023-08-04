@@ -1,5 +1,6 @@
 import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
+import { ElImage, ElIcon } from 'element-plus'
 import { View } from '@element-plus/icons-vue'
 
 export default defineComponent({
@@ -35,7 +36,7 @@ export default defineComponent({
         title: 'Item',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render: (_text: unknown, r: any) => {
-          return <el-image v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={r.logo} fit="cover"></el-image>
+          return <ElImage v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={r.logo} fit="cover"></ElImage>
         },
       },
       {
@@ -58,9 +59,9 @@ export default defineComponent({
             <div style="display:flex;align-items: center">
               {text}
               <router-link to={`/tokens/${props.address}/${r.txid}`}>
-                <el-icon style="font-size: 18px;margin-left:7px;">
+                <ElIcon style="font-size: 18px;margin-left:7px;">
                   <View />
-                </el-icon>
+                </ElIcon>
               </router-link>
             </div>
           )

@@ -1,5 +1,6 @@
 import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
+import { ElImage } from 'element-plus'
 import { queryAssetsByTxid } from '@/services/nft'
 import { CollInfo } from '@/types'
 
@@ -43,12 +44,12 @@ export default defineComponent({
           return (
             <>
               {r.txid && (
-                <el-image
+                <ElImage
                   v-slots={{ error: () => <div class="el-image__error">#{r.tokenid}</div> }}
                   style="width: 40px; height: 40px; border-radius: 5px"
                   src={`${r.baseuri}/${r.txid}/${r.tokenid}.png`}
                   fit="cover"
-                ></el-image>
+                ></ElImage>
               )}
             </>
           )

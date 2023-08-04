@@ -33,6 +33,25 @@ export default defineComponent({
       prevPage = page
       emit('current-change', page)
     }
+
+    watch(
+      () => props.loading,
+      (loading) => {
+        if (!loading) {
+          resetPositionTop()
+        }
+      }
+    )
+
+    function resetPositionTop() {
+      const resetPosition: ScrollToOptions = {
+        top: 0,
+        left: 0,
+        behavior: 'smooth',
+      }
+      window.scrollTo(resetPosition)
+    }
+
     return () => (
       <div class={s['dog-list']} v-loading={props.loading}>
         {!!props.dataSource.length && (

@@ -8,6 +8,7 @@ async function loadCollMap() {
     const res = await collMap()
     localStorage.setItem('nfts', JSON.stringify(res.data))
     loading.value = false
+    document.body.removeChild(document.getElementById('loading-container')!)
   } catch {
     loadCollMap()
   }
@@ -41,10 +42,5 @@ onMounted(async () => {
     border-radius: 4px;
     border: 1px solid #333;
   }
-}
-
-.nav-popper,
-.nav-drawer {
-  z-index: 10000 !important;
 }
 </style>

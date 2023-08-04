@@ -92,7 +92,7 @@ connectDpal()
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 9999;
+  z-index: 2001;
   width: 100%;
   background-color: #fff;
   border-bottom: 1px solid #333;

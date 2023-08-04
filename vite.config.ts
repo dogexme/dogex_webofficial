@@ -4,6 +4,7 @@ import path from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+import ElementPlus from 'unplugin-element-plus/vite'
 import removeConsole from 'vite-plugin-remove-console'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 
@@ -28,6 +29,7 @@ export default defineConfig({
       resolvers: [ElementPlusResolver()],
     }),
     removeConsole(),
+    ElementPlus({}),
   ],
   css: {
     postcss: {},

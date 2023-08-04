@@ -9,7 +9,7 @@ defineOptions({
 })
 
 const curTabValue = ref<CollInfoType>('overview')
-const txid = ref('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff')
+const txid = ref('')
 const txidCopy = ref('')
 const loadingSearch = ref(false)
 const showContent = ref(false)
