@@ -53,12 +53,12 @@ export default defineComponent({
         title: 'Count',
         dataIndex: 'nft_count',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        render(text: unknown, record: any) {
+        render(text: number, record: any) {
           return (
             <>
               {text && (
                 <div>
-                  {text}
+                  {numberFormat(text)}
                   <span style="color: #606266">{`(${+(record.ratio * 100).toFixed(2)}%)`}</span>
                   <el-progress style="width: 100%; margin-top: 5px;border:1px solid #000;border-radius:5px" stroke-width={10} percentage={+(record.ratio * 100)} show-text={false} />
                 </div>

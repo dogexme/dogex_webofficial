@@ -1,5 +1,6 @@
 import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
+import DogCollValid from '@/components/DogCollValid.vue'
 import { queryAdrCollections } from '@/services/nft'
 import { View } from '@element-plus/icons-vue'
 
@@ -36,7 +37,11 @@ export default defineComponent({
         title: 'Item',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render: (_text: unknown, r: any) => {
-          return <el-image v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={r.logo} fit="cover"></el-image>
+          return (
+            <DogCollValid>
+              <el-image v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={r.logo} fit="cover"></el-image>
+            </DogCollValid>
+          )
         },
       },
       {
@@ -56,14 +61,12 @@ export default defineComponent({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render(text: number, r: any) {
           return (
-            <div style="display:flex;align-items: center">
-              {text}
-              <router-link to={`/tokens/${props.address}/${r.txid}`}>
-                <el-icon style="font-size: 18px;margin-left:7px;">
-                  <View />
-                </el-icon>
-              </router-link>
-            </div>
+            <router-link style="display:flex;align-items: center" to={`/tokens/${props.address}/${r.txid}`}>
+              {numberFormat(text)}
+              <el-icon style="font-size: 18px;margin-left:7px;">
+                <View />
+              </el-icon>
+            </router-link>
           )
         },
       },

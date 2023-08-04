@@ -1,23 +1,22 @@
 <script setup lang="ts">
-const isShowDrawer = ref(false)
-const address = ref('')
-const doge = window?.DogeApi
+import { omitCenterString } from '@/utils'
+import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
 
-async function connectDpal() {
-  if (doge) {
-    if (await doge.isEnabled()) {
-      const { userAddress } = await doge.userAddress()
-      address.value = userAddress
-    } else {
-      const { status } = await doge.enable()
-      if (status === 'success') {
-        const { userAddress } = await doge.userAddress()
-        address.value = userAddress
-      }
-    }
-  } else {
-    console.log(`please install dpal wallet`)
-  }
+type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
+
+const isShowDrawer = ref(false)
+const activePath = ref('/')
+const drawerDirection = ref<DrawerDirection>('ltr')
+const { connectDpal, address, isInstall } = useDoge()
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function selectItem() {
+  isShowDrawer.value = false
+}
+
+function triggerDrawer(direction: DrawerDirection) {
+  isShowDrawer.value = !isShowDrawer.value
+  drawerDirection.value = direction
 }
 
 connectDpal()
@@ -28,43 +27,49 @@ connectDpal()
     <nav class="nav">
       <div class="nav-wrap">
         <div class="logo-wrap">
-          <a class="nav-more" href="javascript:void(0)" @click="isShowDrawer = !isShowDrawer">&#xe66c;</a>
+          <a class="nav-more" href="javascript:void(0)" @click="triggerDrawer('ltr')">&#xe66c;</a>
           <!-- <span class="nav-logo"></span> -->
           <a href="/" class="nav-title">dogex.me</a>
           <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
-        <el-menu class="nav-menu" router default-active="/home" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
-          <el-menu-item index="/home">
-            <a href="/home">Home</a>
+        <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
+          <el-menu-item index="/">
+            <router-link to="/">Home</router-link>
           </el-menu-item>
-          <!-- <el-sub-menu index="2" popper-class="nav-popper">
-            <template #title>Address</template>
-            <el-menu-item index="2-1">Assets</el-menu-item>
-            <el-menu-item index="2-2">Transfers</el-menu-item>
-          </el-sub-menu> -->
         </el-menu>
         <ul class="nav-active">
           <!-- <li class="nav-active-item">
             <a href="/home" @click="connectDpal">Home</a>
           </li> -->
           <li class="nav-active-item nav-active-item--weblink" v-if="!address">
-            <a href="javascript:void(0)" @click="connectDpal">Dpalwallet</a>
+            <a href="javascript:void(0)" @click="connectDpal" v-if="isInstall">Dpalwallet</a>
+            <a href="https://dpalwallet.io" target="_blank" v-else>Dpalwallet</a>
           </li>
           <li style="margin-left: 12px" v-if="address">
-            <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to info" placement="bottom">
-              <router-link :to="`/address/${address}`">{{ address }} ></router-link>
+            <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to address" placement="bottom">
+              <router-link :to="`/address/${address}`" style="display: flex; align-items: center">{{ address }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" /></router-link>
             </el-tooltip>
           </li>
         </ul>
-        <el-popover popper-class="nav-popper" placement="bottom-end" title="Title" :width="200" trigger="hover" content="this is content, this is content, this is content">
-          <template #reference>
-            <a class="nav-active-more" href="javascript:void(0)">&#xeb10;</a>
-          </template>
-        </el-popover>
+        <a class="nav-active-more" @click="triggerDrawer('rtl')" href="javascript:void(0)">&#xeb10;</a>
       </div>
     </nav>
-    <el-drawer append-to-body :show-close="false" :with-header="false" size="70%" v-model="isShowDrawer" direction="ltr" modal-class="nav-drawer">
-      <span>Hi, there!</span>
+    <el-drawer append-to-body :show-close="false" :with-header="false" size="70%" v-model="isShowDrawer" :direction="drawerDirection" modal-class="nav-drawer">
+      <el-menu v-if="drawerDirection == 'ltr'" @select="selectItem" router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical">
+        <el-menu-item index="/">
+          <router-link to="/">Home</router-link>
+        </el-menu-item>
+      </el-menu>
+      <el-menu v-else background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
+        <el-menu-item v-if="address" index="address"
+          ><router-link :to="`/address/${address}`" style="display: flex; align-items: center"
+            >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" /></router-link
+        ></el-menu-item>
+        <el-menu-item v-else index="dpalwallet">
+          <a href="javascript:void(0)" @click="connectDpal" v-if="isInstall">Dpalwallet</a>
+          <a href="https://dpalwallet.io" target="_blank" v-else>Dpalwallet</a>
+        </el-menu-item>
+      </el-menu>
     </el-drawer>
   </div>
 </template>
@@ -87,20 +92,11 @@ connectDpal()
   position: fixed;
   top: 0;
   left: 0;
+  z-index: 9999;
   width: 100%;
   background-color: #fff;
   border-bottom: 1px solid #333;
-  z-index: 9999;
-  &::after {
-    content: '';
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    display: block;
-    height: 5px;
-    width: 100%;
-    background-color: #f5f5f5;
-  }
+  box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
 }
 .nav-logo {
   --size: 29px;

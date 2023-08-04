@@ -139,6 +139,7 @@ export default defineComponent({
           </div>
           {!!props.dataSource.length && (
             <DogPagination
+              totalText={' '}
               style="margin-top: 20px"
               v-model:currentPage={currentPage.value}
               v-model:jumpPage={jumpPage.value}

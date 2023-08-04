@@ -14,17 +14,12 @@ export default defineConfig({
     vueJsx(),
     AutoImport({
       imports: ['vue', 'vue-router', 'vuex'],
-      dirs: [
-        // './hooks',
-        // './composables' // only root modules
-        './src/components/**/*.vue',
-        './src/components/**/*.tsx',
-        './src/utils/**/*.ts',
-      ],
+      dirs: ['./src/hooks/**/*.ts', './src/components/**/*.vue', './src/components/**/*.tsx', './src/utils/**/*.ts'],
       dts: './src/auto-imports.d.ts',
       eslintrc: {
         enabled: true,
       },
+      resolvers: [ElementPlusResolver()],
     }),
     Components({
       dirs: ['src/components', 'src/**/components'],
@@ -34,6 +29,9 @@ export default defineConfig({
     }),
     removeConsole(),
   ],
+  css: {
+    postcss: {},
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

@@ -9,3 +9,39 @@
     --nav-height: 40px;
   }
 }
+
+
+.dog-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  vertical-align: text-bottom;
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+}
+
+.dog-icon_block {
+  width: 21px;
+  height: 21px;
+  background-image: url(./assets/img/icon-block.webp);
+}
+
+.dog-icon_search {
+  width: 18px;
+  height: 18px;
+  background-image: url(./assets/img/icon-search.webp);
+}
+
+.dog-icon_jiantou-left {
+  width: 15px;
+  height: 15px;
+  background-image: url(./assets/img/jiantou-left.webp);
+}
+
+.dog-icon_jiantou-right {
+  width: 15px;
+  height: 15px;
+  background-image: url(./assets/img/jiantou-right.webp);
+}
+

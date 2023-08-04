@@ -3,10 +3,18 @@ import { collMap } from '@/services/nft'
 
 const loading = ref(true)
 
+async function loadCollMap() {
+  try {
+    const res = await collMap()
+    localStorage.setItem('nfts', JSON.stringify(res.data))
+    loading.value = false
+  } catch {
+    loadCollMap()
+  }
+}
+
 onMounted(async () => {
-  const res = await collMap()
-  localStorage.setItem('nfts', JSON.stringify(res.data))
-  loading.value = false
+  loadCollMap()
 })
 </script>
 <template>

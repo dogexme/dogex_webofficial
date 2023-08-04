@@ -3,7 +3,11 @@
   <div id="container">
     <DogNav></DogNav>
     <main class="content">
-      <router-view></router-view>
+      <router-view v-slot="{ Component }">
+        <keep-alive :include="['home']">
+          <component :is="Component" :key="$route.fullPath" />
+        </keep-alive>
+      </router-view>
     </main>
     <footer id="footer">
       <ul class="link-list">
@@ -20,7 +24,7 @@
           <a href="https://t.me/dpalwallet" target="_blank" class="nft link-list_item_a">&#xec25;</a>
         </li>
       </ul>
-      <span style="font-size: 12px">Copyright © 2023 dogex.me</span>
+      <span style="font-size: 16px; margin-top: 24px">Copyright © 2023 dogex.me</span>
     </footer>
   </div>
 </template>
@@ -28,9 +32,9 @@
 .content {
   width: 100%;
   max-width: 1280px;
-  min-height: 80vh;
+  min-height: 72.5vh;
   box-sizing: border-box;
-  padding: 12px;
+  padding: 12px 12px 0;
   margin: 0 auto;
   overflow: hidden;
 }
@@ -38,23 +42,14 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 130px;
+  height: 14.444444444444443vmin;
+  min-height: 116px;
   border-top: 1px solid #333;
   justify-content: center;
   align-items: center;
-  &::before {
-    content: '';
-    top: 0;
-    right: 0;
-    position: absolute;
-    display: block;
-    height: 5px;
-    width: 100%;
-    background-color: #f5f5f5;
-  }
+  margin-top: 5.55vmin;
 }
 .link-list {
-  margin-bottom: 12px;
   &_item {
     display: inline-block;
     margin: 0 12px;

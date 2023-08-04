@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { dateFormat } from '@/utils'
 import { queryColl, getBlocksCount } from '@/services/nft'
-import { Search, Loading, CircleCloseFilled } from '@element-plus/icons-vue'
+import { Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
 import AssetsTable from './components/AssetsTable'
+
+defineOptions({
+  name: 'home',
+})
 
 const curTabValue = ref<CollInfoType>('overview')
 const txid = ref('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff')
@@ -12,7 +15,7 @@ const loadingSearch = ref(false)
 const showContent = ref(false)
 const isNotFount = ref(false)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const collInfo = ref<Partial<CollInfo>>({})
+const collInfo = ref<CollInfo>()
 const blockCount = ref(0)
 const table = ref()
 
@@ -118,68 +121,29 @@ onMounted(() => {
     <div class="nav-search" :class="[!showContent && 'nav-search--center']">
       <h1 class="home-title" v-if="!showContent">dogex.me</h1>
       <div class="nav-search_inputwrap">
-        <el-icon><Search /></el-icon>
+        <i class="dog-icon dog-icon_search"></i>
         <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="txid" @keydown.enter="search" />
         <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
         <el-icon v-if="!loadingSearch && txid.length" style="cursor: pointer" @click="txid = ''"><CircleCloseFilled /></el-icon>
       </div>
       <div class="blocks-number">
-        Processed Blocks: <span>{{ blockCount }}</span>
+        <i class="dog-icon dog-icon_block"></i>
+        Processed Blocks: <span v-if="blockCount">{{ blockCount }}</span>
       </div>
     </div>
     <div class="coll-wrapper" v-if="showContent">
       <DogTabs v-if="!isNotFount" v-model="curTabValue" :tabs="tabs" @change="changeTab">
         <DogTabsItem value="overview">
-          <div class="coll-info" v-loading="loadingSearch">
-            <div class="coll-info_item">
-              <div class="coll-info_item_label">Logo</div>
-              <div class="coll-info_item_value">
-                <div class="coll-logo-wrap" v-if="collInfo.logo">
-                  <el-image class="coll-logo-img" :src="collInfo.logo" fit="cover" />
-                  <DogValidSvgIcon class="valid-icon" style="fill: rgb(29, 155, 240); width: 16px; height: 16px"></DogValidSvgIcon>
-                </div>
-              </div>
-            </div>
-            <div class="coll-info_item">
-              <div class="coll-info_item_label">Tick</div>
-              <div class="coll-info_item_value">{{ collInfo.tick }}</div>
-            </div>
-            <div class="coll-info_item">
-              <div class="coll-info_item_label">Max</div>
-              <div class="coll-info_item_value">{{ collInfo.max }}</div>
-            </div>
-            <div class="coll-info_item">
-              <div class="coll-info_item_label">Mintval</div>
-              <div class="coll-info_item_value">{{ collInfo.mintval }}</div>
-            </div>
-            <div class="coll-info_item">
-              <div class="coll-info_item_label">Deployer</div>
-              <div class="coll-info_item_value">
-                <DogLink route :to="`/address/${collInfo.deployer}`" is-copy :label="collInfo.deployer" :value="collInfo.deployer"></DogLink>
-              </div>
-            </div>
-            <div class="coll-info_item">
-              <div class="coll-info_item_label">Holders</div>
-              <div class="coll-info_item_value">{{ collInfo.holders }}</div>
-            </div>
-            <!-- <div class="coll-info_item">
-            <div class="coll-info_item_label">Buri</div>
-            <div class="coll-info_item_value">{{ collInfo.buri }}</div>
-          </div> -->
-            <div class="coll-info_item">
-              <div class="coll-info_item_label">Date</div>
-              <div class="coll-info_item_value">{{ collInfo.date && dateFormat(new Date(collInfo.date)) }}</div>
-            </div>
-          </div>
+          <Overview v-loading="loadingSearch" :collInfo="collInfo!"></Overview>
         </DogTabsItem>
         <DogTabsItem value="holders">
-          <HolderTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
+          <HolderTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
         </DogTabsItem>
         <DogTabsItem value="transfers">
-          <TransfersTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></TransfersTable>
+          <TransfersTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></TransfersTable>
         </DogTabsItem>
         <DogTabsItem value="assets">
-          <AssetsTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
+          <AssetsTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
         </DogTabsItem>
       </DogTabs>
       <el-empty v-else></el-empty>
@@ -202,7 +166,7 @@ onMounted(() => {
 #home {
   position: relative;
   box-sizing: border-box;
-  min-height: 80vh;
+  min-height: 72.5vh;
 }
 
 .home-title {
@@ -269,7 +233,7 @@ onMounted(() => {
     border-radius: 40px;
     box-sizing: border-box;
     border: 1px solid #333;
-    outline: 3px solid rgb(221, 194, 249);
+    outline: 3px solid #ddc2f9;
     box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
     overflow: hidden;
   }
@@ -281,7 +245,7 @@ onMounted(() => {
   align-self: center;
   border-radius: 6px;
   padding: 8px 10px;
-  background-color: rgb(221, 194, 249);
+  background-color: #ddc2f9;
   font-weight: bold;
   span {
     color: rgb(53, 128, 127);
@@ -290,43 +254,6 @@ onMounted(() => {
 
 .coll-wrapper {
   padding-top: 230px;
-}
-
-.coll-info {
-  &_item {
-    display: flex;
-    font-size: 14px;
-    margin-bottom: 20px;
-  }
-  &_item_label {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    &--link {
-      cursor: pointer;
-      // color: rgb(220, 200, 244);
-    }
-  }
-  &_item_value {
-    flex: 1;
-    word-break: break-all;
-  }
-}
-
-.coll-logo-wrap {
-  position: relative;
-  display: inline-flex;
-  .coll-logo-img {
-    --size: 48px;
-    width: var(--size);
-    height: var(--size);
-    border-radius: 5px;
-  }
-  .valid-icon {
-    position: absolute;
-    right: -8px;
-    bottom: -7px;
-  }
 }
 
 .loading-icon {

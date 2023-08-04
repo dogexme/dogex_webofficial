@@ -4,6 +4,10 @@ import s from './index.module.scss'
 export default defineComponent({
   props: {
     loading: Boolean,
+    dataSource: {
+      type: Array,
+      default: () => [],
+    },
     defaultPageSize: {
       type: Number,
       default: 15,
@@ -31,24 +35,31 @@ export default defineComponent({
     }
     return () => (
       <div class={s['dog-list']} v-loading={props.loading}>
-        <DogPagination
-          style="margin-bottom: 20px"
-          totalText={props.totalText}
-          v-model:currentPage={currentPage.value}
-          v-model:jumpPage={jumpPage.value}
-          defaultPageSize={props.defaultPageSize}
-          total={props.total}
-          onCurrent-change={changePage}
-        />
-        {slots.default?.()}
-        <DogPagination
-          style="margin-top: 20px"
-          v-model:currentPage={currentPage.value}
-          v-model:jumpPage={jumpPage.value}
-          defaultPageSize={props.defaultPageSize}
-          total={props.total}
-          onCurrent-change={changePage}
-        />
+        {!!props.dataSource.length && (
+          <DogPagination
+            style="margin-bottom: 20px"
+            totalText={props.totalText}
+            v-model:currentPage={currentPage.value}
+            v-model:jumpPage={jumpPage.value}
+            defaultPageSize={props.defaultPageSize}
+            total={props.total}
+            onCurrent-change={changePage}
+          />
+        )}
+
+        {slots.default?.(props.dataSource)}
+        {!props.dataSource.length && <el-empty></el-empty>}
+        {!!props.dataSource.length && (
+          <DogPagination
+            style="margin-top: 20px"
+            totalText=" "
+            v-model:currentPage={currentPage.value}
+            v-model:jumpPage={jumpPage.value}
+            defaultPageSize={props.defaultPageSize}
+            total={props.total}
+            onCurrent-change={changePage}
+          />
+        )}
       </div>
     )
   },

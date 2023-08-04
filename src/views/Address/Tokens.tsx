@@ -12,7 +12,7 @@ export default defineComponent({
     const total = ref(0)
     const page = ref(1)
     const loading = ref(false)
-    const defaultPageSize = 18
+    const defaultPageSize = 24
 
     async function getData() {
       try {
@@ -24,7 +24,6 @@ export default defineComponent({
           address,
         })
         data.value = setCollectionLogo(res.data.data)
-        console.log(data.value)
         total.value = res.data.total
       } finally {
         loading.value = false
@@ -39,14 +38,24 @@ export default defineComponent({
     onMounted(() => getData())
 
     return () => (
-      <DogCard is-back title="Address Details">
-        <DogList currentPage={page.value} defaultPageSize={18} loading={loading.value} total={total.value} onCurrent-change={changePage}>
-          <div class={s['dog-token-grid']}>
-            {data.value.map(({ tokenid, txid, baseuri }) => (
-              <DogTokenItem key={tokenid} tokenId={tokenid} owner={txid} baseUrl={baseuri} imgSrc={`${baseuri}/${txid}/${tokenid}.png`}></DogTokenItem>
-            ))}
-          </div>
-        </DogList>
+      <DogCard is-back title="Tokens">
+        <DogList
+          dataSource={data.value}
+          currentPage={page.value}
+          defaultPageSize={defaultPageSize}
+          loading={loading.value}
+          total={total.value}
+          onCurrent-change={changePage}
+          v-slots={{
+            default: (dataSource: [{ tokenid: string; txid: string; baseuri: string }]) => (
+              <div class={s['dog-token-grid']}>
+                {dataSource.map(({ tokenid, txid, baseuri }) => (
+                  <DogTokenItem key={tokenid} tokenId={tokenid} owner={address} baseUrl={baseuri} imgSrc={`${baseuri}/${txid}/${tokenid}.png`}></DogTokenItem>
+                ))}
+              </div>
+            ),
+          }}
+        ></DogList>
       </DogCard>
     )
   },

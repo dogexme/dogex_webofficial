@@ -59,14 +59,18 @@ function handlerJumpPage() {
 
 <template>
   <div class="dog-page">
-    <div class="dog-page_total">{{ props.totalText }}</div>
+    <div class="dog-page_total">{{ props.totalText || `A total of ${props.total} data found` }}</div>
     <div class="dog-page_control">
       <div class="dog-page_control_item dog-page_control_first" @click="currentPage > 1 && (currentPage = 1)" :class="[currentPage == 1 && 'dog-page_control_item--disabled']">First</div>
-      <div class="dog-page_control_item dog-page_control_prev" @click="currentPage > 1 && currentPage--" :class="[currentPage == 1 && 'dog-page_control_item--disabled']">&lt;</div>
+      <div class="dog-page_control_item dog-page_control_prev" @click="currentPage > 1 && currentPage--" :class="[currentPage == 1 && 'dog-page_control_item--disabled']">
+        <i class="dog-icon dog-icon_jiantou-left"></i>
+      </div>
       <div class="dog-page_control_item dog-page_control_input-item dog-page_control_page" style="cursor: none; padding: 0 8px">
         <input v-model="jumpPage" class="dog-page_control_input" :placeholder="`Page 1 of ${pages}`" type="text" @keydown.enter="handlerJumpPage" />
       </div>
-      <div class="dog-page_control_item dog-page_control_next" @click="currentPage < pages && currentPage++" :class="[currentPage == pages && 'dog-page_control_item--disabled']">&gt;</div>
+      <div class="dog-page_control_item dog-page_control_next" @click="currentPage < pages && currentPage++" :class="[currentPage == pages && 'dog-page_control_item--disabled']">
+        <i class="dog-icon dog-icon_jiantou-right"></i>
+      </div>
       <div class="dog-page_control_item dog-page_control_last" @click="currentPage < pages && (currentPage = pages)" :class="[currentPage == pages && 'dog-page_control_item--disabled']">Last</div>
     </div>
   </div>
@@ -76,8 +80,14 @@ function handlerJumpPage() {
 .dog-page {
   width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   align-items: center;
+  &_total {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 2;
+  }
 }
 .dog-page_control {
   display: flex;

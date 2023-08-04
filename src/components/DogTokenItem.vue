@@ -1,5 +1,5 @@
 <script setup lang="ts">
-// import { omitCenterString } from '@/utils'
+import { omitCenterString } from '@/utils'
 const props = defineProps<{
   imgSrc?: string
   tokenId?: string | number
@@ -10,17 +10,20 @@ const props = defineProps<{
 <template>
   <div class="dog-token-item">
     <div class="dog-token-item_img">
-      <el-image v-if="props.baseUrl" :src="props.imgSrc" :style="{ borderRadius: '8px' }"> </el-image>
-      <div class="el-image__error" style="width: 100%; height: 230px" v-else>#{{ props.tokenId }}</div>
+      <el-image class="dog-token-item_imgitem" :src="props.imgSrc">
+        <template #error>
+          <div class="el-image__error dog-token-item_error">#{{ props.tokenId }}</div>
+        </template>
+      </el-image>
     </div>
     <div class="dog-token-item_row">
       <span class="dog-token-item_label">Token ID: </span>
       <span class="dog-token-item_value">{{ props.tokenId }}</span>
     </div>
-    <!-- <div class="dog-token-item_row">
+    <div class="dog-token-item_row">
       <span class="dog-token-item_label">Owner: </span>
-      <span class="dog-token-item_value"><DogLink is-copy :label="omitCenterString(props.owner, 24)" :value="props.owner"></DogLink></span>
-    </div> -->
+      <span class="dog-token-item_value"><DogLink is-copy :label="omitCenterString(props.owner, 10)" :value="props.owner"></DogLink></span>
+    </div>
   </div>
 </template>
 
@@ -39,6 +42,20 @@ const props = defineProps<{
   &_label {
     font-weight: 500;
     color: #737373;
+  }
+  &_img {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    margin-bottom: 10px;
+  }
+  &_placeholder {
+    background-color: red;
+  }
+  &_imgitem {
+    position: absolute;
+    border-radius: 8px;
+    inset: 0;
   }
 }
 </style>
