@@ -38,7 +38,7 @@ export default defineComponent({
     onMounted(() => getData())
 
     return () => (
-      <DogCard is-back title="Address Detail">
+      <DogCard is-back title="Assets">
         <DogList
           dataSource={data.value}
           currentPage={page.value}

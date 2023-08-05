@@ -66,8 +66,9 @@ export default defineComponent({
       {
         title: 'Address',
         dataIndex: 'address',
-        render(text: string) {
-          return <DogLink route to={`/address/${text}`} is-copy label={text} value={text}></DogLink>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        render(text: string, r: any) {
+          return <DogLink route to={`/tokens/${text}/${r.txid}`} is-copy label={text} value={text}></DogLink>
         },
       },
     ]
