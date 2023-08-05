@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { omitCenterString } from '@/utils'
 import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
+import { ElMessageBox } from 'element-plus'
 
 type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
 
@@ -19,8 +20,10 @@ function selectItem() {
 function connect() {
   connectDpal()
     .then((userAddress) => {
-      address.value = userAddress
-      router.push(`/address/${userAddress}`)
+      if (userAddress) {
+        address.value = userAddress
+        router.push(`/address/${userAddress}`)
+      }
     })
     .catch((code) => {
       if (DogeErrorCode.notInstall == code) {
