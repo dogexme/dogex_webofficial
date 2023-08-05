@@ -18,7 +18,7 @@ const props = withDefaults(
       <div class="coll-info_item_label">Logo</div>
       <div class="coll-info_item_value">
         <div class="coll-logo-wrap" v-if="props.collInfo.logo">
-          <DogCollValid :show="collInfo.valid == 1">
+          <DogCollValid :show="collInfo.valid == 0">
             <el-image class="coll-logo-img" :src="props.collInfo.logo" fit="cover" />
           </DogCollValid>
         </div>

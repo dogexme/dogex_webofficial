@@ -60,7 +60,7 @@ function triggerDrawer(direction: DrawerDirection) {
             <a href="javascript:void(0)" @click="connect">Connect DpalWallet</a>
           </li>
           <li style="margin-left: 12px" v-else>
-            <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to address" placement="bottom">
+            <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to assets" placement="bottom">
               <router-link :to="`/address/${address}`" style="display: flex; align-items: center"
                 >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png"
               /></router-link>

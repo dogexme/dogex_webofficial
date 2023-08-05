@@ -3,6 +3,7 @@ import DogTable from '@/components/DogTable/DogTable'
 import { ElImage } from 'element-plus'
 import { queryTransferByTxid } from '@/services/nft'
 import { CollInfo } from '@/types'
+import { setCollectionLogo } from '@/utils'
 
 export default defineComponent({
   props: {
@@ -36,7 +37,8 @@ export default defineComponent({
         emit('update:isLoading', isLoading)
       },
     })
-    const columns = [
+
+    const originColumns = [
       {
         title: 'Item',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -53,6 +55,13 @@ export default defineComponent({
               )}
             </>
           )
+        },
+      },
+      {
+        title: 'Tokenid',
+        dataIndex: 'id',
+        render(text: string) {
+          return `#${text}`
         },
       },
       {
@@ -93,6 +102,8 @@ export default defineComponent({
       },
     ]
 
+    const columns = ref(originColumns)
+
     function nextPage(pageNumber: number) {
       page.value = pageNumber
       getData()
@@ -115,7 +126,16 @@ export default defineComponent({
           delete content.txid
           return Object.assign(item, content)
         })
-        console.log(data.value)
+
+        console.log('transfer', data.value)
+
+        const collInfo = setCollectionLogo({ txid: props.txid })
+
+        if (!collInfo.baseuri) {
+          columns.value = originColumns.filter((item) => item.title != 'Item')
+        } else {
+          columns.value = originColumns
+        }
       } catch (e: unknown) {
         props.error?.(e as Error)
       } finally {
@@ -127,6 +147,6 @@ export default defineComponent({
       reload: () => getData(true),
     })
 
-    return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+    return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
   },
 })

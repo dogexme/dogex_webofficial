@@ -38,7 +38,7 @@ export default defineComponent({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render: (_text: unknown, r: any) => {
           return (
-            <DogCollValid show={r.valid == 1}>
+            <DogCollValid show={r.valid == 0}>
               <ElImage v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={r.logo} fit="cover"></ElImage>
             </DogCollValid>
           )
