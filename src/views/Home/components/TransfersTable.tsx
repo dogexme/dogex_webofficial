@@ -147,6 +147,6 @@ export default defineComponent({
       reload: () => getData(true),
     })
 
-    return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+    return () => <DogTable rowkey="txid" loading={loading.value} dataSource={data.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
   },
 })

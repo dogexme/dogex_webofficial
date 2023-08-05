@@ -93,7 +93,7 @@ function handlerJumpPage() {
     background-color: transparent;
     padding: 0;
     &::placeholder {
-      color: #000;
+      color: #a5a5a5;
     }
   }
   &_item {
