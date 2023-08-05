@@ -8,10 +8,10 @@ const tabs = [
     label: 'Assets',
     value: 'assets',
   },
-  {
-    label: 'Transfer',
-    value: 'transfer',
-  },
+  // {
+  //   label: 'Transfer',
+  //   value: 'transfer',
+  // },
 ]
 function changeTab(val: string) {
   if (loading.value) return
@@ -19,13 +19,13 @@ function changeTab(val: string) {
 }
 </script>
 <template>
-  <DogPageHeader isBack title="Address"></DogPageHeader>
+  <DogPageHeader isBack :title="address"></DogPageHeader>
   <DogTabs v-model="curTabValue" :tabs="tabs" @change="changeTab">
     <DogTabsItem value="assets" key="assets">
       <AddressAssetsTable :address="address" v-model:isLoading="loading"></AddressAssetsTable>
     </DogTabsItem>
-    <DogTabsItem value="transfer" key="transfer">
+    <!-- <DogTabsItem value="transfer" key="transfer">
       <AddressTransferTable :address="address"></AddressTransferTable>
-    </DogTabsItem>
+    </DogTabsItem> -->
   </DogTabs>
 </template>

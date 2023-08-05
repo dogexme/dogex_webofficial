@@ -4,22 +4,40 @@ import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
 
 type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
 
+const router = useRouter()
 const isShowDrawer = ref(false)
 const activePath = ref('/')
 const drawerDirection = ref<DrawerDirection>('ltr')
-const { connectDpal, address, isInstall } = useDoge()
+const address = ref('')
+const { connectDpal } = useDoge()
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function selectItem() {
   isShowDrawer.value = false
 }
 
+function connect() {
+  connectDpal()
+    .then((userAddress) => {
+      address.value = userAddress
+      router.push(`/address/${userAddress}`)
+    })
+    .catch((code) => {
+      if (DogeErrorCode.notInstall == code) {
+        ElMessageBox.confirm('please install dpal wallet?', '', {
+          confirmButtonText: 'Install',
+          type: 'warning',
+        }).then(() => {
+          window.open('https://dpalwallet.io')
+        })
+      }
+    })
+}
+
 function triggerDrawer(direction: DrawerDirection) {
   isShowDrawer.value = !isShowDrawer.value
   drawerDirection.value = direction
 }
-
-connectDpal()
 </script>
 
 <template>
@@ -38,16 +56,14 @@ connectDpal()
           </el-menu-item>
         </el-menu>
         <ul class="nav-active">
-          <!-- <li class="nav-active-item">
-            <a href="/home" @click="connectDpal">Home</a>
-          </li> -->
           <li class="nav-active-item nav-active-item--weblink" v-if="!address">
-            <a href="javascript:void(0)" @click="connectDpal" v-if="isInstall">Dpalwallet</a>
-            <a href="https://dpalwallet.io" target="_blank" v-else>Dpalwallet</a>
+            <a href="javascript:void(0)" @click="connect">Connect DpalWallet</a>
           </li>
-          <li style="margin-left: 12px" v-if="address">
+          <li style="margin-left: 12px" v-else>
             <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to address" placement="bottom">
-              <router-link :to="`/address/${address}`" style="display: flex; align-items: center">{{ address }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" /></router-link>
+              <router-link :to="`/address/${address}`" style="display: flex; align-items: center"
+                >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png"
+              /></router-link>
             </el-tooltip>
           </li>
         </ul>
@@ -66,8 +82,7 @@ connectDpal()
             >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" /></router-link
         ></el-menu-item>
         <el-menu-item v-else index="dpalwallet">
-          <a href="javascript:void(0)" @click="connectDpal" v-if="isInstall">Dpalwallet</a>
-          <a href="https://dpalwallet.io" target="_blank" v-else>Dpalwallet</a>
+          <a href="javascript:void(0)" @click="connect">Connect DpalWallet</a>
         </el-menu-item>
       </el-menu>
     </el-drawer>

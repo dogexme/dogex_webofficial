@@ -243,10 +243,11 @@ onMounted(() => {
 
 .blocks-number {
   display: inline-block;
+  line-height: 35px;
   margin-top: 16px;
   align-self: center;
   border-radius: 6px;
-  padding: 8px 10px;
+  padding: 0 10px;
   background-color: #ddc2f9;
   font-weight: bold;
   span {

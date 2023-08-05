@@ -2,8 +2,7 @@ import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import DogCollValid from '@/components/DogCollValid.vue'
 import { queryAdrCollections } from '@/services/nft'
-import { ElImage, ElIcon } from 'element-plus'
-import { View } from '@element-plus/icons-vue'
+import { ElImage } from 'element-plus'
 
 export default defineComponent({
   props: {
@@ -48,8 +47,9 @@ export default defineComponent({
       {
         title: 'Txid',
         dataIndex: 'txid',
-        render(text: string) {
-          return <>{text && <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 24)} value={text}></DogLink>}</>
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        render(text: string, r: any) {
+          return <>{text && <DogLink route is-copy to={`/tokens/${props.address}/${r.txid}`} label={omitCenterString(text, 24)} value={text}></DogLink>}</>
         },
       },
       {
@@ -60,15 +60,8 @@ export default defineComponent({
         title: 'Token Count',
         dataIndex: 'tokenCount',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        render(text: number, r: any) {
-          return (
-            <router-link style="display:flex;align-items: center" to={`/tokens/${props.address}/${r.txid}`}>
-              {numberFormat(text)}
-              <ElIcon style="font-size: 18px;margin-left:7px;">
-                <View />
-              </ElIcon>
-            </router-link>
-          )
+        render(text: number) {
+          return numberFormat(text)
         },
       },
       {

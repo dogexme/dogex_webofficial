@@ -40,6 +40,7 @@ export default defineComponent({
       {
         title: 'Rank',
         render: (_text: unknown, _record: unknown, i: number) => <span class="table-index">{(page.value - 1) * 15 + i + 1}</span>,
+        width: '100px',
       },
       {
         title: 'Holder',
