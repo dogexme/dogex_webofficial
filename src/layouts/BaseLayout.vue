@@ -15,7 +15,7 @@
           <a href="https://twitter.com/dpalofficial" target="_blank" class="nft link-list_item_a">&#xe652;</a>
         </li>
         <li class="link-list_item">
-          <a href="https://github.com/dpalwallet" target="_blank" class="nft link-list_item_a">&#xe691;</a>
+          <a href="https://github.com/dpalwallet/DRC-721" target="_blank" class="nft link-list_item_a">&#xe691;</a>
         </li>
         <!-- <li class="link-list_item">
           <a href="https://discord.com/dpalwallet" target="_blank" class="nft link-list_item_a">&#xebf8;</a>
