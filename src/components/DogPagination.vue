@@ -60,9 +60,7 @@ function handlerJumpPage() {
       <div class="dog-page_control_item dog-page_control_input-item dog-page_control_page" style="cursor: none; padding: 0 8px">
         <input v-model="jumpPage" class="dog-page_control_input" :placeholder="`Page 1 of ${pages}`" type="text" @keydown.enter="handlerJumpPage" />
       </div>
-      <div class="dog-page_control_item dog-page_control_item--disabled">
-        {{ currentPage }}
-      </div>
+      <div class="dog-page_control_item dog-page_control_item--disabled" style="font-size: 12px">{{ currentPage }}/{{ pages }}</div>
       <div class="dog-page_control_item dog-page_control_next" @click="currentPage < pages && currentPage++" :class="[currentPage == pages && 'dog-page_control_item--disabled']">
         <i class="dog-icon dog-icon_jiantou-right"></i>
       </div>
@@ -89,6 +87,7 @@ function handlerJumpPage() {
   &_input {
     width: 100%;
     line-height: 28px;
+    font-size: 12px;
     border: none;
     outline: 0;
     background-color: transparent;
