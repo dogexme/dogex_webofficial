@@ -28,6 +28,8 @@ export default defineComponent({
     const jumpPage = ref('')
     let prevPage = -1
 
+    const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
+
     function changePage(page: number) {
       if (page == prevPage) return
       prevPage = page
@@ -54,13 +56,13 @@ export default defineComponent({
 
     return () => (
       <div class={s['dog-list']} v-loading={props.loading}>
-        {!!props.dataSource.length && (
+        {!!props.dataSource.length && pages.value > 1 && (
           <DogPagination
             style="margin-bottom: 20px"
             totalText={props.totalText}
             v-model:currentPage={currentPage.value}
             v-model:jumpPage={jumpPage.value}
-            defaultPageSize={props.defaultPageSize}
+            pages={pages.value}
             total={props.total}
             onCurrent-change={changePage}
           />
@@ -68,13 +70,13 @@ export default defineComponent({
 
         {slots.default?.(props.dataSource)}
         {!props.dataSource.length && <el-empty></el-empty>}
-        {!!props.dataSource.length && (
+        {!!props.dataSource.length && pages.value > 1 && (
           <DogPagination
             style="margin-top: 20px"
             totalText=" "
             v-model:currentPage={currentPage.value}
             v-model:jumpPage={jumpPage.value}
-            defaultPageSize={props.defaultPageSize}
+            pages={pages.value}
             total={props.total}
             onCurrent-change={changePage}
           />

@@ -137,7 +137,7 @@ onMounted(() => {
 </script>
 <template>
   <div id="home">
-    <div class="nav-search" :class="[!showContent && 'nav-search--center']">
+    <div class="nav-search">
       <h1 class="home-title" v-if="!showContent">dogex.me</h1>
       <form @submit.prevent class="nav-search_inputwrap">
         <i class="dog-icon dog-icon_search"></i>

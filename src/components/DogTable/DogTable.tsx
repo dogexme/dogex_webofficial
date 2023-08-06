@@ -49,6 +49,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const containerRef = ref<HTMLElement>()
     const currentPage = ref(1)
+    const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
 
     watch(
       () => props.loading,
@@ -91,8 +92,8 @@ export default defineComponent({
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
-          {!!props.dataSource.length && (
-            <DogPagination style="margin-bottom: 20px" totalText={props.totalText} v-model:currentPage={currentPage.value} defaultPageSize={props.defaultPageSize} total={props.total} />
+          {!!props.dataSource.length && pages.value > 1 && (
+            <DogPagination style="margin-bottom: 20px" totalText={props.totalText} v-model:currentPage={currentPage.value} pages={pages.value} total={props.total} />
           )}
 
           <div class={s['table-container']} ref={containerRef}>
@@ -120,7 +121,7 @@ export default defineComponent({
             </table>
             {!props.dataSource.length && <el-empty></el-empty>}
           </div>
-          {!!props.dataSource.length && <DogPagination totalText={' '} style="margin-top: 20px" v-model:currentPage={currentPage.value} defaultPageSize={props.defaultPageSize} total={props.total} />}
+          {!!props.dataSource.length && pages.value > 1 && <DogPagination totalText={' '} style="margin-top: 20px" v-model:currentPage={currentPage.value} pages={pages.value} total={props.total} />}
         </div>
       )
     }

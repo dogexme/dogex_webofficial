@@ -2,12 +2,12 @@
 const props = withDefaults(
   defineProps<{
     currentPage?: number
-    defaultPageSize?: number
+    pages?: number
     total?: number
     totalText?: string
   }>(),
   {
-    defaultPageSize: 15,
+    pages: 1,
     currentPage: 1,
     total: 0,
   }
@@ -24,7 +24,7 @@ const currentPage = computed({
 })
 
 const jumpPage = ref('')
-const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
+const pages = computed(() => props.pages)
 
 function handlerJumpPage() {
   if (!/^-?\d+$/.test(String(jumpPage.value))) {
