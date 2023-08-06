@@ -1,16 +1,3 @@
-:root {
-  --nav-height: 60px;
-  --nav-bg-color: red;
-  font-size: 16px;
-}
-
-@media screen and (max-width: 1280px) {
-  :root {
-    --nav-height: 40px;
-  }
-}
-
-
 .dog-icon {
   display: inline-block;
   width: 16px;

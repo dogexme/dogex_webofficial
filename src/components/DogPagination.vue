@@ -50,7 +50,7 @@ function handlerJumpPage() {
 </script>
 
 <template>
-  <div class="dog-page">
+  <form @submit.prevent class="dog-page">
     <div class="dog-page_total">{{ props.totalText || `A total of ${props.total} data found` }}</div>
     <div class="dog-page_control">
       <div class="dog-page_control_item dog-page_control_first" @click="currentPage > 1 && (currentPage = 1)" :class="[currentPage == 1 && 'dog-page_control_item--disabled']">First</div>
@@ -66,7 +66,7 @@ function handlerJumpPage() {
       </div>
       <div class="dog-page_control_item dog-page_control_last" @click="currentPage < pages && (currentPage = pages)" :class="[currentPage == pages && 'dog-page_control_item--disabled']">Last</div>
     </div>
-  </div>
+  </form>
 </template>
 
 <style lang="scss">

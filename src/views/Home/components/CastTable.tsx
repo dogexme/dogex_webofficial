@@ -8,7 +8,6 @@ import { setCollectionLogo, numberFormat } from '@/utils'
 export default defineComponent({
   emits: ['search'],
   setup(_props, { emit }) {
-    const router = useRouter()
     const data = ref([])
     const total = ref(0)
     const page = ref(1)
@@ -17,7 +16,6 @@ export default defineComponent({
 
     function handleClickTxid(e: string) {
       emit('search', e)
-      router.push('/nft')
     }
 
     const columns = [

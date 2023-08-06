@@ -10,6 +10,7 @@ defineOptions({
 })
 
 const route = useRoute()
+const router = useRouter()
 const curTabValue = ref<CollInfoType>('overview')
 const txid = ref('')
 const txidCopy = ref('')
@@ -89,6 +90,7 @@ async function search(txidValue: string) {
   if (!hash || loadingSearch.value) return
   loadingSearch.value = true
   showContent.value = true
+  router.push('/nft')
   try {
     console.log(curTabValue.value)
 
@@ -137,12 +139,12 @@ onMounted(() => {
   <div id="home">
     <div class="nav-search" :class="[!showContent && 'nav-search--center']">
       <h1 class="home-title" v-if="!showContent">dogex.me</h1>
-      <div class="nav-search_inputwrap">
+      <form @submit.prevent class="nav-search_inputwrap">
         <i class="dog-icon dog-icon_search"></i>
         <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="txid" @keydown.enter="search('')" />
         <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
         <el-icon v-if="!loadingSearch && txid.length" style="cursor: pointer" @click="txid = ''"><CircleCloseFilled /></el-icon>
-      </div>
+      </form>
       <div class="blocks-number">
         <i class="dog-icon dog-icon_block"></i>
         Processed Blocks: <span v-if="blockCount">{{ blockCount }}</span>

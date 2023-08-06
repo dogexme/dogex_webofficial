@@ -34,8 +34,4 @@ export default [
     path: '/home',
     redirect: '/',
   },
-  {
-    path: '/nft',
-    redirect: '/',
-  },
 ] as RouteRecordRaw[]

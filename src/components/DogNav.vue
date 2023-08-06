@@ -17,6 +17,13 @@ function selectItem() {
   isShowDrawer.value = false
 }
 
+function linkAssets(address: string) {
+  router.push({
+    name: 'address',
+    params: { address },
+  })
+}
+
 function connect() {
   connectDpal()
     .then((userAddress) => {
@@ -54,9 +61,7 @@ function triggerDrawer(direction: DrawerDirection) {
           <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
         <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
-          <el-menu-item index="/">
-            <router-link to="/">Home</router-link>
-          </el-menu-item>
+          <el-menu-item index="/"> Home </el-menu-item>
         </el-menu>
         <ul class="nav-active">
           <li class="nav-active-item nav-active-item--weblink" v-if="!address">
@@ -74,19 +79,12 @@ function triggerDrawer(direction: DrawerDirection) {
       </div>
     </nav>
     <el-drawer append-to-body :show-close="false" :with-header="false" size="70%" v-model="isShowDrawer" :direction="drawerDirection" modal-class="nav-drawer">
-      <el-menu v-if="drawerDirection == 'ltr'" @select="selectItem" router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical">
-        <el-menu-item index="/">
-          <router-link to="/">Home</router-link>
-        </el-menu-item>
+      <el-menu v-if="drawerDirection == 'ltr'" route @select="selectItem" router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical">
+        <el-menu-item index="/"> Home </el-menu-item>
       </el-menu>
       <el-menu v-else background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
-        <el-menu-item v-if="address" index="address"
-          ><router-link :to="`/address/${address}`" style="display: flex; align-items: center"
-            >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" /></router-link
-        ></el-menu-item>
-        <el-menu-item v-else index="dpalwallet">
-          <a href="javascript:void(0)" @click="connect">Connect DpalWallet</a>
-        </el-menu-item>
+        <el-menu-item v-if="address" index="address" @click="linkAssets(address)"> {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" /> </el-menu-item>
+        <el-menu-item v-else index="dpalwallet" @click="connect"> Connect DpalWallet </el-menu-item>
       </el-menu>
     </el-drawer>
   </div>
