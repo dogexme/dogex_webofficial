@@ -10,6 +10,13 @@ export default [
         path: '',
         name: 'home',
         component: () => import('@/views/Home/Home.vue'),
+        children: [
+          {
+            path: 'nft',
+            name: 'nft',
+            component: {},
+          },
+        ],
       },
       {
         name: 'address',
@@ -22,5 +29,13 @@ export default [
         component: () => import('@/views/Address/Tokens'),
       },
     ],
+  },
+  {
+    path: '/home',
+    redirect: '/',
+  },
+  {
+    path: '/nft',
+    redirect: '/',
   },
 ] as RouteRecordRaw[]

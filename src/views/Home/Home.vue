@@ -3,21 +3,24 @@ import { queryColl, getBlocksCount } from '@/services/nft'
 import { Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
 import AssetsTable from './components/AssetsTable'
+import { RouteRecordName, onBeforeRouteUpdate } from 'vue-router'
 
 defineOptions({
   name: 'home',
 })
 
+const route = useRoute()
 const curTabValue = ref<CollInfoType>('overview')
 const txid = ref('')
 const txidCopy = ref('')
 const loadingSearch = ref(false)
-const showContent = ref(false)
-const isNotFount = ref(false)
+const showContent = ref(route.name == 'nft' ? true : false)
+const isNotFount = ref(route.name == 'nft' ? true : false)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const collInfo = ref<CollInfo>()
 const blockCount = ref(0)
 const table = ref()
+const routeName = ref<RouteRecordName | null | undefined>(route.name)
 
 const tabs = [
   {
@@ -78,10 +81,14 @@ async function changeTab(tabVal: CollInfoType) {
   })
 }
 
-async function search() {
+async function search(txidValue: string) {
+  if (txidValue) {
+    txid.value = txidValue
+  }
   const hash = txid.value.trim()
   if (!hash || loadingSearch.value) return
   loadingSearch.value = true
+  showContent.value = true
   try {
     console.log(curTabValue.value)
 
@@ -98,7 +105,6 @@ async function search() {
     })
   } finally {
     loadingSearch.value = false
-    showContent.value = true
   }
 }
 
@@ -114,6 +120,15 @@ function getBlocksCountHandler() {
   })
 }
 
+onBeforeRouteUpdate((route) => {
+  routeName.value = route.name
+  if (route.name == 'home') {
+    txid.value = ''
+    loadingSearch.value = false
+    curTabValue.value = 'overview'
+  }
+})
+
 onMounted(() => {
   getBlocksCountHandler()
 })
@@ -124,7 +139,7 @@ onMounted(() => {
       <h1 class="home-title" v-if="!showContent">dogex.me</h1>
       <div class="nav-search_inputwrap">
         <i class="dog-icon dog-icon_search"></i>
-        <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="txid" @keydown.enter="search" />
+        <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="txid" @keydown.enter="search('')" />
         <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
         <el-icon v-if="!loadingSearch && txid.length" style="cursor: pointer" @click="txid = ''"><CircleCloseFilled /></el-icon>
       </div>
@@ -133,7 +148,7 @@ onMounted(() => {
         Processed Blocks: <span v-if="blockCount">{{ blockCount }}</span>
       </div>
     </div>
-    <div class="coll-wrapper" v-if="showContent">
+    <div class="coll-wrapper" v-if="showContent && routeName == 'nft'">
       <DogTabs v-if="!isNotFount" v-model="curTabValue" :tabs="tabs" @change="changeTab">
         <DogTabsItem value="overview">
           <Overview v-loading="loadingSearch" :collInfo="collInfo"></Overview>
@@ -157,6 +172,9 @@ onMounted(() => {
         </div>
       </DogCard> -->
     </div>
+    <DogCard v-show="routeName == 'home'" style="margin-top: 12px">
+      <CastTable @search="search"></CastTable>
+    </DogCard>
   </div>
 </template>
 
@@ -184,29 +202,16 @@ onMounted(() => {
 }
 
 .nav-search {
-  position: absolute;
-  top: 0;
-  left: 50%;
   width: 100%;
   box-sizing: border-box;
   padding: 50px 0;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  transform: translateX(-50%) translateZ(0);
-  transition: top 0.2s;
   background: url(/src/assets/img/bg.png) no-repeat;
   background-size: cover;
   background-position: center;
   border-radius: 20px;
-
-  &--center {
-    margin-top: 0;
-    top: 50%;
-    left: 50%;
-    transition: top 0.2s;
-    transform: translate(-50%, -50%) translateZ(0);
-  }
 
   .nav-search-input {
     flex: 1;
@@ -256,7 +261,7 @@ onMounted(() => {
 }
 
 .coll-wrapper {
-  padding-top: 230px;
+  margin-top: 12px;
 }
 
 .loading-icon {

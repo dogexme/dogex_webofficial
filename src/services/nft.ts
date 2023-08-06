@@ -87,8 +87,20 @@ export function queryAdrCollections(params: PageResult & { address: string }) {
   })
 }
 
+/**
+ * 查询地址拥有集合的tokens
+ */
 export function queryAdrTokensByHash(params: PageResult & { address: string; txid: string }) {
   return axios.get('https://ujut4cr0vc.execute-api.ap-east-1.amazonaws.com/beta/api', {
+    params,
+  })
+}
+
+/**
+ * 铸造光集合
+ */
+export function queryCastLightList(params: PageResult) {
+  return axios.get('https://1hiopbkjp8.execute-api.ap-east-1.amazonaws.com/beta/api', {
     params,
   })
 }

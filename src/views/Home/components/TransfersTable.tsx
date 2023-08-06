@@ -49,7 +49,7 @@ export default defineComponent({
                 <ElImage
                   v-slots={{ error: () => <div class="el-image__error">#{r.id}</div> }}
                   style="width: 40px; height: 40px; border-radius: 5px"
-                  src={`${r.buri}/${r.id}.png`}
+                  src={`${r.baseuri}/${r.contentTxid}/${r.id}.png`}
                   fit="cover"
                 ></ElImage>
               )}
@@ -123,14 +123,15 @@ export default defineComponent({
         total.value = res.data.total
         data.value = res.data.data.map((item: { content: string }) => {
           const content = JSON.parse(item.content)
+          const contentTxid = content.txid
+          const { baseuri } = setCollectionLogo({ txid: contentTxid })
           delete content.txid
-          return Object.assign(item, content)
+          return Object.assign(item, content, { baseuri, contentTxid })
         })
 
         console.log('transfer', data.value)
 
         const collInfo = setCollectionLogo({ txid: props.txid })
-
         if (!collInfo.baseuri) {
           columns.value = originColumns.filter((item) => item.title != 'Item')
         } else {
