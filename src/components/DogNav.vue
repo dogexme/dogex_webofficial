@@ -2,12 +2,14 @@
 import { omitCenterString } from '@/utils'
 import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
 import { ElMessageBox } from 'element-plus'
+import { useAppStore } from '@/store'
 
 type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
 
+const appStore = useAppStore()
 const router = useRouter()
 const isShowDrawer = ref(false)
-const activePath = ref('/')
+const activePath = computed(() => appStore.activeRoutePath)
 const drawerDirection = ref<DrawerDirection>('ltr')
 const address = ref('')
 const { connectDpal } = useDoge()
@@ -15,13 +17,6 @@ const { connectDpal } = useDoge()
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function selectItem() {
   isShowDrawer.value = false
-}
-
-function linkAssets(address: string) {
-  router.push({
-    name: 'address',
-    params: { address },
-  })
 }
 
 function connect() {
@@ -41,6 +36,9 @@ function connect() {
           window.open('https://dpalwallet.io')
         })
       }
+    })
+    .finally(() => {
+      isShowDrawer.value = false
     })
 }
 
@@ -82,9 +80,11 @@ function triggerDrawer(direction: DrawerDirection) {
       <el-menu v-if="drawerDirection == 'ltr'" route @select="selectItem" router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical">
         <el-menu-item index="/"> Home </el-menu-item>
       </el-menu>
-      <el-menu v-else background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
-        <el-menu-item v-if="address" index="address" @click="linkAssets(address)"> {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" /> </el-menu-item>
-        <el-menu-item v-else index="dpalwallet" @click="connect"> Connect DpalWallet </el-menu-item>
+      <el-menu v-else router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
+        <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address } }">
+          {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" />
+        </el-menu-item>
+        <el-menu-item v-else @click="connect"> Connect DpalWallet </el-menu-item>
       </el-menu>
     </el-drawer>
   </div>

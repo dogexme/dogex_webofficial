@@ -1,11 +1,17 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-import { createStore } from 'vuex'
+import { createPinia, defineStore } from 'pinia'
+import { RouteLocationNormalized } from 'vue-router'
 
-const store = createStore({
-  state: {
-    count: 0,
-  },
-})
+const store = createPinia()
 
 export default store
+
+export const useAppStore = defineStore('app', {
+  state: () => ({
+    activeRoute: {} as RouteLocationNormalized,
+  }),
+  getters: {
+    activeRoutePath(state) {
+      return state.activeRoute.path
+    },
+  },
+})
