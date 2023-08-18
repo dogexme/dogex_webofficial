@@ -44,8 +44,12 @@ export default defineComponent({
       default: false,
     },
     totalText: String,
+    rowClick: {
+      type: Boolean,
+      default: false,
+    },
   },
-  emits: ['current-change'],
+  emits: ['current-change', 'row-click'],
   setup(props, { emit }) {
     const containerRef = ref<HTMLElement>()
     const currentPage = ref(1)
@@ -112,7 +116,7 @@ export default defineComponent({
               <tbody class={s['dog-table-tb']}>
                 {props.dataSource.map((record, i) => {
                   return (
-                    <tr class={s['dog-table-tr']} key={record[props.rowkey]}>
+                    <tr class={s['dog-table-tr']} onClick={() => emit('row-click', record)} key={record[props.rowkey]}>
                       {renderTbodyTd(record, i)}
                     </tr>
                   )

@@ -3,6 +3,7 @@ import { omitCenterString } from '@/utils'
 import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
 import { ElMessageBox } from 'element-plus'
 import { useAppStore } from '@/store'
+import navlist from '@/config/navlist'
 
 type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
 
@@ -59,7 +60,7 @@ function triggerDrawer(direction: DrawerDirection) {
           <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
         <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
-          <el-menu-item index="/"> Home </el-menu-item>
+          <el-menu-item v-for="n in navlist" :index="n.path" :key="n.name"> {{ n.name }} </el-menu-item>
         </el-menu>
         <ul class="nav-active">
           <li class="nav-active-item nav-active-item--weblink" v-if="!address">
@@ -78,7 +79,7 @@ function triggerDrawer(direction: DrawerDirection) {
     </nav>
     <el-drawer append-to-body :show-close="false" :with-header="false" size="70%" v-model="isShowDrawer" :direction="drawerDirection" modal-class="nav-drawer">
       <el-menu v-if="drawerDirection == 'ltr'" route @select="selectItem" router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical">
-        <el-menu-item index="/"> Home </el-menu-item>
+        <el-menu-item v-for="n in navlist" :index="n.path" :key="n.name"> {{ n.name }} </el-menu-item>
       </el-menu>
       <el-menu v-else router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
         <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address } }">

@@ -28,6 +28,11 @@ export default [
         path: 'tokens/:address/:txid',
         component: () => import('@/views/Address/Tokens'),
       },
+      {
+        name: 'marketplace',
+        path: 'marketplace',
+        component: () => import('@/views/Marketplace/Marketplace.vue'),
+      },
     ],
   },
   {
