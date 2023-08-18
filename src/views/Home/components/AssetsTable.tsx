@@ -25,16 +25,13 @@ export default defineComponent({
   },
   emits: ['update:isLoading'],
   setup(props, { expose, emit }) {
-    const data = ref([])
-    const total = ref(0)
-    const page = ref(1)
-    const loading = computed({
-      get() {
-        return props.isLoading
-      },
-      set(isLoading) {
-        emit('update:isLoading', isLoading)
-      },
+    const { loading, dataSource, total, page, query } = useTable({
+      api: getData,
+      pageSize: 15,
+    })
+
+    watch(loading, (isLoading) => {
+      emit('update:isLoading', isLoading)
     })
 
     const originColumns = [
@@ -76,26 +73,13 @@ export default defineComponent({
 
     const columns = ref(originColumns)
 
-    function nextPage(pageNumber: number) {
-      page.value = pageNumber
-      getData()
-    }
-
-    async function getData(isReload = false) {
-      loading.value = true
+    async function getData(page: number, pageSize: number) {
       try {
-        if (isReload) {
-          page.value = 1
-        }
         const res = await queryAssetsByTxid({
           txid: props.txid,
-          pageSize: 15,
-          page: page.value,
+          pageSize,
+          page,
         })
-        total.value = res.data.total
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data.value = setCollectionLogo(res.data.data.map((d: any) => Object.assign(d, { txid: props.txid })))
-        console.log('assets', data.value)
 
         const collInfo = setCollectionLogo({ txid: props.txid })
 
@@ -104,18 +88,22 @@ export default defineComponent({
         } else {
           columns.value = originColumns
         }
+
+        return {
+          total: res.data.total,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          data: setCollectionLogo(res.data.data.map((d: any) => Object.assign(d, { txid: props.txid }))),
+        }
       } catch (e: unknown) {
         props.error?.(e as Error)
         throw e
-      } finally {
-        loading.value = false
       }
     }
 
     expose({
-      reload: () => getData(true),
+      reload: () => query(1),
     })
 
-    return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={query} />
   },
 })

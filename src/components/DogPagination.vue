@@ -12,14 +12,13 @@ const props = withDefaults(
     total: 0,
   }
 )
-const emit = defineEmits(['current-change', 'update:currentPage'])
+const emit = defineEmits(['update:currentPage'])
 const currentPage = computed({
   get() {
     return props.currentPage
   },
   set(page) {
     emit('update:currentPage', page)
-    emit('current-change', page)
   },
 })
 
