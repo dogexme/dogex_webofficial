@@ -21,17 +21,14 @@ export default defineComponent({
   },
   emits: ['update:isLoading'],
   setup(props, { expose, emit }) {
-    const data = ref([])
-    const total = ref(0)
-    const page = ref(1)
-    const loading = computed({
-      get() {
-        return props.isLoading
-      },
-      set(isLoading) {
-        emit('update:isLoading', isLoading)
-      },
+    const {dataSource, page, total, loading, query} = useTable({
+      api: getData,
     })
+
+    watch(loading, (isLoading) => {
+      emit('update:isLoading', isLoading)
+    })
+
     const columns = [
       {
         title: 'Item',
@@ -73,37 +70,28 @@ export default defineComponent({
       },
     ]
 
-    function nextPage(pageNumber: number) {
-      page.value = pageNumber
-      getData()
-    }
-
-    async function getData() {
-      loading.value = true
+    async function getData(page: number, pageSize: number) {
       try {
         const res = await queryAdrCollections({
           address: props.address,
-          pageSize: 15,
-          page: page.value,
+          pageSize,
+          page,
         })
-        total.value = res.data.total
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data.value = setCollectionLogo(res.data.data)
-        console.log(data.value)
-        // console.log('assets', data.value)
+
+        return {
+          total: res.data.total,
+          data: setCollectionLogo(res.data.data)
+        }
       } catch (e: unknown) {
         props.error?.(e as Error)
-      } finally {
-        loading.value = false
+        throw e
       }
     }
 
-    getData()
-
     expose({
-      reload: getData,
+      reload: page.value = 1,
     })
 
-    return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} />
   },
 })

@@ -64,9 +64,20 @@ export default defineComponent({
       }
     )
 
+    watch(
+      () => props.currentPage,
+      (p) => {
+        currentPage.value = p
+      }
+    )
+
     watch(currentPage, (page: number) => {
       emit('current-change', page)
     })
+
+    function pageChange(p: number) {
+      currentPage.value = p
+    }
 
     function resetPositionTop() {
       const resetPosition: ScrollToOptions = {
@@ -97,7 +108,7 @@ export default defineComponent({
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
           {!!props.dataSource.length && pages.value > 1 && (
-            <DogPagination style="margin-bottom: 20px" totalText={props.totalText} v-model:currentPage={currentPage.value} pages={pages.value} total={props.total} />
+            <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange}/>
           )}
 
           <div class={s['table-container']} ref={containerRef}>
@@ -125,7 +136,7 @@ export default defineComponent({
             </table>
             {!props.dataSource.length && <el-empty></el-empty>}
           </div>
-          {!!props.dataSource.length && pages.value > 1 && <DogPagination totalText={' '} style="margin-top: 20px" v-model:currentPage={currentPage.value} pages={pages.value} total={props.total} />}
+          {!!props.dataSource.length && pages.value > 1 && <DogPagination totalText={' '} style="margin-top: 20px" currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange}/>}
         </div>
       )
     }

@@ -12,15 +12,24 @@ const props = withDefaults(
     total: 0,
   }
 )
-const emit = defineEmits(['update:currentPage'])
-const currentPage = computed({
-  get() {
-    return props.currentPage
-  },
-  set(page) {
-    emit('update:currentPage', page)
-  },
-})
+
+const emit = defineEmits(['change'])
+
+const currentPage = ref(1)
+
+watch(
+  () => props.currentPage,
+  (p) => {
+    currentPage.value = p
+  }
+)
+
+watch(
+  currentPage,
+  (p) => {
+    emit('change', p)
+  }
+)
 
 const jumpPage = ref('')
 const pages = computed(() => props.pages)

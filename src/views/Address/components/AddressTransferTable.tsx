@@ -20,17 +20,14 @@ export default defineComponent({
   },
   emits: ['update:isLoading'],
   setup(props, { expose, emit }) {
-    const data = ref([])
-    const total = ref(0)
-    const page = ref(1)
-    const loading = computed({
-      get() {
-        return props.isLoading
-      },
-      set(isLoading) {
-        emit('update:isLoading', isLoading)
-      },
+    const { dataSource, total, page, loading, query } = useTable({
+      api: getData,
     })
+
+    watch(loading, (isLoading) => {
+      emit('update:isLoading', isLoading)
+    })
+
     const columns = [
       {
         title: 'Item',
@@ -76,19 +73,17 @@ export default defineComponent({
       },
     ]
 
-    function nextPage(pageNumber: number) {
-      page.value = pageNumber
-      getData()
+    async function getData(page: number, pageSize: number) {
+      return {
+        total: 0,
+        data: []
+      }
     }
 
-    async function getData() {}
-
-    getData()
-
     expose({
-      reload: getData,
+      reload: page.value = 1,
     })
 
-    return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} />
   },
 })

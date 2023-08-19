@@ -8,11 +8,11 @@ import { setCollectionLogo, numberFormat } from '@/utils'
 export default defineComponent({
   emits: ['search'],
   setup(_props, { emit }) {
-    const data = ref([])
-    const total = ref(0)
-    const page = ref(1)
-    const loading = ref(false)
     const pageSize = 20
+    const { dataSource, total, page, loading, query } = useTable({
+      api: getData,
+      pageSize,
+    })
 
     function handleClickTxid(e: string) {
       emit('search', e)
@@ -68,39 +68,33 @@ export default defineComponent({
       },
     ]
 
-    function nextPage(pageNumber: number) {
-      page.value = pageNumber
-      getData()
-    }
+    async function getData(page: number, pageSize: number) {
+      const res = await queryCastLightList({
+        pageSize,
+        page,
+      })
 
-    async function getData(isReload = false) {
-      loading.value = true
-      try {
-        if (isReload) {
-          page.value = 1
-        }
-        const res = await queryCastLightList({
-          pageSize,
-          page: page.value,
-        })
-        total.value = res.data.total
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        data.value = res.data.data.map((item: any) => {
+      return {
+        total: res.data.total,
+        // eslint-disablenext-line @typescript-eslint/no-explicit-any
+        data: res.data.data.map((item: any) => {
           const { logo, valid } = setCollectionLogo({ txid: item.txid })
           return Object.assign(item, { logo, valid })
-        })
-        console.log(data.value)
-      } finally {
-        loading.value = false
+        }),
       }
     }
 
-    onMounted(() => {
-      getData(true)
-    })
-
     return () => (
-      <DogTable rowkey="txid" defaultPageSize={pageSize} loading={loading.value} dataSource={data.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+      <DogTable
+        rowkey="txid"
+        defaultPageSize={pageSize}
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns}
+        currentPage={page.value}
+        total={total.value}
+        onCurrent-change={query}
+      />
     )
   },
 })

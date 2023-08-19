@@ -26,16 +26,13 @@ export default defineComponent({
   },
   emits: ['update:isLoading'],
   setup(props, { emit, expose }) {
-    const data = ref([])
-    const total = ref(0)
-    const page = ref(1)
-    const loading = computed({
-      get() {
-        return props.isLoading
-      },
-      set(isLoading) {
-        emit('update:isLoading', isLoading)
-      },
+    const { dataSource, loading, total, page, query } = useTable({
+      api: getData,
+      pageSize: 15,
+    })
+
+    watch(loading, (isLoading) => {
+      emit('update:isLoading', isLoading)
     })
 
     const originColumns = [
@@ -104,24 +101,15 @@ export default defineComponent({
 
     const columns = ref(originColumns)
 
-    function nextPage(pageNumber: number) {
-      page.value = pageNumber
-      getData()
-    }
-
-    async function getData(isReload = false) {
-      loading.value = true
+    async function getData(page: number, pageSize: number) {
       try {
-        if (isReload) {
-          page.value = 1
-        }
         const res = await queryTransferByTxid({
           txid: props.txid,
-          pageSize: 15,
-          page: page.value,
+          pageSize,
+          page,
         })
-        total.value = res.data.total
-        data.value = res.data.data.map((item: { content: string }) => {
+
+        const data = res.data.data.map((item: { content: string }) => {
           const content = JSON.parse(item.content)
           const contentTxid = content.txid
           const { baseuri } = setCollectionLogo({ txid: contentTxid })
@@ -129,7 +117,6 @@ export default defineComponent({
           return Object.assign(item, content, { baseuri, contentTxid })
         })
 
-        console.log('transfer', data.value)
 
         const collInfo = setCollectionLogo({ txid: props.txid })
         if (!collInfo.baseuri) {
@@ -137,17 +124,21 @@ export default defineComponent({
         } else {
           columns.value = originColumns
         }
+
+        return {
+          total: res.data.total,
+          data
+        }
       } catch (e: unknown) {
         props.error?.(e as Error)
-      } finally {
-        loading.value = false
+        throw e
       }
     }
 
     expose({
-      reload: () => getData(true),
+      reload: () => page.value = 1,
     })
 
-    return () => <DogTable rowkey="txid" loading={loading.value} dataSource={data.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+    return () => <DogTable rowkey="txid" loading={loading.value} dataSource={dataSource.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={query} />
   },
 })

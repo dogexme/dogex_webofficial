@@ -8,44 +8,38 @@ export default defineComponent({
   setup() {
     const { params } = useRoute()
     const { txid, address } = params as { txid: string; address: string }
-    const data = ref([])
-    const total = ref(0)
-    const page = ref(1)
-    const loading = ref(false)
     const defaultPageSize = 24
 
-    async function getData() {
-      try {
-        loading.value = true
-        const res = await queryAdrTokensByHash({
-          page: page.value,
-          pageSize: defaultPageSize,
-          txid,
-          address,
-        })
-        data.value = setCollectionLogo(res.data.data)
-        total.value = res.data.total
-      } finally {
-        loading.value = false
+    const { dataSource, total, page, loading, query } = useTable({
+      api: getData,
+      pageSize: defaultPageSize
+    })
+
+    async function getData(page: number, pageSize: number) {
+      const res = await queryAdrTokensByHash({
+        page,
+        pageSize,
+        txid,
+        address,
+      })
+      total.value = res.data.total
+      return {
+        total: res.data.total,
+        data: setCollectionLogo(res.data.data)
       }
     }
 
-    function changePage(pageNumber: number) {
-      page.value = pageNumber
-      getData()
-    }
-
-    onMounted(() => getData())
+    onMounted(() => page.value = 1)
 
     return () => (
       <DogCard is-back title="Assets">
         <DogList
-          dataSource={data.value}
+          dataSource={dataSource.value}
           currentPage={page.value}
           defaultPageSize={defaultPageSize}
           loading={loading.value}
           total={total.value}
-          onCurrent-change={changePage}
+          onCurrent-change={query}
           v-slots={{
             default: (dataSource: [{ tokenid: string; txid: string; baseuri: string }]) => (
               <div class={s['dog-token-grid']}>

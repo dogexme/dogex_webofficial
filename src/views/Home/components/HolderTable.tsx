@@ -25,17 +25,11 @@ export default defineComponent({
   },
   emits: ['update:isLoading'],
   setup(props, { emit, expose }) {
-    const data = ref([])
-    const total = ref(0)
-    const page = ref(1)
-    const loading = computed({
-      get() {
-        return props.isLoading
-      },
-      set(isLoading) {
-        emit('update:isLoading', isLoading)
-      },
+    const { loading, dataSource, total, page, query } = useTable({
+      api: getData,
+      pageSize: 15,
     })
+
     const columns = [
       {
         title: 'Rank',
@@ -71,36 +65,31 @@ export default defineComponent({
       },
     ]
 
-    function nextPage(pageNumber: number) {
-      page.value = pageNumber
-      getData()
-    }
+    watch(loading, (isLoading) => {
+      emit('update:isLoading', isLoading)
+    })
 
-    async function getData(isReload = false) {
-      loading.value = true
+    async function getData(page: number, pageSize: number) {
       try {
-        if (isReload) {
-          page.value = 1
-        }
         const res = await queryHoldersByTxid({
           txid: props.txid,
-          pageSize: 15,
-          page: page.value,
+          pageSize,
+          page,
         })
-        total.value = res.data.total
-        data.value = res.data.data.map((d: { nft_count: number }) => ({ ...d, ratio: d.nft_count / props.collInfo.max! }))
-        console.log(data.value)
+        return {
+          total: res.data.total,
+          data: res.data.data.map((d: { nft_count: number }) => ({ ...d, ratio: d.nft_count / props.collInfo.max! }))
+        }
       } catch (e: unknown) {
         props.error?.(e as Error)
-      } finally {
-        loading.value = false
+        throw e
       }
     }
 
     expose({
-      reload: () => getData(true),
+      reload: () => page.value = 1,
     })
 
-    return () => <DogTable loading={loading.value} dataSource={data.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} />
+    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} />
   },
 })

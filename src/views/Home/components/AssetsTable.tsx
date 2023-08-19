@@ -101,7 +101,7 @@ export default defineComponent({
     }
 
     expose({
-      reload: () => query(1),
+      reload: () => page.value = 1,
     })
 
     return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={query} />
