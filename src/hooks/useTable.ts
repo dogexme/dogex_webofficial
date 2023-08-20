@@ -33,6 +33,10 @@ export function useTable(options: TableHookOptions) {
     }
   }
 
+  function refresh() {
+    query(page.value)
+  }
+
   onMounted(() => {
     if (first) {
       query(page.value)
@@ -45,5 +49,6 @@ export function useTable(options: TableHookOptions) {
     page,
     total,
     query,
+    refresh
   }
 }

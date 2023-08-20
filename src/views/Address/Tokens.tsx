@@ -38,6 +38,7 @@ export default defineComponent({
           loading={loading.value}
           total={total.value}
           onCurrent-change={query}
+          onRefresh={() => query(page.value)}
           v-slots={{
             default: (dataSource: [{ tokenid: string; txid: string; baseuri: string }]) => (
               <div class={s['dog-token-grid']}>

@@ -1,5 +1,7 @@
+import { ElButton } from 'element-plus'
 import DogPagination from './DogPagination.vue'
 import s from './index.module.scss'
+import { Refresh } from '@element-plus/icons-vue'
 
 export default defineComponent({
   props: {
@@ -23,6 +25,7 @@ export default defineComponent({
     },
     totalText: String,
   },
+  emits: ['current-change', 'refresh'],
   setup(props, { slots, emit }) {
     const currentPage = ref(1)
     const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
@@ -62,6 +65,9 @@ export default defineComponent({
 
     return () => (
       <div class={s['dog-list']} v-loading={props.loading}>
+        <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
+          <ElButton icon={Refresh} circle onClick={() => emit('refresh')}></ElButton>
+        </div>
         {!!props.dataSource.length && pages.value > 1 && (
           <DogPagination
             style="margin-bottom: 20px"

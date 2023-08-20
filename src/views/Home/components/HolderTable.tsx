@@ -12,7 +12,7 @@ export default defineComponent({
     },
     collInfo: {
       type: Object as PropType<Partial<CollInfo>>,
-      required: true,
+      default: () => ({})
     },
     tabVal: {
       type: String,
@@ -103,6 +103,6 @@ export default defineComponent({
       }
     })
 
-    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} />
+    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} onRefresh={() => query(page.value)}/>
   },
 })

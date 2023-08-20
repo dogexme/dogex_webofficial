@@ -2,16 +2,11 @@ import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import { ElImage } from 'element-plus'
 import { queryAssetsByTxid } from '@/services/nft'
-import { CollInfo } from '@/types'
 
 export default defineComponent({
   props: {
     txid: {
       type: String,
-      required: true,
-    },
-    collInfo: {
-      type: Object as PropType<Partial<CollInfo>>,
       required: true,
     },
     tabVal: {
@@ -116,6 +111,6 @@ export default defineComponent({
       }
     })
 
-    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={query} />
+    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={query} onRefresh={() => query(page.value)}/>
   },
 })

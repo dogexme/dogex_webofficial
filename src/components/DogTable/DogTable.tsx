@@ -1,5 +1,7 @@
 import DogPagination from '../DogPagination.vue'
+import { ElButton } from 'element-plus'
 import s from './DogTable.module.scss'
+import { Refresh } from '@element-plus/icons-vue'
 
 interface ColumnProps {
   dataIndex?: string
@@ -49,7 +51,7 @@ export default defineComponent({
       default: false,
     },
   },
-  emits: ['current-change', 'row-click'],
+  emits: ['current-change', 'row-click', 'refresh'],
   setup(props, { emit }) {
     const containerRef = ref<HTMLElement>()
     const currentPage = ref(1)
@@ -107,6 +109,9 @@ export default defineComponent({
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
+          <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
+            <ElButton icon={Refresh} circle onClick={() => emit('refresh')}></ElButton>
+          </div>
           {!!props.dataSource.length && pages.value > 1 && (
             <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange}/>
           )}

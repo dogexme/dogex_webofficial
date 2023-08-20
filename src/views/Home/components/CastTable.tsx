@@ -94,6 +94,7 @@ export default defineComponent({
         currentPage={page.value}
         total={total.value}
         onCurrent-change={query}
+        onRefresh={() => query(page.value)}
       />
     )
   },
