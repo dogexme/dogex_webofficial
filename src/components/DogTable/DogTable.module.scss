@@ -46,4 +46,11 @@
   &:first-child > .dog-table-td{
     border-top: 1px solid #333;
   }
+
+  &_hover {
+    &:hover {
+      cursor: pointer;
+      background-color: #f5f5f5;
+    }
+  }
 }

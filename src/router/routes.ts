@@ -32,6 +32,15 @@ export default [
         name: 'marketplace',
         path: 'marketplace',
         component: () => import('@/views/Marketplace/Marketplace.vue'),
+        children: [{
+          path: '',
+          name: 'marketTokenList',
+          component: () => import('@/views/Marketplace/MarketTokenList'),
+        }, {
+          path: 'tokens',
+          name: 'marketTokens',
+          component: () => import('@/views/Marketplace/MarketTokens'),
+        }]
       },
     ],
   },

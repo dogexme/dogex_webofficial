@@ -113,7 +113,7 @@ export default defineComponent({
             <ElButton icon={Refresh} circle onClick={() => emit('refresh')}></ElButton>
           </div>
           {!!props.dataSource.length && pages.value > 1 && (
-            <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange}/>
+            <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
 
           <div class={s['table-container']} ref={containerRef}>
@@ -132,16 +132,26 @@ export default defineComponent({
               <tbody class={s['dog-table-tb']}>
                 {props.dataSource.map((record, i) => {
                   return (
-                    <tr class={s['dog-table-tr']} onClick={() => emit('row-click', record)} key={record[props.rowkey]}>
-                      {renderTbodyTd(record, i)}
-                    </tr>
+                    <>
+                      {props.rowClick ? (
+                        <tr class={[s['dog-table-tr'], s['dog-table-tr_hover']]} onClick={() => emit('row-click', record)} key={record[props.rowkey]}>
+                          {renderTbodyTd(record, i)}
+                        </tr>
+                      ) : (
+                        <tr class={s['dog-table-tr']} key={record[props.rowkey]}>
+                          {renderTbodyTd(record, i)}
+                        </tr>
+                      )}
+                    </>
                   )
                 })}
               </tbody>
             </table>
             {!props.dataSource.length && <el-empty></el-empty>}
           </div>
-          {!!props.dataSource.length && pages.value > 1 && <DogPagination totalText={' '} style="margin-top: 20px" currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange}/>}
+          {!!props.dataSource.length && pages.value > 1 && (
+            <DogPagination totalText={' '} style="margin-top: 20px" currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
+          )}
         </div>
       )
     }
