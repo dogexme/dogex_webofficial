@@ -20,7 +20,7 @@ const isNotFount = ref(route.name == 'nft' ? true : false)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const collInfo = ref<CollInfo>()
 const blockCount = ref(0)
-const table = ref()
+const tables = reactive<any>({})
 const routeName = ref<RouteRecordName | null | undefined>(route.name)
 
 const tabs = [
@@ -68,16 +68,17 @@ function handleNotFount() {
 
 async function changeTab(tabVal: CollInfoType) {
   if (!txidCopy.value || loadingSearch.value) return
-
   curTabValue.value = tabVal
+  reload()
+}
 
-  if (curTabValue.value == 'overview' || curTabValue.value == 'holders') {
-    await getOverview({ txid: txidCopy.value })
-  }
-
+function reload(isForce = false) {
   nextTick(() => {
-    if (table.value?.reload) {
-      table.value?.reload()
+    if (tables[curTabValue.value]?.reload) {
+      if (isForce) {
+        tables[curTabValue.value].setLoad(false)
+      }
+      tables[curTabValue.value].reload()
     }
   })
 }
@@ -92,19 +93,12 @@ async function search(txidValue: string) {
   showContent.value = true
   router.push('/nft')
   try {
-    console.log(curTabValue.value)
-
     if (curTabValue.value == 'overview' || curTabValue.value == 'holders') {
       await getOverview({ txid: hash })
     }
 
     txidCopy.value = hash
-
-    await nextTick(async () => {
-      if (table.value?.reload) {
-        await table.value?.reload()
-      }
-    })
+    reload(true)
   } finally {
     loadingSearch.value = false
   }
@@ -151,18 +145,18 @@ onMounted(() => {
       </div>
     </div>
     <div class="coll-wrapper" v-if="showContent && routeName == 'nft'">
-      <DogTabs v-if="!isNotFount" v-model="curTabValue" :tabs="tabs" @change="changeTab">
+      <DogTabs v-if="!isNotFount" keep-dom v-model="curTabValue" :tabs="tabs" @change="changeTab">
         <DogTabsItem value="overview">
-          <Overview v-loading="loadingSearch" :collInfo="collInfo"></Overview>
+          <Overview :ref="(ref) => tables['holders'] = ref" v-loading="loadingSearch" :collInfo="collInfo"></Overview>
         </DogTabsItem>
         <DogTabsItem value="holders">
-          <HolderTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
+          <HolderTable :ref="(ref) => tables['holders'] = ref" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
         </DogTabsItem>
         <DogTabsItem value="transfers">
-          <TransfersTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></TransfersTable>
+          <TransfersTable :ref="(ref) => tables['transfers'] = ref" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></TransfersTable>
         </DogTabsItem>
         <DogTabsItem value="assets">
-          <AssetsTable ref="table" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
+          <AssetsTable :ref="(ref) => tables['assets'] = ref" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
         </DogTabsItem>
       </DogTabs>
       <el-empty v-else></el-empty>

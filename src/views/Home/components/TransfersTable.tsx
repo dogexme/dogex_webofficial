@@ -29,6 +29,7 @@ export default defineComponent({
     const { dataSource, loading, total, page, query } = useTable({
       api: getData,
       pageSize: 15,
+      first: false
     })
 
     watch(loading, (isLoading) => {
@@ -135,8 +136,20 @@ export default defineComponent({
       }
     }
 
+    const isLoaded = ref(false)
+
     expose({
-      reload: () => page.value = 1,
+      reload: () => {
+        if (page.value == 1 && !isLoaded.value) {
+          query(1)
+          isLoaded.value = true
+        } else {
+          page.value = 1
+        }
+      },
+      setLoad(isLoad: boolean) {
+        isLoaded.value = isLoad
+      }
     })
 
     return () => <DogTable rowkey="txid" loading={loading.value} dataSource={dataSource.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={query} />

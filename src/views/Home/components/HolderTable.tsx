@@ -28,6 +28,7 @@ export default defineComponent({
     const { loading, dataSource, total, page, query } = useTable({
       api: getData,
       pageSize: 15,
+      first: false
     })
 
     const columns = [
@@ -56,7 +57,7 @@ export default defineComponent({
                 <div>
                   {numberFormat(text)}
                   <span style="color: #606266">{`(${+(record.ratio * 100).toFixed(2)}%)`}</span>
-                  <ElProgress style="width: 100%; margin-top: 5px;border:1px solid #000;border-radius:5px" stroke-width={10} percentage={+(record.ratio * 100)} show-text={false} />
+                  <ElProgress style="width: 100%; margin-top: 5px;" stroke-width={10} percentage={+(record.ratio * 100)} show-text={false} />
                 </div>
               )}
             </>
@@ -86,8 +87,20 @@ export default defineComponent({
       }
     }
 
+    const isLoaded = ref(false)
+
     expose({
-      reload: () => page.value = 1,
+      reload: () => {
+        if (page.value == 1 && !isLoaded.value) {
+          query(1)
+          isLoaded.value = true
+        } else {
+          page.value = 1
+        }
+      },
+      setLoad(isLoad: boolean) {
+        isLoaded.value = isLoad
+      }
     })
 
     return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} />

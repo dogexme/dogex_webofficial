@@ -30,11 +30,11 @@ const props = withDefaults(
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Max</div>
-      <div class="coll-info_item_value">{{ numberFormat(props.collInfo.max) }}</div>
+      <div class="coll-info_item_value">{{ props.collInfo.max && numberFormat(props.collInfo.max) }}</div>
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Mintval</div>
-      <div class="coll-info_item_value">{{ numberFormat(props.collInfo.mintval) }}</div>
+      <div class="coll-info_item_value">{{ props.collInfo.mintval && numberFormat(props.collInfo.mintval) }}</div>
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Deployer</div>
@@ -44,7 +44,7 @@ const props = withDefaults(
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Holders</div>
-      <div class="coll-info_item_value">{{ numberFormat(props.collInfo.holders) }}</div>
+      <div class="coll-info_item_value">{{ props.collInfo.holders && numberFormat(props.collInfo.holders) }}</div>
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Date</div>

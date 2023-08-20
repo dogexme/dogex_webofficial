@@ -17,6 +17,10 @@ export default defineComponent({
       type: Array as PropType<Array<TabOptions>>,
       required: true,
     },
+    keepDom: {
+      type: Boolean,
+      default: false
+    }
   },
   emits: ['update:modelValue', 'change'],
   setup(props, { emit, slots }) {
@@ -31,9 +35,23 @@ export default defineComponent({
     })
 
     return () => {
-      const children = slots.default?.().filter((vnode) => {
-        return tabValue.value === vnode.props?.value
+      const values = [] as Array<string>
+
+      let children = slots.default?.().map((itemSlot) => {
+        const value = itemSlot.props?.value
+        values.push(value)
+        if (props.keepDom) {
+          return <DogCard style={{ display: value == tabValue.value ? 'block' : 'none' }}>{itemSlot}</DogCard>
+        } else {
+          return <DogCard>{itemSlot}</DogCard>
+        }
       })
+
+      if (!props.keepDom && children) {
+        children = children.filter((_vnode, i) => {
+          return tabValue.value === values[i]
+        })
+      }
 
       return (
         <div class={s['dog-tabs']}>
@@ -46,7 +64,7 @@ export default defineComponent({
               )
             })}
           </ul>
-          <DogCard class={s['dog-tabs_content']}>{children}</DogCard>
+          {children}
         </div>
       )
     }
