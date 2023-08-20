@@ -1,6 +1,7 @@
 <script setup lang="ts">
-const curTabValue = ref('tokens')
 const router = useRouter()
+const route = useRoute()
+const curTabValue = ref<string>((route.query.category as string) || 'tokens')
 const tabs = [
   {
     label: 'Tokens',
@@ -19,10 +20,10 @@ const tabs = [
 function changeTab(val: string) {
   curTabValue.value = val
   router.push({
-    name: 'marketplace',
+    name: 'marketTokenList',
     query: {
-      category: val
-    }
+      category: val,
+    },
   })
 }
 </script>

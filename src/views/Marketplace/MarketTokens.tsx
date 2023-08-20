@@ -1,4 +1,5 @@
 import DogTable from '@/components/DogTable/DogTable'
+import DogPageHeader from '@/components/DogPageHeader.vue'
 
 export default defineComponent({
   setup() {
@@ -18,8 +19,8 @@ export default defineComponent({
       },
       {
         title: 'Listed',
-        dataIndex: 'listed'
-      }
+        dataIndex: 'listed',
+      },
     ]
 
     async function api(page: number, pageSize: number) {
@@ -48,6 +49,21 @@ export default defineComponent({
       router.push('/')
     }
 
-    return () => <DogTable rowClick loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} onRow-click={handleRowClick} onRefresh={refresh}/>
+    return () => (
+      <div>
+        <DogPageHeader isBack title="Tokens / Detail"></DogPageHeader>
+        <DogTable
+          rowClick
+          loading={loading.value}
+          dataSource={dataSource.value}
+          columns={columns}
+          currentPage={page.value}
+          total={total.value}
+          onCurrent-change={nextPage}
+          onRow-click={handleRowClick}
+          onRefresh={refresh}
+        />
+      </div>
+    )
   },
 })
