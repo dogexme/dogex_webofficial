@@ -24,17 +24,19 @@ export default defineComponent({
     totalText: String,
   },
   setup(props, { slots, emit }) {
-    const currentPage = ref(props.currentPage)
-    const jumpPage = ref('')
-    let prevPage = -1
-
+    const currentPage = ref(1)
     const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
 
-    function changePage(page: number) {
-      if (page == prevPage) return
-      prevPage = page
+    watch(currentPage, (page: number) => {
       emit('current-change', page)
-    }
+    })
+
+    watch(
+      () => props.currentPage,
+      (p) => {
+        currentPage.value = p
+      }
+    )
 
     watch(
       () => props.loading,
@@ -44,6 +46,10 @@ export default defineComponent({
         }
       }
     )
+
+    function pageChange(p: number) {
+      currentPage.value = p
+    }
 
     function resetPositionTop() {
       const resetPosition: ScrollToOptions = {
@@ -60,11 +66,10 @@ export default defineComponent({
           <DogPagination
             style="margin-bottom: 20px"
             totalText={props.totalText}
-            v-model:currentPage={currentPage.value}
-            v-model:jumpPage={jumpPage.value}
+            currentPage={currentPage.value}
             pages={pages.value}
             total={props.total}
-            onCurrent-change={changePage}
+            onChange={pageChange}
           />
         )}
 
@@ -74,11 +79,10 @@ export default defineComponent({
           <DogPagination
             style="margin-top: 20px"
             totalText=" "
-            v-model:currentPage={currentPage.value}
-            v-model:jumpPage={jumpPage.value}
+            currentPage={currentPage.value}
             pages={pages.value}
             total={props.total}
-            onCurrent-change={changePage}
+            onChange={pageChange}
           />
         )}
       </div>

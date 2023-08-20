@@ -29,8 +29,6 @@ export default defineComponent({
       }
     }
 
-    onMounted(() => page.value = 1)
-
     return () => (
       <DogCard is-back title="Assets">
         <DogList
