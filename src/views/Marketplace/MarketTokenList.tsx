@@ -46,7 +46,10 @@ export default defineComponent({
     function handleRowClick(r: any) {
       console.log(r)
       router.push({
-        name: 'marketTokens'
+        name: 'marketTokens',
+        query: {
+          hash: 123
+        }
       })
     }
 

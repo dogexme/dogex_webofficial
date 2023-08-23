@@ -1,9 +1,13 @@
-import DogTable from '@/components/DogTable/DogTable'
 import DogPageHeader from '@/components/DogPageHeader.vue'
+import DogTokenBuyItem from '@/components/DogTokenBuyItem.vue'
+import DogList from '@/components/DogList'
+import s from './index.module.scss'
 
 export default defineComponent({
   setup() {
     const router = useRouter()
+    const route = useRoute()
+
     const columns = [
       {
         title: 'Collection',
@@ -24,7 +28,6 @@ export default defineComponent({
     ]
 
     async function api(page: number, pageSize: number) {
-      console.log(page, pageSize)
       return {
         data: [
           { collection: 'dogim', floorPrice: 12, unitPrice: 132, listed: 789 },
@@ -36,33 +39,34 @@ export default defineComponent({
       }
     }
 
+    const defaultPageSize = 15
+
     const { loading, dataSource, page, total, query, refresh } = useTable({
       api,
+      pageSize: 15
     })
-
-    function nextPage(page: number) {
-      query(page)
-    }
-
-    function handleRowClick(r: any) {
-      console.log(r)
-      router.push('/')
-    }
 
     return () => (
       <div>
         <DogPageHeader isBack title="Tokens / Detail"></DogPageHeader>
-        <DogTable
-          rowClick
-          loading={loading.value}
+        <DogList
           dataSource={dataSource.value}
-          columns={columns}
           currentPage={page.value}
+          defaultPageSize={defaultPageSize}
+          loading={loading.value}
           total={total.value}
-          onCurrent-change={nextPage}
-          onRow-click={handleRowClick}
+          onCurrent-change={query}
           onRefresh={refresh}
-        />
+          v-slots={{
+            default: (dataSource: [{ tokenid: string; txid: string; baseuri: string }]) => (
+              <div class={s['dog-token-grid']}>
+                {dataSource.map(() => (
+                  <DogTokenBuyItem ></DogTokenBuyItem>
+                ))}
+              </div>
+            ),
+          }}
+        ></DogList>
       </div>
     )
   },
