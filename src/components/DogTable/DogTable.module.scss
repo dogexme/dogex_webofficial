@@ -13,7 +13,8 @@
 
 .dog-table {
   width: 100%;
-  min-width: 960px;
+  max-width: 960px;
+  min-width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;

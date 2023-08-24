@@ -2,7 +2,7 @@ import DogPageHeader from '@/components/DogPageHeader.vue'
 import DogTokenBuyItem from '@/components/DogTokenBuyItem.vue'
 import DogTokenBuyContentItem from '@/components/DogTokenBuyContentItem.vue'
 import DogList from '@/components/DogList'
-import { ElDialog, ElButton } from 'element-plus'
+import { ElDialog, ElButton, ElResult } from 'element-plus'
 import s from './index.module.scss'
 import { useAppStore } from '@/store'
 
@@ -37,9 +37,12 @@ export default defineComponent({
       },
     ]
 
+    enum SHOW_STATUS { 'SHOW', 'SUCCESS', "FAIL" }
     const minDialogWidth = 600
     const visible = ref(false)
     const dialogWidth = ref(minDialogWidth)
+    const isBuyLoading = ref(false)
+    const showStatus = ref<SHOW_STATUS>(SHOW_STATUS.SHOW)
 
 
     function openBuy(buyInfo: any) {
@@ -53,6 +56,19 @@ export default defineComponent({
       }).catch(() => {
         console.log('123')
       })
+    }
+
+    function buy() {
+      isBuyLoading.value = true
+      setTimeout(() => {
+        showStatus.value = SHOW_STATUS.SUCCESS
+        // isBuyLoading.value = false
+      }, 2000)
+    }
+
+    function handleDialogClose() {
+      showStatus.value = SHOW_STATUS.SHOW
+      isBuyLoading.value = false
     }
 
     async function api(page: number, pageSize: number) {
@@ -88,32 +104,56 @@ export default defineComponent({
             ),
           }}
         ></DogList>
-        <ElDialog title="Checkout" width={dialogWidth.value} align-center append-to-body v-model={visible.value} v-slots={{
-          footer: () => (
-            <span class="dialog-footer">
-              <ElButton onClick={() => visible.value = false}>Cancel</ElButton>
+        <ElDialog title="Checkout" width={dialogWidth.value} align-center append-to-body v-model={visible.value} onClosed={handleDialogClose} v-slots={{
+          footer: () => {
+            return <>
               {
-                !address.value ?
-                <ElButton type="primary" onClick={handleConnectDpal}>Connect DpalWallet</ElButton> :
-                <ElButton type="primary" onClick={() => visible.value = false}>Buy</ElButton>
+                showStatus.value === SHOW_STATUS.SHOW && <span class="dialog-footer">
+                <ElButton onClick={() => visible.value = false}>Cancel</ElButton>
+                {
+                  !address.value ?
+                  <ElButton type="primary" onClick={handleConnectDpal}>Connect DpalWallet</ElButton> :
+                  <ElButton type="primary" loading={isBuyLoading.value} onClick={buy}>Buy</ElButton>
+                }
+              </span>
               }
-            </span>
-          )
+            </>
+          }
         }}>
           <div class={s['dog-buy-token']}>
             <DogTokenBuyContentItem style="width: 200px"/>
           </div>
-          <div class={[s['dog-buy-amount'], s['dog-buy-amount--first']]}>
-            <span>Price</span>
-            <span>$12.2</span>
-          </div>
-          <div class={s['dog-buy-amount']}>
-            <span>You Pay</span>
-            <div class={s['dog-buy-amount_youpay']}>
-              <span>12.2 ÐOGE</span>
+          {
+          showStatus.value === SHOW_STATUS.SHOW &&  <div>
+            <div class={[s['dog-buy-amount'], s['dog-buy-amount--first']]}>
+              <span>Price</span>
               <span>$12.2</span>
             </div>
+            <div class={s['dog-buy-amount']}>
+              <span>You Pay</span>
+              <div class={s['dog-buy-amount_youpay']}>
+                <span>12.2 ÐOGE</span>
+                <span>$12.2</span>
+              </div>
+            </div>
           </div>
+          }
+          {
+            showStatus.value === SHOW_STATUS.SUCCESS && <div class={s['dog-buy-result']}>
+            <ElResult
+              icon="success"
+              title="Payment success"
+            ></ElResult>
+          </div>
+          }
+          {
+            showStatus.value === SHOW_STATUS.FAIL && <div class={s['dog-buy-result']}>
+            <ElResult
+              icon="error"
+              title="Sorry, Transaction Failed"
+            ></ElResult>
+          </div>
+          }
         </ElDialog>
       </div>
     )

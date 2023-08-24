@@ -50,9 +50,8 @@ export default defineComponent({
         },
       },
       {
-        title: 'Tokenid',
+        title: 'Token Id',
         dataIndex: 'tokenid',
-        width: '350px',
         render(text: string) {
           return text && `#${text}`
         },
