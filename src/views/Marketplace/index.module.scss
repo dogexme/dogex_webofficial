@@ -11,3 +11,28 @@
     grid-template-columns: repeat(2, 1fr);
   }
 }
+
+.dog-buy-token {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 24px;
+}
+
+.dog-buy-amount {
+  display: flex;
+  justify-content: space-between;
+  font-size: 16px;
+  color: #333;
+
+  &--first {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #b9b9b9;
+  }
+
+  &_youpay {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+  }
+}

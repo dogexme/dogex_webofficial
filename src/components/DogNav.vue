@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { omitCenterString } from '@/utils'
 import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
-import { ElMessageBox } from 'element-plus'
 import { useAppStore } from '@/store'
 import navlist from '@/config/navlist'
 
@@ -12,8 +11,8 @@ const router = useRouter()
 const isShowDrawer = ref(false)
 const activePath = computed(() => appStore.activeRoutePath)
 const drawerDirection = ref<DrawerDirection>('ltr')
-const address = ref('')
-const { connectDpal } = useDoge()
+const { connectDpal } = appStore
+const address = computed(() => appStore.address)
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function selectItem() {
@@ -24,18 +23,7 @@ function connect() {
   connectDpal()
     .then((userAddress) => {
       if (userAddress) {
-        address.value = userAddress
         router.push(`/address/${userAddress}`)
-      }
-    })
-    .catch((code) => {
-      if (DogeErrorCode.notInstall == code) {
-        ElMessageBox.confirm('please install dpal wallet?', '', {
-          confirmButtonText: 'Install',
-          type: 'warning',
-        }).then(() => {
-          window.open('https://dpalwallet.io')
-        })
       }
     })
     .finally(() => {

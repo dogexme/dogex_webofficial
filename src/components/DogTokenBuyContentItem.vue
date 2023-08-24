@@ -6,12 +6,9 @@ const props = defineProps<{
   owner?: string
   baseUrl?: string
 }>()
-
-const emit = defineEmits(['click-buy'])
-
 </script>
 <template>
-  <div class="dog-token-item dog-token-item--hover">
+  <div class="dog-token-item">
     <div class="dog-token-item_img">
       <el-image class="dog-token-item_imgitem" :src="props.imgSrc">
         <template #error>
@@ -27,11 +24,6 @@ const emit = defineEmits(['click-buy'])
       <span class="dog-token-item_label">Hash: </span>
       <span class="dog-token-item_value"><DogLink is-copy :label="omitCenterString('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff', 10)" :value="'1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff'"></DogLink></span>
     </div>
-    <div class="dog-token-item_row dog-token-item--amount">
-      <span class="dog-token-item_label">1ÐOGE</span>
-      <span class="dog-token-item_label">$1.588</span>
-    </div>
-    <div class="dog-token-item_buyBtn" @click="emit('click-buy', props)">Buy</div>
   </div>
 </template>
 
@@ -43,14 +35,8 @@ const emit = defineEmits(['click-buy'])
   border: solid 1px #000;
   background-color: #fff;
   font-size: 12px;
-  &--hover {
-    transition: all .5s;
-    &:hover {
-      border-color:	#DA70D6;
-    }
-  }
   &--amount {
-    border-top: 1px solid #f5f5f5;
+    border-top: 1px solid rgb(218, 112, 214);
     padding-top: 10px;
     margin: 10px 0px;
     display: flex;
@@ -77,19 +63,6 @@ const emit = defineEmits(['click-buy'])
     position: absolute;
     border-radius: 8px;
     inset: 0;
-  }
-  &_buyBtn {
-    line-height: 35px;
-    color: #fff;
-    border-radius: 20px;
-    text-align: center;
-    cursor: pointer;
-    font-size: 14px;
-    background-color: #DA70D6;
-    transition: all .2s;
-    &:hover {
-      background-color: #ee7bea;
-    }
   }
 }
 </style>
