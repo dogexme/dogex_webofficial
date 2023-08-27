@@ -8,6 +8,7 @@ import ElementPlus from 'unplugin-element-plus/vite'
 import removeConsole from 'vite-plugin-remove-console'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import viteCompression from 'vite-plugin-compression'
+import { viteMockServe } from 'vite-plugin-mock'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -32,6 +33,11 @@ export default defineConfig({
     removeConsole(),
     ElementPlus({}),
     viteCompression(),
+    viteMockServe({
+      mockPath: 'mock',
+      enable: process.env.NODE_ENV === 'development',
+      watchFiles: false,
+    }),
   ],
   css: {
     postcss: {},

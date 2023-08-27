@@ -1,18 +1,20 @@
+interface Route {
+  path: string
+  title: string
+  children?: Route[]
+}
+
 export default [
   {
     path: '/',
     title: 'Home',
   },
   {
-    path: '/swordpool',
-    title: 'Swordpool',
-    children: [{
-      path: '/swordpool/swap',
-      title: 'Swap',
-    }]
+    path: '/swap',
+    title: 'Swap',
   },
   // {
   //   name: 'Marketplace',
   //   path: '/marketplace',
   // },
-]
+] as Route[]

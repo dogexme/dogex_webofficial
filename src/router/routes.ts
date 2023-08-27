@@ -29,14 +29,9 @@ export default [
         component: () => import('@/views/Address/Tokens'),
       },
       {
-        path: 'swordpool',
-        name: 'swordpool',
-        redirect: { name: 'swordpoolSwap' },
-        children: [{
-          path: 'swap',
-          name: 'swordpoolSwap',
-          component: () => import('@/views/Swordpool/Swap.vue')
-        }]
+        path: 'swap',
+        name: 'swap',
+        component: () => import('@/views/Swap/Swap.vue')
       }
       // {
       //   name: 'marketplace',

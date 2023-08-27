@@ -3,7 +3,7 @@ import { omitCenterString } from '@/utils'
 import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
 import { useAppStore } from '@/store'
 import navlist from '@/config/navlist'
-import { ElMenuItem, ElSubMenu } from 'element-plus'
+import { ElMenuItem, ElMessageBox, ElSubMenu } from 'element-plus'
 
 type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
 
@@ -21,15 +21,20 @@ function selectItem() {
 }
 
 function connect() {
-  connectDpal()
-    .then((userAddress) => {
-      if (userAddress) {
-        router.push(`/address/${userAddress}`)
-      }
-    })
-    .finally(() => {
-      isShowDrawer.value = false
-    })
+  ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect DpalWallet', {
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+  }).then(() => {
+    connectDpal()
+      .then((userAddress) => {
+        if (userAddress) {
+          router.push(`/address/${userAddress}`)
+        }
+      })
+      .finally(() => {
+        isShowDrawer.value = false
+      })
+  })
 }
 
 function triggerDrawer(direction: DrawerDirection) {
@@ -179,25 +184,16 @@ function triggerDrawer(direction: DrawerDirection) {
   border: 1px solid #333;
   margin: 0 3px;
   overflow: hidden;
+  box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
   a {
     display: block;
     padding: 4px 12px;
   }
-  &::after {
-    content: '';
-    bottom: 0;
-    right: 0;
-    position: absolute;
-    display: block;
-    height: 3px;
-    width: 100%;
-    background-color: #f5f5f5;
-  }
   &--weblink {
     background-color: currentColor;
     color: rgb(238, 181, 15);
-    &::after {
-      background-color: rgb(218, 167, 14) !important;
+    :hover {
+      background-color: rgba(0,0,0,.05);
     }
   }
 }

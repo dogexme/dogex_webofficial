@@ -1,8 +1,8 @@
 @font-face {
   font-family: "nft"; /* Project id 4185132 */
-  src: url('iconfont.woff2?t=1690896406687') format('woff2'),
-       url('iconfont.woff?t=1690896406687') format('woff'),
-       url('iconfont.ttf?t=1690896406687') format('truetype');
+  src: url('iconfont.woff2?t=1693124428665') format('woff2'),
+       url('iconfont.woff?t=1693124428665') format('woff'),
+       url('iconfont.ttf?t=1693124428665') format('truetype');
 }
 
 .nft {
@@ -11,6 +11,14 @@
   font-style: normal;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-xiajiantou:before {
+  content: "\eb6d";
+}
+
+.icon-icon_jiaohuan:before {
+  content: "\e64f";
 }
 
 .icon-gengduo:before {
