@@ -3,6 +3,7 @@ import { omitCenterString } from '@/utils'
 import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
 import { useAppStore } from '@/store'
 import navlist from '@/config/navlist'
+import { ElMenuItem, ElSubMenu } from 'element-plus'
 
 type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
 
@@ -48,7 +49,15 @@ function triggerDrawer(direction: DrawerDirection) {
           <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
         <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
-          <el-menu-item v-for="n in navlist" :index="n.path" :key="n.name"> {{ n.name }} </el-menu-item>
+          <component v-for="n in navlist" :is="n.children ? ElSubMenu : ElMenuItem" :index="n.path" :key="n.title">
+            <template v-if="n.children" #title>{{ n.title }}</template>
+            <template v-if="n.children">
+              <ElMenuItem v-for="c in n.children" :index="c.path" :key="c.title">{{ c.title }}</ElMenuItem>
+            </template>
+            <template v-else>
+              {{ n.title }}
+            </template>
+          </component>
         </el-menu>
         <ul class="nav-active">
           <li class="nav-active-item nav-active-item--weblink" v-if="!address">
@@ -67,7 +76,15 @@ function triggerDrawer(direction: DrawerDirection) {
     </nav>
     <el-drawer append-to-body :show-close="false" :with-header="false" size="70%" v-model="isShowDrawer" :direction="drawerDirection" modal-class="nav-drawer">
       <el-menu v-if="drawerDirection == 'ltr'" route @select="selectItem" router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical">
-        <el-menu-item v-for="n in navlist" :index="n.path" :key="n.name"> {{ n.name }} </el-menu-item>
+        <component v-for="n in navlist" :is="n.children ? ElSubMenu : ElMenuItem" :index="n.path" :key="n.title">
+          <template v-if="n.children" #title>{{ n.title }}</template>
+          <template v-if="n.children">
+            <ElMenuItem v-for="c in n.children" :index="c.path" :key="c.title">{{ c.title }}</ElMenuItem>
+          </template>
+          <template v-else>
+            {{ n.title }}
+          </template>
+        </component>
       </el-menu>
       <el-menu v-else router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
         <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address } }">

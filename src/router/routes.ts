@@ -29,26 +29,36 @@ export default [
         component: () => import('@/views/Address/Tokens'),
       },
       {
-        name: 'marketplace',
-        path: 'marketplace',
-        component: () => import('@/views/Marketplace/Marketplace.vue'),
-        redirect: {
-          name: 'marketTokenList',
-          query: { category: 'tokens' },
-        },
-        children: [
-          {
-            path: '',
-            name: 'marketTokenList',
-            component: () => import('@/views/Marketplace/MarketTokenList'),
-          },
-          {
-            path: 'tokens',
-            name: 'marketTokens',
-            component: () => import('@/views/Marketplace/MarketTokens'),
-          },
-        ],
-      },
+        path: 'swordpool',
+        name: 'swordpool',
+        redirect: { name: 'swordpoolSwap' },
+        children: [{
+          path: 'swap',
+          name: 'swordpoolSwap',
+          component: () => import('@/views/Swordpool/Swap.vue')
+        }]
+      }
+      // {
+      //   name: 'marketplace',
+      //   path: 'marketplace',
+      //   component: () => import('@/views/Marketplace/Marketplace.vue'),
+      //   redirect: {
+      //     name: 'marketTokenList',
+      //     query: { category: 'tokens' },
+      //   },
+      //   children: [
+      //     {
+      //       path: '',
+      //       name: 'marketTokenList',
+      //       component: () => import('@/views/Marketplace/MarketTokenList'),
+      //     },
+      //     {
+      //       path: 'tokens',
+      //       name: 'marketTokens',
+      //       component: () => import('@/views/Marketplace/MarketTokens'),
+      //     },
+      //   ],
+      // },
     ],
   },
   {

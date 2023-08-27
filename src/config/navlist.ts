@@ -1,10 +1,18 @@
 export default [
   {
-    name: 'Home',
     path: '/',
+    title: 'Home',
   },
   {
-    name: 'Marketplace',
-    path: '/marketplace',
+    path: '/swordpool',
+    title: 'Swordpool',
+    children: [{
+      path: '/swordpool/swap',
+      title: 'Swap',
+    }]
   },
+  // {
+  //   name: 'Marketplace',
+  //   path: '/marketplace',
+  // },
 ]
