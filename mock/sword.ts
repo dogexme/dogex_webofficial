@@ -7,10 +7,18 @@ export default [
       return {
         data: [
           {
-            poolid: '池子编号，可以部署相同的池子',
+            poolid: 1,
             tokenA: 'doge',
             tokenB: 'dogi',
-            pooladdress: '池子地址',
+            pooladdress: 'asdasjkdoasjdiosajodi',
+            status: "0" // 0 正常 1 暂停 2 停止
+          },
+          {
+            poolid: 2,
+            tokenA: 'doge',
+            tokenB: 'dogim',
+            pooladdress: 'asdasjkdoasjdiosajodi',
+            status: "0" // 0 正常 1 暂停 2 停止
           },
         ],
       }

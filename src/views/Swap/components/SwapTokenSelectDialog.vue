@@ -1,9 +1,10 @@
 <script setup lang="ts">
 const props = defineProps<{
-  modelValue: boolean
+  modelValue: boolean,
+  list: TokenSwapInfo[]
 }>()
 
-const emit = defineEmits(['update:modelValue'])
+const emit = defineEmits(['update:modelValue', 'change'])
 
 const visible = computed({
   get() {
@@ -14,14 +15,12 @@ const visible = computed({
   }
 })
 
-onMounted(() => {
-
-})
-
 </script>
 <template>
-  <el-dialog title="选择代币" v-model="visible" align-center append-to-body>
-
+  <el-dialog title="选择代币" width="500px" v-model="visible" align-center append-to-body>
+    <div style="min-height: 350px">
+      <el-button v-for="t in props.list" @click="emit('change', t)">{{ t.tokenB }}</el-button>
+    </div>
   </el-dialog>
 </template>
 <style lang="scss"></style>

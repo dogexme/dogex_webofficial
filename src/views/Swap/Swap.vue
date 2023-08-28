@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { queryPools } from '@/services/sword'
+import { queryPools, queryPoolState } from '@/services/sword'
 import SwapInput from './components/SwapInput.vue'
 import SwapTokenSelectDialog from './components/SwapTokenSelectDialog.vue'
 import { useAppStore } from '@/store';
@@ -8,35 +8,32 @@ import { ElMessageBox } from 'element-plus';
 const appStore = useAppStore()
 const { connectDpal } = appStore
 const address = computed(() => appStore.address)
-const payToken = ref({
-  amount: 0,
-  rate: 100,
-  currentPool: {
-    pooladdress: '池子地址',
-    poolid: '池子编号，可以部署相同的池子',
-    tokenA: 'doge',
-    tokenB: 'dogi',
-  },
+const loading = ref(false)
+
+const payToken = ref<TokenInfo>({
+  amount: 10,
+  rate: 1,
+  min: 10,
 })
-const revToken = ref({
+
+const revToken = ref<TokenInfo>({
   amount: 0,
-  rate: 10,
-  currentPool: {
-    pooladdress: '池子地址',
-    poolid: '池子编号，可以部署相同的池子',
-    tokenA: 'doge',
-    tokenB: 'dogi',
-  },
+  rate: 1,
 })
-const focusName = ref('')
+
+const tokenItems = reactive({
+  pay: payToken,
+  rev: revToken
+})
+
+const focusName = ref<TokenInputName>('')
 const visible = ref(false)
 const tokenPools = ref([])
-const currentPool = ref({})
 
 watch(
   () => payToken.value.amount,
   (amount) => {
-    if (focusName.value == 'payToken') {
+    if (focusName.value == 'pay') {
       revToken.value.amount = amount
     }
   }
@@ -45,7 +42,7 @@ watch(
 watch(
   () => revToken.value.amount,
   (amount) => {
-    if (focusName.value == 'revToken') {
+    if (focusName.value == 'rev') {
       payToken.value.amount = amount
     }
   }
@@ -58,8 +55,31 @@ function changeToken() {
   revToken.value = swap
 }
 
-function selectToken() {
+function selectToken(name: TokenInputName) {
   visible.value = true
+  focusName.value = name
+}
+
+function changeSelectToken(token: TokenSwapInfo) {
+  if (!loading.value && focusName.value) {
+    const key = focusName.value
+    tokenItems[key].currentPool = token
+    loading.value = true
+    queryPoolState(token.poolid).then((res) => {
+      if (res.data.status == 'success') {
+        const data = res.data.data
+        const { balanceA, balanceB } = data
+
+        if (balanceA / balanceB < 0) {
+
+        }
+      }
+      visible.value = false
+      setTimeout(() => {
+        loading.value = false
+      }, 500)
+    })
+  }
 }
 
 function connect() {
@@ -74,6 +94,7 @@ function connect() {
 onMounted(() => {
   queryPools().then((res) => {
     tokenPools.value = res.data.data
+    revToken.value.currentPool = tokenPools.value[0] as TokenSwapInfo
   })
 })
 </script>
@@ -84,18 +105,18 @@ onMounted(() => {
       <div class="swap-pair_title">
         <span class="swap-pair_tab">兑换</span>
       </div>
-      <SwapInput v-model="payToken.amount" title="你付钱" @focus="focusName = 'payToken'" @select-token="selectToken" :currentPool="currentPool"></SwapInput>
+      <SwapInput name="pay" v-model="payToken.amount" title="你付钱" @focus="focusName = 'pay'" @select-token="selectToken" :currentPool="payToken.currentPool" :min="payToken.min"></SwapInput>
       <div class="swap-pair_changewrap">
         <div class="swap-pair_change" @click="changeToken">
           <span class="nft">&#xe64f;</span>
         </div>
       </div>
-      <SwapInput v-model="revToken.amount" title="你收到" @focus="focusName = 'revToken'" @select-token="selectToken" :currentPool="currentPool"></SwapInput>
+      <SwapInput name="rev" v-model="revToken.amount" title="你收到" @focus="focusName = 'rev'" @select-token="selectToken" :currentPool="revToken.currentPool" :min="revToken.min"></SwapInput>
       <!-- <div class="swap-pair_info"></div> -->
       <div class="swap-pair_buy swap-pair_buy--connect" @click="connect" v-if="!address">连接钱包</div>
       <div class="swap-pair_buy" v-else>支付</div>
     </div>
-    <SwapTokenSelectDialog v-model="visible"></SwapTokenSelectDialog>
+    <SwapTokenSelectDialog v-model="visible" :list="tokenPools" @change="changeSelectToken"></SwapTokenSelectDialog>
   </div>
 </template>
 <style lang="scss">

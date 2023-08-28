@@ -12,9 +12,9 @@ export const queryPools = () => {
 /**
  * 获取代币最新金额
  */
-export const queryPoolState = (params: { pari: string }) => {
-  return axios.get('/api/sword/queryPoolState', {
-    params
+export const queryPoolState = (poolid: string) => {
+  return axios.get<ResultToken<TokenState>>('/api/sword/queryPoolState', {
+    params: { poolid }
   })
 }
 

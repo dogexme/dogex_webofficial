@@ -2,20 +2,27 @@
 const props = withDefaults(
   defineProps<{
     title: string
-    modelValue?: number
-    currentPool?: object
+    modelValue?: number | ''
+    currentPool?: TokenSwapInfo
+    min?: number
+    name: TokenInputName
   }>(),
   {
+    min: 0,
     modelValue: 0,
   }
 )
-const emit = defineEmits(['update:modelValue', 'focus', 'selectToken'])
+const emit = defineEmits<{
+  (event: 'selectToken', t: TokenInputName): void,
+  (event: 'update:modelValue', amount: number | ''): void,
+  (event: 'focus'): void
+}>()
 
 const amount = computed({
   get() {
     return props.modelValue
   },
-  set(amount: number) {
+  set(amount: number | '') {
     emit('update:modelValue', amount)
   },
 })
@@ -26,11 +33,12 @@ const amount = computed({
     <span class="swap-pair_item_title">{{ props.title }}</span>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">
-        <input type="number" class="swap-pair_input" v-model.number="amount"  :min="0" :step="1" placeholder="请输入金额" @focus="emit('focus')" />
+        <input type="number" class="swap-pair_input" v-model.number="amount"  :min="props.min" :step="1" placeholder="请输入金额" @focus="emit('focus')" />
       </div>
-      <div class="swap-pair_token" @click="emit('selectToken')">
-        Doge<span class="nft" style="font-size: 12px">&#xeb6d;</span>
+      <div class="swap-pair_token" @click="emit('selectToken', props.name)" v-if="props.currentPool">
+        {{ props.currentPool?.tokenB }}<span class="nft" style="font-size: 12px" >&#xeb6d;</span>
       </div>
+      <div class="swap-pair_token" style="cursor: default;" v-else>doge</div>
     </section>
     <!-- <section class="swap-pair_amount">
       <span class="swap-pair_amount_real">$1.5554</span>
@@ -57,6 +65,7 @@ const amount = computed({
   }
   &_inputwrap {
     flex: 1;
+    margin-right: 12px;
   }
   &_input {
     width: 100%;
@@ -65,7 +74,6 @@ const amount = computed({
     font-size: 32px;
     background-color: transparent;
     padding: 0;
-    margin-right: 12px;
     /* chrome */
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
