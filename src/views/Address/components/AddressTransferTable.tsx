@@ -73,7 +73,7 @@ export default defineComponent({
       },
     ]
 
-    async function getData(page: number, pageSize: number) {
+    async function getData() {
       return {
         total: 0,
         data: []

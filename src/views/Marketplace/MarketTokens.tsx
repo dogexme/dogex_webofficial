@@ -8,8 +8,8 @@ import { useAppStore } from '@/store'
 
 export default defineComponent({
   setup() {
-    const router = useRouter()
-    const route = useRoute()
+    // const router = useRouter()
+    // const route = useRoute()
     const appStore = useAppStore()
     const { connectDpal } = appStore
     const address = computed(() => appStore.address)
@@ -18,24 +18,24 @@ export default defineComponent({
       api,
       pageSize: defaultPageSize
     })
-    const columns = [
-      {
-        title: 'Collection',
-        dataIndex: 'collection',
-      },
-      {
-        title: 'Floor Price',
-        dataIndex: 'floorPrice',
-      },
-      {
-        title: 'Unit Price',
-        dataIndex: 'unitPrice',
-      },
-      {
-        title: 'Listed',
-        dataIndex: 'listed',
-      },
-    ]
+    // const columns = [
+    //   {
+    //     title: 'Collection',
+    //     dataIndex: 'collection',
+    //   },
+    //   {
+    //     title: 'Floor Price',
+    //     dataIndex: 'floorPrice',
+    //   },
+    //   {
+    //     title: 'Unit Price',
+    //     dataIndex: 'unitPrice',
+    //   },
+    //   {
+    //     title: 'Listed',
+    //     dataIndex: 'listed',
+    //   },
+    // ]
 
     enum SHOW_STATUS { 'SHOW', 'SUCCESS', "FAIL" }
     const minDialogWidth = 600
@@ -45,7 +45,7 @@ export default defineComponent({
     const showStatus = ref<SHOW_STATUS>(SHOW_STATUS.SHOW)
 
 
-    function openBuy(buyInfo: any) {
+    function openBuy() {
       visible.value = true
       dialogWidth.value = Math.min(minDialogWidth, window.screen.width - 20)
     }
@@ -71,7 +71,7 @@ export default defineComponent({
       isBuyLoading.value = false
     }
 
-    async function api(page: number, pageSize: number) {
+    async function api() {
       return {
         data: [
           { collection: 'dogim', floorPrice: 12, unitPrice: 132, listed: 789 },
