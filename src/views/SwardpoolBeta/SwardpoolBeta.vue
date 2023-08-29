@@ -9,7 +9,7 @@ const currentPool = ref()
 const currentPoolState = ref<TokenState>()
 const transfersData = ref([])
 const loading = ref(false)
-const second = 5
+const second = 30
 
 async function queryPoolStatus(poolid: string) {
   try {

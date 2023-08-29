@@ -1,4 +1,5 @@
 import DogTable from '@/components/DogTable/DogTable'
+import DogLink from '@/components/DogLink.vue'
 
 export default defineComponent({
   props: {
@@ -25,6 +26,20 @@ export default defineComponent({
         render(text: 0 | 1 | 2) {
           return statusType[text]
         }
+      },
+      {
+        title: 'Txid',
+        dataIndex: 'txid',
+        render(text: string) {
+          return <>{text && <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 24)} value={text}></DogLink>}</>
+        },
+      },
+      {
+        title: 'Address',
+        dataIndex: 'address',
+        render(text: string) {
+          return <DogLink is-copy label={text} value={text}></DogLink>
+        },
       },
       {
         title: 'Gas',
