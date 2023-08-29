@@ -4,21 +4,24 @@ import SwapInput from './components/SwapInput.vue'
 import SwapTokenSelectDialog from './components/SwapTokenSelectDialog.vue'
 import { useAppStore } from '@/store';
 import { ElMessageBox } from 'element-plus';
+import np from 'number-precision'
 
 const appStore = useAppStore()
 const { connectDpal } = appStore
 const address = computed(() => appStore.address)
 const loading = ref(false)
+const isWatchStop = ref(false)
 
 const payToken = ref<TokenInfo>({
-  amount: 10,
+  amount: 0,
   rate: 1,
-  min: 10,
+  loading: false
 })
 
 const revToken = ref<TokenInfo>({
   amount: 0,
   rate: 1,
+  loading: false
 })
 
 const tokenItems = reactive({
@@ -29,12 +32,13 @@ const tokenItems = reactive({
 const focusName = ref<TokenInputName>('')
 const visible = ref(false)
 const tokenPools = ref([])
+const poolid = ref('')
 
 watch(
   () => payToken.value.amount,
   (amount) => {
-    if (focusName.value == 'pay') {
-      revToken.value.amount = amount
+    if (focusName.value == 'pay' && !isWatchStop.value) {
+      revToken.value.amount = np.divide(amount, revToken.value.rate)
     }
   }
 )
@@ -42,8 +46,8 @@ watch(
 watch(
   () => revToken.value.amount,
   (amount) => {
-    if (focusName.value == 'rev') {
-      payToken.value.amount = amount
+    if (focusName.value == 'rev' && !isWatchStop.value) {
+      payToken.value.amount = np.divide(amount, payToken.value.rate)
     }
   }
 )
@@ -61,25 +65,35 @@ function selectToken(name: TokenInputName) {
 }
 
 function changeSelectToken(token: TokenSwapInfo) {
-  if (!loading.value && focusName.value) {
+  if (!loading.value && focusName.value && poolid.value != token.poolid) {
     const key = focusName.value
     tokenItems[key].currentPool = token
+    tokenItems[key].loading = true
     loading.value = true
     queryPoolState(token.poolid).then((res) => {
       if (res.data.status == 'success') {
+        poolid.value = token.poolid
         const data = res.data.data
         const { balanceA, balanceB } = data
-
-        if (balanceA / balanceB < 0) {
-
+        payToken.value.rate = np.divide(balanceB, balanceA)
+        revToken.value.rate = np.divide(balanceA, balanceB)
+        isWatchStop.value = true
+        if (key == 'pay') {
+          payToken.value.amount = np.divide(revToken.value.amount, revToken.value.rate)
+        } else {
+          revToken.value.amount = np.divide(payToken.value.amount, revToken.value.rate)
         }
+        nextTick(() => {
+          isWatchStop.value = false
+        })
       }
-      visible.value = false
       setTimeout(() => {
         loading.value = false
+        tokenItems[key].loading = false
       }, 500)
     })
   }
+  visible.value = false
 }
 
 function connect() {
@@ -95,6 +109,8 @@ onMounted(() => {
   queryPools().then((res) => {
     tokenPools.value = res.data.data
     revToken.value.currentPool = tokenPools.value[0] as TokenSwapInfo
+    focusName.value = 'rev'
+    changeSelectToken(revToken.value.currentPool)
   })
 })
 </script>
@@ -105,13 +121,13 @@ onMounted(() => {
       <div class="swap-pair_title">
         <span class="swap-pair_tab">兑换</span>
       </div>
-      <SwapInput name="pay" v-model="payToken.amount" title="你付钱" @focus="focusName = 'pay'" @select-token="selectToken" :currentPool="payToken.currentPool" :min="payToken.min"></SwapInput>
+      <SwapInput name="pay" v-model="payToken.amount" :loading="payToken.loading" title="你付钱" @focus="focusName = 'pay'" @select-token="selectToken" :currentPool="payToken.currentPool" :min="payToken.min"></SwapInput>
       <div class="swap-pair_changewrap">
         <div class="swap-pair_change" @click="changeToken">
           <span class="nft">&#xe64f;</span>
         </div>
       </div>
-      <SwapInput name="rev" v-model="revToken.amount" title="你收到" @focus="focusName = 'rev'" @select-token="selectToken" :currentPool="revToken.currentPool" :min="revToken.min"></SwapInput>
+      <SwapInput name="rev" v-model="revToken.amount" :loading="revToken.loading" title="你收到" @focus="focusName = 'rev'" @select-token="selectToken" :currentPool="revToken.currentPool" :min="revToken.min"></SwapInput>
       <!-- <div class="swap-pair_info"></div> -->
       <div class="swap-pair_buy swap-pair_buy--connect" @click="connect" v-if="!address">连接钱包</div>
       <div class="swap-pair_buy" v-else>支付</div>

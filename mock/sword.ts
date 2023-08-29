@@ -27,14 +27,25 @@ export default [
   {
     url: '/api/sword/queryPoolState',
     method: 'get',
-    response() {
-      return {
-        status: 'success',
-        data: {
-          balanceA: 1000, // 当前池子 tokena 余额（doge余额）
-          balanceB: 100000, // 当前池子 tokenb 余额
-          blockno: 1000000, // 当前池子最新索引的区块
-        },
+    response(req) {
+      if (req.query.poolid == 1) {
+        return {
+          status: 'success',
+          data: {
+            balanceA: 1000, // 当前池子 tokena 余额（doge余额）
+            balanceB: 100000, // 当前池子 tokenb 余额
+            blockno: 1000000, // 当前池子最新索引的区块
+          },
+        }
+      } else {
+        return {
+          status: 'success',
+          data: {
+            balanceA: 100, // 当前池子 tokena 余额（doge余额）
+            balanceB: 1000, // 当前池子 tokenb 余额
+            blockno: 1000000, // 当前池子最新索引的区块
+          },
+        }
       }
     },
   },

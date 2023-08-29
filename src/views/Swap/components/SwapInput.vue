@@ -5,11 +5,13 @@ const props = withDefaults(
     modelValue?: number | ''
     currentPool?: TokenSwapInfo
     min?: number
-    name: TokenInputName
+    name: TokenInputName,
+    loading?: boolean
   }>(),
   {
     min: 0,
     modelValue: 0,
+    loading: false
   }
 )
 const emit = defineEmits<{
@@ -33,7 +35,7 @@ const amount = computed({
     <span class="swap-pair_item_title">{{ props.title }}</span>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">
-        <input type="number" class="swap-pair_input" v-model.number="amount"  :min="props.min" :step="1" placeholder="请输入金额" @focus="emit('focus')" />
+        <input type="number" class="swap-pair_input" v-model.number="amount"  :min="props.min" :step="1" :style="[props.loading ? { color: '#a5a5a5' } : {}]" placeholder="请输入金额" @focus="emit('focus')" />
       </div>
       <div class="swap-pair_token" @click="emit('selectToken', props.name)" v-if="props.currentPool">
         {{ props.currentPool?.tokenB }}<span class="nft" style="font-size: 12px" >&#xeb6d;</span>
