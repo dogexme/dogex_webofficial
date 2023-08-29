@@ -29,10 +29,15 @@ export default [
         component: () => import('@/views/Address/Tokens'),
       },
       {
-        path: 'swap',
-        name: 'swap',
-        component: () => import('@/views/Swap/Swap.vue')
+        path: 'swardpoolBeta',
+        name: 'swardpoolBeta',
+        component: () => import('@/views/SwardpoolBeta/SwardpoolBeta.vue')
       }
+      // {
+      //   path: 'swap',
+      //   name: 'swap',
+      //   component: () => import('@/views/Swap/Swap.vue')
+      // }
       // {
       //   name: 'marketplace',
       //   path: 'marketplace',

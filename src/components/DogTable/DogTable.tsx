@@ -34,7 +34,6 @@ export default defineComponent({
     },
     total: {
       type: Number,
-      default: 15,
       required: true,
     },
     currentPage: {
@@ -50,6 +49,14 @@ export default defineComponent({
       type: Boolean,
       default: false,
     },
+    showPagination: {
+      type: Boolean,
+      default: true
+    },
+    refresh: {
+      type: Boolean,
+      default: true
+    }
   },
   emits: ['current-change', 'row-click', 'refresh'],
   setup(props, { emit }) {
@@ -109,10 +116,14 @@ export default defineComponent({
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
-          <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
+
+          {
+            props.refresh &&
+            <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
             <ElButton icon={Refresh} circle onClick={() => emit('refresh')}></ElButton>
           </div>
-          {!!props.dataSource.length && pages.value > 1 && (
+          }
+          {props.showPagination && !!props.dataSource.length && pages.value > 1 && (
             <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
 
@@ -149,7 +160,7 @@ export default defineComponent({
             </table>
             {!props.dataSource.length && <el-empty></el-empty>}
           </div>
-          {!!props.dataSource.length && pages.value > 1 && (
+          {props.showPagination && !!props.dataSource.length && pages.value > 1 && (
             <DogPagination totalText={' '} style="margin-top: 20px" currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
         </div>
