@@ -33,8 +33,12 @@ export default defineComponent({
       },
       {
         title: 'Swap',
-        render() {
-          return `Swap ${props.currentPool?.tokenA} for ${props.currentPool?.tokenB}`
+        render(_text: any, r: any) {
+          if (r.swapType == 'SWAP_B_A') {
+            return `Swap ${props.currentPool?.tokenB} for ${props.currentPool?.tokenA}`
+          } else {
+            return `Swap ${props.currentPool?.tokenA} for ${props.currentPool?.tokenB}`
+          }
         }
       },
       {
