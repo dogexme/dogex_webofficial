@@ -27,17 +27,21 @@ export default defineComponent({
         title: 'Block No',
         dataIndex: 'blockno',
       },
-      {
-        title: 'Order Id',
-        dataIndex: 'id'
-      },
+      // {
+      //   title: 'Order Id',
+      //   dataIndex: 'id'
+      // },
       {
         title: 'Swap',
         render(_text: any, r: any) {
           if (r.swapType == 'SWAP_B_A') {
             return `Swap ${props.currentPool?.tokenB} for ${props.currentPool?.tokenA}`
-          } else {
+          } else if (r.swapType == 'SWAP_A_B'){
             return `Swap ${props.currentPool?.tokenA} for ${props.currentPool?.tokenB}`
+          } else if(r.swapType == 'ROLLBACK_A' || r.swapType == 'ROLLBACK_B') {
+            return 'ROLLBACK'
+          } else {
+            return r.swapType
           }
         }
       },
@@ -51,6 +55,13 @@ export default defineComponent({
       {
         title: 'Txid',
         dataIndex: 'txid',
+        render(text: string) {
+          return <>{text && <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink>}</>
+        },
+      },
+      {
+        title: 'Processed Txid',
+        dataIndex: 'processedTxid',
         render(text: string) {
           return <>{text && <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink>}</>
         },

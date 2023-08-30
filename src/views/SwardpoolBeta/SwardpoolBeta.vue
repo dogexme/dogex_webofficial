@@ -120,7 +120,7 @@ onMounted(() => {
     </el-col>
     <el-col :span="24">
       <dog-card>
-        <h4 style="margin-top: 0">Transfers</h4>
+        <h4 style="margin-top: 0">Pool Transactions</h4>
         <TransferTable :current-pool="(currentPool as SwordPool)"></TransferTable>
       </dog-card>
     </el-col>

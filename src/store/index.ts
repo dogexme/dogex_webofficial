@@ -33,7 +33,7 @@ export const useAppStore = defineStore('app', {
         }
         throw code
       })
-    }
+    },
   },
   getters: {
     activeRoutePath(state) {
