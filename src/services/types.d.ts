@@ -26,3 +26,11 @@ type ResultToken<D = any> = {
   data: D,
   status: 'success' | 'fail'
 }
+
+interface SwordPool {
+  pooladdress: string
+  poolid: string
+  status: string
+  tokenA: string
+  tokenB: string
+}

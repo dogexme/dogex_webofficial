@@ -1,25 +1,42 @@
 import DogTable from '@/components/DogTable/DogTable'
 import DogLink from '@/components/DogLink.vue'
+import { queryPoolTransfers } from '@/services/sword'
+import { PropType } from 'vue'
+import {numberFormat} from '@/utils'
 
 export default defineComponent({
   props: {
-    data: {
-      type: Array,
-      required: true,
-    },
-    loading: {
-      type: Boolean,
-      default: false
+    currentPool: {
+      type: Object as PropType<SwordPool>
     }
   },
   setup(props) {
     const statusType = {
-      0: 'wait',
+      0: 'waitting',
       1: 'success',
       2: 'fail'
     }
 
+    const { loading, dataSource, total, page, query } = useTable({
+      api: getData,
+      pageSize: 20,
+    })
+
     const originColumns = [
+      {
+        title: 'Block No',
+        dataIndex: 'blockno',
+      },
+      {
+        title: 'Order Id',
+        dataIndex: 'id'
+      },
+      {
+        title: 'Swap',
+        render() {
+          return `Swap ${props.currentPool?.tokenA} for ${props.currentPool?.tokenB}`
+        }
+      },
       {
         title: 'Status',
         dataIndex: 'status',
@@ -31,27 +48,41 @@ export default defineComponent({
         title: 'Txid',
         dataIndex: 'txid',
         render(text: string) {
-          return <>{text && <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 24)} value={text}></DogLink>}</>
+          return <>{text && <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink>}</>
         },
       },
       {
         title: 'Address',
         dataIndex: 'address',
         render(text: string) {
-          return <DogLink is-copy label={text} value={text}></DogLink>
+          return <DogLink is-copy label={omitCenterString(text, 12)} value={text}></DogLink>
         },
       },
       {
-        title: 'Gas',
-        dataIndex: 'gas',
-      },
-      {
-        title: 'BalanceA',
+        title: 'Balance',
         dataIndex: 'balanceA',
+        render(balanceA: number) {
+          return `${numberFormat(balanceA)} ${props.currentPool?.tokenA}`
+        }
       },
       {
-        title: 'BalanceB',
+        title: 'Balance',
         dataIndex: 'balanceB',
+        render(balanceA: number) {
+          return `${numberFormat(balanceA)} ${props.currentPool?.tokenB}`
+        }
+      },
+      {
+        title: 'In',
+        render(_text: any, r: any) {
+          return r.inTokenA > 0 ? `${numberFormat(r.inTokenA)} ${props.currentPool?.tokenA}` : `${numberFormat(r.inTokenB)} ${props.currentPool?.tokenB}`
+        }
+      },
+      {
+        title: 'Out',
+        render(_text: any, r: any) {
+          return r.outTokenA > 0 ? `${numberFormat(r.outTokenA)} ${props.currentPool?.tokenA}` : `${numberFormat(r.outTokenB)} ${props.currentPool?.tokenB}`
+        }
       },
       // {
       //   title: 'Old BalanceA',
@@ -61,26 +92,26 @@ export default defineComponent({
       //   title: 'Old BalanceB',
       //   dataIndex: 'old_balance_b',
       // },
-      {
-        title: 'In TokenA',
-        dataIndex: 'inTokenA',
-      },
-      {
-        title: 'In TokenB',
-        dataIndex: 'inTokenB',
-      },
-      {
-        title: 'Out TokenA',
-        dataIndex: 'outTokenA',
-      },
-      {
-        title: 'Out TokenB',
-        dataIndex: 'outTokenB',
-      },
     ]
 
     const columns = ref(originColumns)
 
-    return () => <DogTable rowkey="id" loading={props.loading} dataSource={props.data} columns={columns.value} total={100} currentPage={1} showPagination={false} refresh={false}/>
+    watch(() => props.currentPool?.pooladdress, () => {
+      query(1)
+    })
+
+    async function getData(page: number, pageSize: number) {
+      const res = await queryPoolTransfers({ pageSize, page, address: props.currentPool?.pooladdress })
+      const { status, data } = res.data
+      return status == 'success' ? {
+        total: data.total,
+        data: data.list
+      } : {
+        total: 0,
+        data: []
+      }
+    }
+
+    return () => <DogTable rowkey="id" loading={loading.value} dataSource={dataSource.value} columns={columns.value} total={total.value} currentPage={page.value} onCurrent-change={query} onRefresh={() => query(page.value)}/>
   },
 })

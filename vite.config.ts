@@ -9,6 +9,7 @@ import removeConsole from 'vite-plugin-remove-console'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import viteCompression from 'vite-plugin-compression'
 import { viteMockServe } from 'vite-plugin-mock'
+import requireTransform from 'vite-plugin-require-transform';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -37,6 +38,9 @@ export default defineConfig({
       mockPath: 'mock',
       enable: process.env.NODE_ENV === 'development',
       watchFiles: false,
+    }),
+    requireTransform({
+      fileRegex: /.[tj]sx?$|.vue$/
     }),
   ],
   css: {

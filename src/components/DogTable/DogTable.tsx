@@ -13,6 +13,11 @@ interface ColumnProps {
   width?: string
 }
 
+enum ActionType {
+  Refresh,
+  Pagination,
+}
+
 export default defineComponent({
   props: {
     columns: {
@@ -63,11 +68,12 @@ export default defineComponent({
     const containerRef = ref<HTMLElement>()
     const currentPage = ref(1)
     const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
+    const actionType = ref(ActionType.Pagination)
 
     watch(
       () => props.loading,
       (loading) => {
-        if (!loading) {
+        if (!loading && actionType.value == ActionType.Pagination) {
           resetPositionTop()
         }
       }
@@ -81,8 +87,14 @@ export default defineComponent({
     )
 
     watch(currentPage, (page: number) => {
+      actionType.value = ActionType.Pagination
       emit('current-change', page)
     })
+
+    function refresh() {
+      actionType.value = ActionType.Refresh
+      emit('refresh')
+    }
 
     function pageChange(p: number) {
       currentPage.value = p
@@ -116,17 +128,15 @@ export default defineComponent({
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
-
           {
             props.refresh &&
             <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
-            <ElButton icon={Refresh} circle onClick={() => emit('refresh')}></ElButton>
+            <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
           </div>
           }
           {props.showPagination && !!props.dataSource.length && pages.value > 1 && (
             <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
-
           <div class={s['table-container']} ref={containerRef}>
             <table class={s['dog-table']}>
               <thead class={s['dog-table-th']}>

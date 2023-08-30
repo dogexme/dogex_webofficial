@@ -1,14 +1,20 @@
 <script setup lang="ts">
-import { queryPools, queryPoolState, queryPoolTransfers } from '@/services/sword'
+import { queryPools, queryPoolState } from '@/services/sword'
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
+import { useAppStore } from '@/store'
+import { ElMessageBox } from 'element-plus'
+import QrcodeVue from 'qrcode.vue'
+import {ArrowDown} from '@element-plus/icons-vue'
+
+const appStore = useAppStore()
+const { connectDpal } = appStore
+const address = computed(() => appStore.address)
 
 const pools = ref<any>([])
 const poolid = ref('')
-const currentPool = ref()
+const currentPool = ref<Partial<SwordPool>>({})
 const currentPoolState = ref<TokenState>()
-const transfersData = ref([])
-const loading = ref(false)
 const second = 30
 
 async function queryPoolStatus(poolid: string) {
@@ -23,7 +29,24 @@ async function queryPoolStatus(poolid: string) {
   }
 }
 
+function connect() {
+  ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect DpalWallet', {
+    confirmButtonText: 'OK',
+    cancelButtonText: 'Cancel',
+  }).then(() => {
+    connectDpal()
+  })
+}
+
+const icons: any = {
+  doge: require('@/assets/img/dogecoin-logo.png'),
+  dogim: require('@/assets/img/dogim.png'),
+}
+
 function changePool(poolid: string) {
+  if (poolid === currentPool.value.poolid) {
+    return
+  }
   const pool = pools.value.find((p: any) => p.poolid === poolid)
   queryPoolStatus(poolid)
   if (pool) {
@@ -31,67 +54,109 @@ function changePool(poolid: string) {
   }
 }
 
-function queryPoolTransfersAll() {
-  loading.value = true
-  queryPoolTransfers({}).then((res) => {
-    const { status, data } = res.data
-    if (status == 'success') {
-      transfersData.value = data.list
-    }
-  }).finally(() => {
-    loading.value = false
-    setTimeout(queryPoolTransfersAll, second * 1000)
-  })
-}
-
 onMounted(() => {
-  queryPools().then(res => {
+  queryPools().then((res) => {
     pools.value = res.data.pools
     poolid.value = pools.value[0].poolid
     currentPool.value = pools.value[0]
     queryPoolStatus(poolid.value)
   })
-  queryPoolTransfersAll()
 })
-
 </script>
 
 <template>
-    <el-row :gutter="12">
-      <el-col :span="6">
-        <dog-card  style="height: 80vh;overflow: auto;">
-          <h4>Overview</h4>
-          <el-select style="margin-bottom: 12px" v-model="poolid" placeholder="select pool" size="large" @change="changePool">
-            <el-option
-              v-for="item in pools"
-              :key="item.poolid"
-              :label="`${item.tokenA}/${item.tokenB}`"
-              :value="item.poolid"
-              :disabled="item.status != 0"
-            />
-          </el-select>
-          <section><span>TokenA:</span> {{ currentPool?.tokenA }}</section>
-          <section><span>TokenB:</span> {{ currentPool?.tokenB }}</section>
-          <section><span>{{ currentPool?.tokenA }} Balance:</span> {{ currentPoolState?.balanceA }}</section>
-          <section><span>{{ currentPool?.tokenB }} Balance:</span> {{ currentPoolState?.balanceB }}</section>
-          <section><span>Rate:</span> {{ np.divide(currentPoolState?.balanceA || 0, currentPoolState?.balanceB || 0) }}</section>
-          <section><span>Pool Block No:</span> {{ currentPoolState?.blockno }}</section>
-        </dog-card>
-      </el-col>
-      <el-col :span="18">
-        <dog-card style="height: 80vh;overflow: auto;">
-          <h4>Transfers</h4>
-          <TransferTable :loading="loading" :data="transfersData"></TransferTable>
-        </dog-card>
-      </el-col>
-    </el-row>
+  <el-row :gutter="12">
+    <el-col :span="24" style="margin-bottom: 12px">
+      <dog-card>
+        <h4 style="margin-top: 0">Swardpool</h4>
+        <el-row>
+          <el-col :span="24" :md="18">
+            <el-dropdown style="display: inline-block" @command="changePool">
+              <el-button>
+                <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
+                <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}
+                <el-icon><ArrowDown /></el-icon>
+              </el-button>
+              <template #dropdown>
+                <el-dropdown-menu>
+                  <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
+                    <img class="token-icon" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
+                    <img class="token-icon" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
+                  </el-dropdown-item>
+                </el-dropdown-menu>
+              </template>
+            </el-dropdown>
+            <el-button type="primary" style="margin-left: 12px" disabled v-if="address">Swap</el-button>
+            <div style="font-size: 14px;margin-left: 8px;margin-bottom: 12px; display: inline-block;" v-else>
+              <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
+            </div>
+            <el-row style="margin: 24px 0">
+              <el-col :span="12">
+                <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="currentPoolState?.balanceA" />
+              </el-col>
+              <el-col :span="12">
+                <el-statistic :title="`Current ${currentPool?.tokenB} Balance`" :precision="5" :value="currentPoolState?.balanceB" />
+              </el-col>
+              <el-col :span="12">
+                <el-statistic title="Price" :precision="4" :value="np.divide(currentPoolState?.balanceA || 0, currentPoolState?.balanceB || 0) || 0" />
+              </el-col>
+              <el-col :span="12">
+                <el-statistic title="Block No" :value="currentPoolState?.blockno" />
+              </el-col>
+            </el-row>
+          </el-col>
+          <el-col :span="24" :md="6" style="display: flex;flex-direction: column; align-items: center">
+            <el-link href="https://github.com/dpalwallet/swardpool" style="margin-bottom:12px" target="_blank">
+              <img class="token-icon" src="/logo.png" alt="" />
+              swardpool
+            </el-link>
+            <div style="border: 2px solid rgb(238, 181, 15);padding: 12px;border-radius: 24px;">
+              <qrcode-vue value="www.baidu.com" :size="150" level="H" />
+            </div>
+            <DogLink style="font-size: 12px;margin-top: 12px;" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
+          </el-col>
+        </el-row>
+      </dog-card>
+    </el-col>
+    <el-col :span="24">
+      <dog-card>
+        <h4 style="margin-top: 0">Transfers</h4>
+        <TransferTable :current-pool="(currentPool as SwordPool)"></TransferTable>
+      </dog-card>
+    </el-col>
+  </el-row>
 </template>
 <style lang="scss" scoped>
-  section {
-    line-height: 2;
-    color: orange;
-    span {
-      color: #333;
-    }
+.token-icon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+.split-word {
+  padding: 0 5px;
+}
+section {
+  line-height: 2;
+  color: orange;
+  span {
+    color: #333;
   }
+}
+.swap-pair_buy {
+  display: inline-block;
+  text-align: center;
+  padding: 5px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  border: 2px solid #fff;
+  background-color: #1e90ff;
+  color: #fff;
+  box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+  font-size: 14px;
+  &--connect {
+    background-color: rgb(238, 181, 15);
+    color: #333;
+  }
+}
 </style>
