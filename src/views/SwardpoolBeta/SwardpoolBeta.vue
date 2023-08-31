@@ -5,27 +5,35 @@ import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
 import QrcodeVue from 'qrcode.vue'
-import {ArrowDown} from '@element-plus/icons-vue'
+import {ArrowDown, InfoFilled} from '@element-plus/icons-vue'
+import SwapDialog from './components/SwapDialog.vue'
+import icons from '@/config/payIcons'
+
+defineOptions({
+  name: 'swap',
+})
 
 const appStore = useAppStore()
 const { connectDpal } = appStore
 const address = computed(() => appStore.address)
-
-const pools = ref<any>([])
+const showSwapDialog = ref(false)
+const pools = ref<any[]>([])
 const poolid = ref('')
 const currentPool = ref<Partial<SwordPool>>({})
 const currentPoolState = ref<TokenState>()
-const second = 30
+const noticeMessage = ref('')
+const loading = ref(false)
 
 async function queryPoolStatus(poolid: string) {
   try {
+    loading.value = true
     const res = await queryPoolState(poolid)
     const { status, data } = res.data
     if (status == 'success') {
       currentPoolState.value = data
     }
   } finally {
-    setTimeout(queryPoolStatus, second * 1000)
+    loading.value = false
   }
 }
 
@@ -36,11 +44,6 @@ function connect() {
   }).then(() => {
     connectDpal()
   })
-}
-
-const icons: any = {
-  doge: require('@/assets/img/dogecoin-logo.png'),
-  dogim: require('@/assets/img/dogim.png'),
 }
 
 function changePool(poolid: string) {
@@ -59,6 +62,7 @@ onMounted(() => {
     pools.value = res.data.pools
     poolid.value = pools.value[0].poolid
     currentPool.value = pools.value[0]
+    noticeMessage.value = res.data.notice_message && false
     queryPoolStatus(poolid.value)
   })
 })
@@ -71,24 +75,38 @@ onMounted(() => {
         <h4 style="margin-top: 0">Swardpool</h4>
         <el-row>
           <el-col :span="24" :md="18">
-            <el-dropdown style="display: inline-block" @command="changePool">
-              <el-button>
-                <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
-                <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}
-                <el-icon><ArrowDown /></el-icon>
-              </el-button>
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
-                    <img class="token-icon" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
-                    <img class="token-icon" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
-                  </el-dropdown-item>
-                </el-dropdown-menu>
+            <div style="display: flex;align-items: center;">
+              <el-popover
+                :content="noticeMessage"
+                width="300"
+                v-if="noticeMessage"
+              >
+                <template #reference>
+                  <el-icon style="margin-right: 5px; color: #aaa;font-size: 24px;cursor: pointer;"><InfoFilled/></el-icon>
+                </template>
+              </el-popover>
+              <el-dropdown style="display: inline-block" @command="changePool">
+                <el-button>
+                  <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
+                  <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}
+                  <el-icon><ArrowDown /></el-icon>
+                </el-button>
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="!!noticeMessage || item.status != 0">
+                      <img class="token-icon" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
+                      <img class="token-icon" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+              <template v-if="address">
+                <el-button type="primary" style="margin-left: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
+                <el-button type="info" style="margin-left: 12px" disabled>Sword</el-button>
               </template>
-            </el-dropdown>
-            <el-button type="primary" style="margin-left: 12px" disabled v-if="address">Swap</el-button>
-            <div style="font-size: 14px;margin-left: 8px;margin-bottom: 12px; display: inline-block;" v-else>
-              <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
+              <div style="font-size: 14px; display: inline-block;" v-else>
+                <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
+              </div>
             </div>
             <el-row style="margin: 24px 0">
               <el-col :span="12">
@@ -111,7 +129,7 @@ onMounted(() => {
               swardpool
             </el-link>
             <div style="border: 2px solid rgb(238, 181, 15);padding: 12px;border-radius: 24px;">
-              <qrcode-vue value="www.baidu.com" :size="150" level="H" />
+              <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
             </div>
             <DogLink style="font-size: 12px;margin-top: 12px;" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
           </el-col>
@@ -125,6 +143,7 @@ onMounted(() => {
       </dog-card>
     </el-col>
   </el-row>
+  <SwapDialog v-model:visible="showSwapDialog" :current-pool="(currentPool as SwordPool)" :current-pool-state="(currentPoolState as TokenState)" @change-pool="changePool" :pools="pools" :loading="loading"></SwapDialog>
 </template>
 <style lang="scss" scoped>
 .token-icon {
@@ -153,7 +172,9 @@ section {
   background-color: #1e90ff;
   color: #fff;
   box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
-  font-size: 14px;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-left: 6px;
   &--connect {
     background-color: rgb(238, 181, 15);
     color: #333;

@@ -2,6 +2,7 @@
 import { collMap } from '@/services/nft'
 
 const loading = ref(true)
+let timer = 0
 
 async function loadCollMap() {
   try {
@@ -9,8 +10,9 @@ async function loadCollMap() {
     localStorage.setItem('nfts', JSON.stringify(res.data))
     loading.value = false
     document.body.removeChild(document.getElementById('loading-container')!)
+    clearTimeout(timer)
   } catch {
-    loadCollMap()
+    timer = window.setTimeout(loadCollMap, 1000);
   }
 }
 

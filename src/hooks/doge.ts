@@ -22,7 +22,18 @@ export function useDoge() {
     }
   }
 
+  async function payPool(cast: number, poolAddress: string) {
+    if (await doge.isEnabled()) {
+      const rs = await doge.useDoge(cast, poolAddress, 'swap');
+      if (rs?.txid) {
+        return rs?.txid
+      }
+    }
+    throw 1
+  }
+
   return {
     connectDpal,
+    payPool
   }
 }

@@ -11,7 +11,9 @@ interface TokenInfo {
   min?: number
   isSelectToken?: boolean
   currentPool?: TokenSwapInfo
-  loading?: boolean
+  loading?: boolean,
+  pools: any,
+  price: number
 }
 
 type TokenInputName = 'pay' | 'rev' | ''
