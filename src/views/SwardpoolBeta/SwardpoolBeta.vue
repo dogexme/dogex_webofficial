@@ -62,7 +62,7 @@ onMounted(() => {
     pools.value = res.data.pools
     poolid.value = pools.value[0].poolid
     currentPool.value = pools.value[0]
-    noticeMessage.value = res.data.notice_message && false
+    noticeMessage.value = res.data.notice_message
     queryPoolStatus(poolid.value)
   })
 })
