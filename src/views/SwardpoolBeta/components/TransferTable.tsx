@@ -49,7 +49,7 @@ export default defineComponent({
         title: 'Status',
         dataIndex: 'status',
         render(text: 0 | 1 | 2) {
-          return statusType[text]
+          return statusType[text] || '-'
         }
       },
       {
@@ -63,7 +63,7 @@ export default defineComponent({
         title: 'Processed Txid',
         dataIndex: 'processedTxid',
         render(text: string) {
-          return <>{text && <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink>}</>
+          return <>{text ? <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink> : '-'}</>
         },
       },
       {
@@ -116,7 +116,7 @@ export default defineComponent({
     })
 
     async function getData(page: number, pageSize: number) {
-      const res = await queryPoolTransfers({ pageSize, page, address: props.currentPool?.pooladdress })
+      const res = await queryPoolTransfers({ pageSize, page })
       const { status, data } = res.data
       return status == 'success' ? {
         total: data.total,
@@ -127,6 +127,6 @@ export default defineComponent({
       }
     }
 
-    return () => <DogTable rowkey="id" loading={loading.value} dataSource={dataSource.value} columns={columns.value} total={total.value} currentPage={page.value} onCurrent-change={query} onRefresh={() => query(page.value)}/>
+    return () => <DogTable defaultPageSize={20} rowkey="id" loading={loading.value} dataSource={dataSource.value} columns={columns.value} total={total.value} currentPage={page.value} onCurrent-change={query} onRefresh={() => query(page.value)}/>
   },
 })

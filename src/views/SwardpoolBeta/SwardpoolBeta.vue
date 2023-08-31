@@ -102,7 +102,7 @@ onMounted(() => {
               </el-dropdown>
               <template v-if="address">
                 <el-button type="primary" style="margin-left: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
-                <el-button type="info" style="margin-left: 12px" disabled>Sword</el-button>
+                <el-button type="info" style="margin-left: 12px" disabled>Sward</el-button>
               </template>
               <div style="font-size: 14px; display: inline-block;" v-else>
                 <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>

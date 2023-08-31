@@ -134,7 +134,7 @@ export default defineComponent({
             <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
           </div>
           }
-          {props.showPagination && !!props.dataSource.length && pages.value > 1 && (
+          {props.showPagination && pages.value > 1 && (
             <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
           <div class={s['table-container']} ref={containerRef}>
@@ -170,7 +170,7 @@ export default defineComponent({
             </table>
             {!props.dataSource.length && <el-empty></el-empty>}
           </div>
-          {props.showPagination && !!props.dataSource.length && pages.value > 1 && (
+          {props.showPagination && pages.value > 1 && (
             <DogPagination totalText={' '} style="margin-top: 20px" currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
         </div>
