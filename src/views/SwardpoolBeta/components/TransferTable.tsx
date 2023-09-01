@@ -4,6 +4,22 @@ import { queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
 import {numberFormat} from '@/utils'
 
+export function getSwapType(swapType: string, tokenA?: string, tokenB?: string) {
+  if (swapType == 'SWAP_B_A') {
+    return `Swap ${tokenB} for ${tokenA}`
+  } else if (swapType == 'SWAP_A_B'){
+    return `Swap ${tokenA} for ${tokenB}`
+  } else if(swapType == 'ROLLBACK_A' || swapType == 'ROLLBACK_B') {
+    return 'ROLLBACK'
+  } else {
+    return swapType
+  }
+}
+
+export function consumeToken(tokenANum: number, tokenBNum: number, tokenA?: string, tokenB?: string) {
+  return tokenANum > 0 ? `${numberFormat(tokenANum)} ${tokenA}` : `${numberFormat(tokenBNum)} ${tokenB}`
+}
+
 export default defineComponent({
   props: {
     currentPool: {
@@ -12,7 +28,7 @@ export default defineComponent({
   },
   setup(props) {
     const statusType = {
-      0: 'waitting',
+      0: 'waiting',
       1: 'success',
       2: 'fail'
     }
@@ -34,15 +50,7 @@ export default defineComponent({
       {
         title: 'Swap',
         render(_text: any, r: any) {
-          if (r.swapType == 'SWAP_B_A') {
-            return `Swap ${props.currentPool?.tokenB} for ${props.currentPool?.tokenA}`
-          } else if (r.swapType == 'SWAP_A_B'){
-            return `Swap ${props.currentPool?.tokenA} for ${props.currentPool?.tokenB}`
-          } else if(r.swapType == 'ROLLBACK_A' || r.swapType == 'ROLLBACK_B') {
-            return 'ROLLBACK'
-          } else {
-            return r.swapType
-          }
+          return getSwapType(r.swapType, props.currentPool?.tokenA, props.currentPool?.tokenB)
         }
       },
       {
@@ -88,15 +96,19 @@ export default defineComponent({
         }
       },
       {
+        title: 'Gas',
+        dataIndex: 'gas',
+      },
+      {
         title: 'In',
         render(_text: any, r: any) {
-          return r.inTokenA > 0 ? `${numberFormat(r.inTokenA)} ${props.currentPool?.tokenA}` : `${numberFormat(r.inTokenB)} ${props.currentPool?.tokenB}`
+          return consumeToken(r.inTokenA, r.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
         }
       },
       {
         title: 'Out',
         render(_text: any, r: any) {
-          return r.outTokenA > 0 ? `${numberFormat(r.outTokenA)} ${props.currentPool?.tokenA}` : `${numberFormat(r.outTokenB)} ${props.currentPool?.tokenB}`
+          return consumeToken(r.outTokenA, r.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
         }
       },
       // {

@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ElMessageBox, ElNotification } from 'element-plus';
+import SwapRecordsDialog from './SwapRecordsDialog.vue'
 import NP from 'number-precision'
+
 NP.enableBoundaryChecking(false);
 
 const props = withDefaults(
@@ -18,10 +20,6 @@ const emit = defineEmits<{
   (event: 'changePool', poolid: string): void
 }>()
 
-watch(() => props.pools, (pools) => {
-  console.log(pools)
-})
-
 const visible = computed({
   get() {
     return props.visible
@@ -31,6 +29,7 @@ const visible = computed({
   }
 })
 
+const showRecordDialog = ref(true)
 const { payPool } = useDoge()
 
 const payToken = ref<TokenInfo>({
@@ -52,6 +51,7 @@ const revToken = ref<TokenInfo>({
 const focusName = ref<TokenInputName>('')
 const isWatchStop = ref(false)
 const paying = ref(false)
+const payData = ref<any>({})
 
 watch(() => props.currentPoolState, (currentPoolState) => {
   const { balanceA, balanceB } = currentPoolState
@@ -113,12 +113,15 @@ async function pay() {
     if (payToken.value.amount) {
       paying.value = true
       await payPool(payToken.value.amount, props.currentPool.pooladdress)
-      await ElNotification({
-        title: 'Success',
-        message: 'Payment success!',
-        type: 'success',
-      })
-      visible.value = false
+      showRecordDialog.value = true
+      payData.value = {
+        status: '0',
+        swapType: 'SWAP_A_B',
+        inTokenA: payToken.value.amount,
+        inTokenB: 0,
+        outTokenA: 0,
+        outTokenB: revToken.value.amount,
+      }
     }
   } catch {
     await ElNotification({
@@ -149,7 +152,7 @@ function close() {
           v-model="payToken.amount"
           :price="payToken.price"
           :loading="loading"
-          title="You Pay"
+          title="You pay"
           @focus="focusName = 'pay'"
           :currentPool="props.currentPool"
           :pools="payToken.pools"
@@ -178,6 +181,7 @@ function close() {
       </div>
     </div>
   </el-dialog>
+  <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
 </template>
 <style lang="scss" scoped>
 .swap-pair {
@@ -213,9 +217,10 @@ function close() {
   }
   &_buy {
     text-align: center;
-    padding: 20px;
+    line-height: 55px;
     margin-top: 12px;
     border-radius: 20px;
+    font-size: 18px;
     cursor: pointer;
     border: 2px solid #fff;
     background-color: #1e90ff;

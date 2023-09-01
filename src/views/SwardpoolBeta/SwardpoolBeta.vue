@@ -5,7 +5,7 @@ import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
 import QrcodeVue from 'qrcode.vue'
-import {ArrowDown, InfoFilled} from '@element-plus/icons-vue'
+import {ArrowDown} from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 
@@ -72,19 +72,11 @@ onMounted(() => {
   <el-row :gutter="12">
     <el-col :span="24" style="margin-bottom: 12px">
       <dog-card>
-        <h4 style="margin-top: 0">Sword Pool</h4>
+        <h4 style="margin-top: 0">Sward Pool</h4>
+        <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon style="margin-bottom: 12px"/>
         <el-row>
           <el-col :span="24" :md="18">
             <div style="display: flex;align-items: center;">
-              <el-popover
-                :content="noticeMessage"
-                width="300"
-                v-if="noticeMessage"
-              >
-                <template #reference>
-                  <el-icon style="margin-right: 5px; color: #aaa;font-size: 24px;cursor: pointer;"><InfoFilled/></el-icon>
-                </template>
-              </el-popover>
               <el-dropdown style="display: inline-block" @command="changePool">
                 <el-button>
                   <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
