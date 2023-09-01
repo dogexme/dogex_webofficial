@@ -99,6 +99,11 @@ function changePool(poolid: string) {
 }
 
 async function pay() {
+
+  if (+payToken.value.amount < 10) {
+    return ElMessage.error('The minimum doge currency is 10.')
+  }
+
   await ElMessageBox.confirm('Do you want to pay?', 'Pay', {
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
@@ -113,6 +118,7 @@ async function pay() {
         message: 'Payment success!',
         type: 'success',
       })
+      visible.value = false
     }
   } catch {
     await ElNotification({
@@ -121,7 +127,6 @@ async function pay() {
       type: 'error',
     })
   } finally {
-    visible.value = false
     paying.value = false
   }
 }
@@ -151,6 +156,7 @@ function close() {
           @change-pool="changePool"
           :min="payToken.min"
         ></SwapInput>
+        <div style="color: red;margin-top: 4px" v-if="+payToken.amount < 10">The minimum doge currency is 10.</div>
         <div class="swap-pair_changewrap">
           <div class="swap-pair_change swap-pair_change--disabled">
             <span class="nft">&#xe64f;</span>
@@ -168,7 +174,7 @@ function close() {
           @change-pool="changePool"
           :min="revToken.min"
         ></SwapInput>
-        <div class="swap-pair_buy" @click="pay">Pay</div>
+        <div class="swap-pair_buy" :style="[+payToken.amount < 10 ? {'background-color': '#aaa', cursor: 'not-allowed'} : {}]" @click="pay">Pay</div>
       </div>
     </div>
   </el-dialog>

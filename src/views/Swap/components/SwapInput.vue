@@ -61,7 +61,7 @@ function changePool(poolid: string) {
     <span class="swap-pair_item_title">{{ props.title }}</span>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">
-        <input type="number" class="swap-pair_input" @input="formattedValue" v-model="amount" :min="props.min" :step="1" :style="[props.loading ? { color: '#a5a5a5' } : {}]" placeholder="请输入金额" @focus="emit('focus')" />
+        <input type="number" class="swap-pair_input" @input="formattedValue" v-model="amount" :min="props.min" :step="1" :style="[props.loading ? { color: '#a5a5a5' } : {}]" placeholder="Please enter the amount" @focus="emit('focus')" />
       </div>
       <el-dropdown :disabled="props.loading" @command="changePool" @visible-change="(isVisible) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
         <div class="swap-pair_token">
@@ -107,6 +107,9 @@ function changePool(poolid: string) {
     font-size: 32px;
     background-color: transparent;
     padding: 0;
+    &::placeholder {
+      font-size: 18px;
+    }
     /* chrome */
     &::-webkit-outer-spin-button,
     &::-webkit-inner-spin-button {
@@ -114,7 +117,7 @@ function changePool(poolid: string) {
     }
     /* 火狐浏览器 */
     &[type='number'] {
-      -moz-appearance: textfield;
+      appearance: textfield;
     }
   }
   &_token {

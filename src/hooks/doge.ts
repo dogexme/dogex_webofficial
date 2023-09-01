@@ -3,9 +3,8 @@ export const DogeErrorCode = {
 }
 
 export function useDoge() {
-  const doge = window?.DogeApi
-
   async function connectDpal() {
+    const doge = window?.DogeApi
     if (doge) {
       if (await doge.isEnabled()) {
         const { userAddress } = await doge.userAddress()
@@ -23,6 +22,7 @@ export function useDoge() {
   }
 
   async function payPool(cast: number, poolAddress: string) {
+    const doge = window?.DogeApi
     if (await doge.isEnabled()) {
       const rs = await doge.useDoge(cast, poolAddress, 'swap');
       if (rs?.txid) {
