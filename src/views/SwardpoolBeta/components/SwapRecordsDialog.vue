@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { queryPoolTransfers } from '@/services/sword'
-import { getSwapType, consumeToken } from './TransferTable'
+import { getSwapType, consumeToken, StatusType } from './TransferTable'
 import { useAppStore } from '@/store'
 import { Loading } from '@element-plus/icons-vue'
+import { omitCenterString } from '@/utils'
 
 const props = withDefaults(
   defineProps<{
@@ -16,12 +17,6 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:visible', isVisible: boolean): void
 }>()
-
-const statusType = {
-  0: 'waiting',
-  1: 'success',
-  2: 'fail',
-}
 
 const appStore = useAppStore()
 const address = computed(() => appStore.address)
@@ -70,7 +65,7 @@ async function getData(page: number, pageSize: number) {
 
 </script>
 <template>
-  <el-dialog width="800px" v-model="visible">
+  <el-dialog width="900px" v-model="visible">
     <el-result icon="success" title="Payment success"></el-result>
     <div v-loading="loading">
       <h4>Pay Data</h4>
@@ -82,10 +77,15 @@ async function getData(page: number, pageSize: number) {
         </el-table-column>
         <el-table-column prop="status" label="Status">
           <template #default="s">
-            {{ statusType[s.row.status as 0] || '-'}}
+            {{ StatusType[s.row.status as 0] || '-'}}
             <el-icon class="is-loading" v-if="s.row.status == 0" style="vertical-align: middle;">
               <Loading />
             </el-icon>
+          </template>
+        </el-table-column>
+        <el-table-column prop="txid" label="Txid" width="180px">
+          <template #default="s">
+            <DogLink v-if="s.row.txid" is-copy :to="`https://chain.so/tx/DOGE/${s.row.txid}`" :label="omitCenterString(s.row.txid, 12)" :value="s.row.txid"></DogLink>
           </template>
         </el-table-column>
         <el-table-column label="In">
@@ -108,7 +108,12 @@ async function getData(page: number, pageSize: number) {
         </el-table-column>
         <el-table-column prop="status" label="Status">
           <template #default="s">
-            {{ statusType[s.row.status as 0] }}
+            {{ StatusType[s.row.status as 0] }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="txid" label="Txid" width="180px">
+          <template #default="s">
+            <DogLink v-if="s.row.txid" is-copy :to="`https://chain.so/tx/DOGE/${s.row.txid}`" :label="omitCenterString(s.row.txid, 12)" :value="s.row.txid"></DogLink>
           </template>
         </el-table-column>
         <el-table-column label="In">

@@ -2,7 +2,13 @@ import DogTable from '@/components/DogTable/DogTable'
 import DogLink from '@/components/DogLink.vue'
 import { queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
-import {numberFormat} from '@/utils'
+import { numberFormat } from '@/utils'
+
+export const StatusType = {
+  0: 'pending',
+  1: 'success',
+  2: 'fail'
+}
 
 export function getSwapType(swapType: string, tokenA?: string, tokenB?: string) {
   if (swapType == 'SWAP_B_A') {
@@ -27,12 +33,6 @@ export default defineComponent({
     }
   },
   setup(props) {
-    const statusType = {
-      0: 'waiting',
-      1: 'success',
-      2: 'fail'
-    }
-
     const { loading, dataSource, total, page, query } = useTable({
       api: getData,
       pageSize: 20,
@@ -57,7 +57,7 @@ export default defineComponent({
         title: 'Status',
         dataIndex: 'status',
         render(text: 0 | 1 | 2) {
-          return statusType[text] || '-'
+          return StatusType[text] || '-'
         }
       },
       {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ElMessageBox, ElNotification } from 'element-plus';
-import SwapRecordsDialog from './SwapRecordsDialog.vue'
+// import SwapRecordsDialog from './SwapRecordsDialog.vue'
 import NP from 'number-precision'
 
 NP.enableBoundaryChecking(false);
@@ -29,7 +29,7 @@ const visible = computed({
   }
 })
 
-const showRecordDialog = ref(true)
+// const showRecordDialog = ref(true)
 const { payPool } = useDoge()
 
 const payToken = ref<TokenInfo>({
@@ -51,7 +51,7 @@ const revToken = ref<TokenInfo>({
 const focusName = ref<TokenInputName>('')
 const isWatchStop = ref(false)
 const paying = ref(false)
-const payData = ref<any>({})
+// const payData = ref<any>({})
 
 watch(() => props.currentPoolState, (currentPoolState) => {
   const { balanceA, balanceB } = currentPoolState
@@ -112,16 +112,24 @@ async function pay() {
   try {
     if (payToken.value.amount) {
       paying.value = true
+      // const txid = await payPool(payToken.value.amount, props.currentPool.pooladdress)
       await payPool(payToken.value.amount, props.currentPool.pooladdress)
-      showRecordDialog.value = true
-      payData.value = {
-        status: '0',
-        swapType: 'SWAP_A_B',
-        inTokenA: payToken.value.amount,
-        inTokenB: 0,
-        outTokenA: 0,
-        outTokenB: revToken.value.amount,
-      }
+      await ElNotification({
+        title: 'Success',
+        message: 'Payment success!',
+        type: 'success',
+      })
+      visible.value = false
+      // showRecordDialog.value = true
+      // payData.value = {
+      //   txid,
+      //   status: '0',
+      //   swapType: 'SWAP_A_B',
+      //   inTokenA: payToken.value.amount,
+      //   inTokenB: 0,
+      //   outTokenA: 0,
+      //   outTokenB: revToken.value.amount,
+      // }
     }
   } catch {
     await ElNotification({
@@ -181,7 +189,7 @@ function close() {
       </div>
     </div>
   </el-dialog>
-  <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
+  <!-- <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog> -->
 </template>
 <style lang="scss" scoped>
 .swap-pair {
