@@ -72,12 +72,12 @@ onMounted(() => {
   <el-row :gutter="12">
     <el-col :span="24" style="margin-bottom: 12px">
       <dog-card>
-        <h4 style="margin-top: 0">Sward Pool</h4>
+        <h4 style="margin-top: 0">Swordpool</h4>
         <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon style="margin-bottom: 12px"/>
         <el-row>
           <el-col :span="24" :md="18">
             <div style="display: flex;align-items: center;">
-              <el-dropdown style="display: inline-block" @command="changePool">
+              <el-dropdown style="display: inline-block;margin-right: 12px" @command="changePool">
                 <el-button>
                   <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
                   <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}
@@ -93,8 +93,10 @@ onMounted(() => {
                 </template>
               </el-dropdown>
               <template v-if="address">
-                <el-button type="primary" style="margin-left: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
-                <el-button type="info" style="margin-left: 12px" disabled>Sward</el-button>
+                <div>
+                  <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
+                  <el-button type="info" style="margin:0" disabled>Sword</el-button>
+                </div>
               </template>
               <div style="font-size: 14px; display: inline-block;" v-else>
                 <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
@@ -118,7 +120,7 @@ onMounted(() => {
           <el-col :span="24" :md="6" style="display: flex;flex-direction: column; align-items: center">
             <el-link href="https://github.com/dpalwallet/swardpool" style="margin-bottom:12px" target="_blank">
               <img class="token-icon" src="/logo.png" alt="" />
-              swardpool
+              Swordpool Rule Beta
             </el-link>
             <div style="border: 2px solid rgb(238, 181, 15);padding: 12px;border-radius: 24px;">
               <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
@@ -138,6 +140,9 @@ onMounted(() => {
   <SwapDialog v-model:visible="showSwapDialog" :current-pool="(currentPool as SwordPool)" :current-pool-state="(currentPoolState as TokenState)" @change-pool="changePool" :pools="pools" :loading="loading"></SwapDialog>
 </template>
 <style lang="scss" scoped>
+:deep(.el-statistic__number){
+  font-size: 18px;
+}
 .token-icon {
   width: 20px;
   height: 20px;
