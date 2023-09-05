@@ -29,8 +29,8 @@ export default [
         component: () => import('@/views/Address/Tokens'),
       },
       {
-        path: 'swardpoolBeta',
-        name: 'swardpoolBeta',
+        path: 'swordpoolBeta',
+        name: 'swordpoolBeta',
         component: () => import('@/views/SwardpoolBeta/SwardpoolBeta.vue')
       }
       // {

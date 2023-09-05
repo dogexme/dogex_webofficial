@@ -10,8 +10,8 @@ export default [
     title: 'Home',
   },
   {
-    path: '/swardpoolBeta',
-    title: 'Swardpool Beta',
+    path: '/swordpoolBeta',
+    title: 'Swordpool Beta',
   },
   // {
   //   name: 'Marketplace',
