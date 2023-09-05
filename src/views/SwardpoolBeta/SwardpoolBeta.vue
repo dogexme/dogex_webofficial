@@ -110,7 +110,7 @@ onMounted(() => {
                 <el-statistic :title="`Current ${currentPool?.tokenB} Balance`" :precision="5" :value="currentPoolState?.balanceB" />
               </el-col>
               <el-col :span="12">
-                <el-statistic title="Price" :precision="4" :value="np.divide(currentPoolState?.balanceA || 0, currentPoolState?.balanceB || 0) || 0" />
+                <el-statistic title="Price" :precision="6" :value="np.divide(currentPoolState?.balanceA || 0, currentPoolState?.balanceB || 0) || 0" />
               </el-col>
               <el-col :span="12">
                 <el-statistic title="Block No" :value="currentPoolState?.blockno" />
@@ -118,7 +118,7 @@ onMounted(() => {
             </el-row>
           </el-col>
           <el-col :span="24" :md="6" style="display: flex;flex-direction: column; align-items: center">
-            <el-link href="https://github.com/dpalwallet/swardpool" style="margin-bottom:12px" target="_blank">
+            <el-link href="https://github.com/dpalwallet/swordpool" style="margin-bottom:12px" target="_blank">
               <img class="token-icon" src="/logo.png" alt="" />
               Swordpool Rule Beta
             </el-link>
