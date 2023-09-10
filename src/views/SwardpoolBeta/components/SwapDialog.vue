@@ -149,7 +149,7 @@ function close() {
 </script>
 
 <template>
-  <el-dialog v-model="visible" width="500px" @close="close" append-to-body>
+  <el-dialog class="custom-dialog" v-model="visible" width="450px" @close="close" append-to-body>
     <div class="swap-container" v-loading="paying">
       <div class="swap-pair">
         <div class="swap-pair_title">
@@ -191,6 +191,26 @@ function close() {
   </el-dialog>
   <!-- <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog> -->
 </template>
+<style lang="scss">
+.custom-dialog {
+  background-color: transparent;
+  box-shadow: none;
+  .el-dialog__header {
+    padding: 0;
+  }
+  .el-dialog__body {
+    padding: 0;
+  }
+  .el-dialog__headerbtn {
+    right: 8px;
+    width: 35px;
+    height: 35px;
+  }
+  .el-dialog__close {
+    color: #fff;
+  }
+}
+</style>
 <style lang="scss" scoped>
 .swap-pair {
   max-width: 500px;

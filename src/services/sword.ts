@@ -44,3 +44,26 @@ export const queryPoolTransfers = (params: { address?: string } & PageResult) =>
     params
   })
 }
+
+
+/**
+ * 查询可转移的 dogim 交易api
+ * @param address
+ * @returns
+ */
+export const getTransferList = (address: string) => {
+  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=get_transfer_list', {
+    params: {address}
+  })
+}
+
+/**
+ * 查询交易状态
+ * @param hash
+ * @returns
+ */
+export const queryTransferStatus = (hash: string) => {
+  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_transaction', {
+    params: {hash}
+  })
+}
