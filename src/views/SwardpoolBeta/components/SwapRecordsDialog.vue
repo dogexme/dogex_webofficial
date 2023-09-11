@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { queryPoolTransfers } from '@/services/sword'
+import { queryPoolTransfers, queryTransferStatus } from '@/services/sword'
 import { getSwapType, consumeToken, StatusType } from './TransferTable'
 import { useAppStore } from '@/store'
 import { Loading } from '@element-plus/icons-vue'
@@ -22,11 +22,15 @@ const appStore = useAppStore()
 const address = computed(() => appStore.address)
 const currentPool = computed(() => props.currentPool)
 const payData = ref<any>([])
+const timer = ref(0)
 
-watch(() => props.payData, (data) => {
+watch(() => props.payData, async (data) => {
   if (data) {
     payData.value = [data]
+    queryStatusLoop(data)
   }
+}, {
+  immediate: true
 })
 
 const { loading, dataSource, total, query } = useTable({
@@ -46,8 +50,34 @@ const visible = computed({
 watch(visible, (isVisible) => {
   if (isVisible) {
     query(1)
+  } else {
+    stopStatusLoop()
   }
 })
+
+async function queryStatusLoop(data: any) {
+  try {
+    const res = await queryTransferStatus('6538cca5570613ccf1096d3cd48c416798e96b9cfde6c7ec17168a9e5ce0f8f6')
+    const resData = res.data.data
+
+    if (res.data.status == 'failed') {
+      return stopStatusLoop()
+    }
+
+    if(resData.status != '0') {
+      data.status = resData.status
+      stopStatusLoop()
+    } else {
+      timer.value = window.setTimeout(() => queryStatusLoop(data), 1000)
+    }
+  } catch {
+    stopStatusLoop()
+  }
+}
+
+function stopStatusLoop() {
+  clearTimeout(timer.value)
+}
 
 async function getData(page: number, pageSize: number) {
   const res = await queryPoolTransfers({ pageSize, page, address: address.value })
@@ -66,7 +96,7 @@ async function getData(page: number, pageSize: number) {
 </script>
 <template>
   <el-dialog width="900px" v-model="visible">
-    <el-result icon="success" title="Payment success"></el-result>
+    <el-result class="swap-result" icon="success" title="Payment success"></el-result>
     <div v-loading="loading">
       <h4>Pay Data</h4>
       <el-table :data="payData" :show-header="false" style="margin-bottom: 12px">
@@ -99,7 +129,7 @@ async function getData(page: number, pageSize: number) {
           </template>
         </el-table-column>
       </el-table>
-      <h4>Pool Transactions</h4>
+      <h4 style="margin-top: 50px">Pool Transactions</h4>
       <el-table :data="dataSource">
         <el-table-column label="Swap" width="200px">
           <template #default="s">
@@ -133,3 +163,14 @@ async function getData(page: number, pageSize: number) {
     </div>
   </el-dialog>
 </template>
+
+<style lang="scss">
+.swap-result {
+  flex-direction: row;
+  padding: 0;
+  .el-result__title {
+    margin-left: 12px;
+    margin-top: 0;
+  }
+}
+</style>
