@@ -10,12 +10,15 @@ const props = withDefaults(
     name: TokenInputName,
     loading?: boolean,
     pools: any[],
-    price: number
+    price: number,
+    disabled: boolean,
+    swapType: 'SWAP_A_B' | 'SWAP_B_A'
   }>(),
   {
     min: 0,
     modelValue: 0,
-    loading: false
+    loading: false,
+    disabled: false
   }
 )
 const emit = defineEmits<{
@@ -58,10 +61,13 @@ function changePool(poolid: string) {
 
 <template>
   <div class="swap-pair_item">
-    <span class="swap-pair_item_title">{{ props.title }}</span>
+    <div style="display: flex; justify-content: space-between;">
+      <span class="swap-pair_item_title">{{ props.title }}</span>
+      <el-button v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'">123</el-button>
+    </div>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">
-        <input type="number" class="swap-pair_input" @input="formattedValue" v-model="amount" :min="props.min" :step="1" :style="[props.loading ? { color: '#a5a5a5' } : {}]" placeholder="Please enter the amount" @focus="emit('focus')" />
+        <input type="number" class="swap-pair_input" @input="formattedValue" v-model="amount" :min="props.min" :step="1" :style="[props.loading ? { color: '#a5a5a5' } : {}]" placeholder="Please enter the amount" @focus="emit('focus')" :disabled="props.disabled"/>
       </div>
       <el-dropdown :disabled="props.loading" @command="changePool" @visible-change="(isVisible) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
         <div class="swap-pair_token">
@@ -84,7 +90,7 @@ function changePool(poolid: string) {
 .swap-pair {
   &_item {
     padding: 12px;
-    border: 2px solid #333;
+    border: 1px solid #b7b7b7;
     border-radius: 10px;
     background-color: #fff;
   }

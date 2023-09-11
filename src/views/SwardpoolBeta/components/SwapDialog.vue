@@ -29,7 +29,7 @@ const visible = computed({
   }
 })
 
-const showRecordDialog = ref(true)
+const showRecordDialog = ref(false)
 const { payPool } = useDoge()
 
 const payToken = ref<TokenInfo>({
@@ -37,6 +37,7 @@ const payToken = ref<TokenInfo>({
   rate: 1,
   loading: false,
   pools: [],
+  swapType: 'SWAP_A_B',
   price: 4
 })
 
@@ -45,21 +46,14 @@ const revToken = ref<TokenInfo>({
   rate: 1,
   loading: false,
   pools: [],
-  price: 0
+  price: 0,
+  swapType: 'SWAP_B_A',
 })
 
 const focusName = ref<TokenInputName>('')
 const isWatchStop = ref(false)
 const paying = ref(false)
-const payData = ref<any>({
-  txid: 'asdsadhj12321huihiasd123',
-  status: '0',
-  swapType: 'SWAP_A_B',
-  inTokenA: payToken.value.amount,
-  inTokenB: 0,
-  outTokenA: 0,
-  outTokenB: revToken.value.amount,
-})
+const payData = ref<any>({})
 
 watch(() => props.currentPoolState, (currentPoolState) => {
   const { balanceA, balanceB } = currentPoolState
@@ -118,21 +112,16 @@ async function pay() {
   })
 
   try {
+    const { swapType } = payToken.value
     if (payToken.value.amount) {
       paying.value = true
       const txid = await payPool(payToken.value.amount, props.currentPool.pooladdress)
-      // await payPool(payToken.value.amount, props.currentPool.pooladdress)
-      // await ElNotification({
-      //   title: 'Success',
-      //   message: 'Payment success!',
-      //   type: 'success',
-      // })
       visible.value = false
       showRecordDialog.value = true
       payData.value = {
         txid,
         status: '0',
-        swapType: 'SWAP_A_B',
+        swapType,
         inTokenA: payToken.value.amount,
         inTokenB: 0,
         outTokenA: 0,
@@ -150,14 +139,26 @@ async function pay() {
   }
 }
 
+function change() {
+  const temp = payToken.value
+  payToken.value = revToken.value
+  revToken.value = temp
+}
+
 function close() {
    payToken.value.amount = revToken.value.amount = 0
+}
+
+function selectToken() {
+  if (payToken.value.swapType == 'SWAP_B_A') {
+    console.log(123)
+  }
 }
 
 </script>
 
 <template>
-  <el-dialog class="custom-dialog" v-model="visible" width="450px" @close="close" append-to-body>
+  <el-dialog class="custom-dialog" v-model="visible" width="500px" @close="close" append-to-body>
     <div class="swap-container" v-loading="paying">
       <div class="swap-pair">
         <div class="swap-pair_title">
@@ -174,10 +175,12 @@ function close() {
           :pools="payToken.pools"
           @change-pool="changePool"
           :min="payToken.min"
+          :disabled="payToken.swapType == 'SWAP_B_A'"
+          :swap-type="payToken.swapType"
         ></SwapInput>
         <div style="color: red;margin-top: 4px" v-if="+payToken.amount < 10">The minimum doge currency is 10.</div>
         <div class="swap-pair_changewrap">
-          <div class="swap-pair_change swap-pair_change--disabled">
+          <div class="swap-pair_change" @click="change">
             <span class="nft">&#xe64f;</span>
           </div>
         </div>
@@ -192,6 +195,8 @@ function close() {
           :price="revToken.price"
           @change-pool="changePool"
           :min="revToken.min"
+          :disabled="payToken.swapType == 'SWAP_B_A'"
+          :swap-type="revToken.swapType"
         ></SwapInput>
         <div class="swap-pair_buy" :style="[+payToken.amount < 10 ? {'background-color': '#aaa', cursor: 'not-allowed'} : {}]" @click="pay">Pay</div>
       </div>
@@ -210,24 +215,31 @@ function close() {
     padding: 0;
   }
   .el-dialog__headerbtn {
+    top: 14px;
     right: 8px;
     width: 35px;
     height: 35px;
   }
   .el-dialog__close {
-    color: #fff;
+    color: #000;
   }
 }
 </style>
 <style lang="scss" scoped>
-.swap-pair {
+.swap-container {
   max-width: 500px;
-  padding: 10px;
+  background-color: #fff;
   border-radius: 20px;
-  background-color: rgb(218, 112, 214);
+  overflow: hidden;
+  padding: 50px 20px 20px;
+}
+.swap-pair {
+  padding: 10px;
+  background-color: #dadada;
+  border-radius: 20px;
   &_title {
     margin: 12px 5px;
-    color: #fff;
+    color: #2c2c2c;
     font-weight: 600;
   }
   &_changewrap {
@@ -244,7 +256,7 @@ function close() {
     border-radius: 12px;
     color: #fff;
     border: 1px solid #fff;
-    background-color: rgb(238, 181, 15);
+    background-color: #ffa21e;
     cursor: pointer;
     &--disabled {
       background-color: #aaa;
@@ -259,7 +271,7 @@ function close() {
     font-size: 18px;
     cursor: pointer;
     border: 2px solid #fff;
-    background-color: #1e90ff;
+    background-color: #ffa21e;
     color: #fff;
     box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
     &--connect {
