@@ -14,7 +14,8 @@ interface TokenInfo {
   loading?: boolean,
   pools: any,
   price: number,
-  swapType: 'SWAP_A_B' | 'SWAP_B_A'
+  swapType: 'SWAP_A_B' | 'SWAP_B_A',
+  txid?: string
 }
 
 type TokenInputName = 'pay' | 'rev' | ''

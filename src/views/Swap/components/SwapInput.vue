@@ -63,7 +63,9 @@ function changePool(poolid: string) {
   <div class="swap-pair_item">
     <div style="display: flex; justify-content: space-between;">
       <span class="swap-pair_item_title">{{ props.title }}</span>
-      <el-button v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">select</el-button>
+      <div class="swap-pair_select" v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">
+        Select>
+      </div>
     </div>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">
@@ -96,6 +98,13 @@ function changePool(poolid: string) {
   }
   &_item_title {
     font-size: 13px;
+  }
+  &_select {
+    color: #333;
+    cursor: pointer;
+    &:hover {
+      color: #ffa21e;
+    }
   }
   &_main {
     display: flex;

@@ -32,8 +32,20 @@ export function useDoge() {
     throw 1
   }
 
+  async function transferD20(inscriptionid: string, receiver: string) {
+    const doge = window?.DogeApi
+    if (await doge.isEnabled()) {
+      const rs = await doge.transferd20(inscriptionid, receiver);
+      if (rs?.txid) {
+        return rs?.txid
+      }
+    }
+    throw 1
+  }
+
   return {
     connectDpal,
-    payPool
+    payPool,
+    transferD20
   }
 }
