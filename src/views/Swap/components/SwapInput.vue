@@ -22,7 +22,7 @@ const props = withDefaults(
   }
 )
 const emit = defineEmits<{
-  (event: 'selectToken', t: TokenInputName): void,
+  (event: 'selectToken'): void,
   (event: 'update:modelValue', amount: number | ''): void,
   (event: 'focus'): void,
   (event: 'changePool', poolid: string): void
@@ -63,7 +63,7 @@ function changePool(poolid: string) {
   <div class="swap-pair_item">
     <div style="display: flex; justify-content: space-between;">
       <span class="swap-pair_item_title">{{ props.title }}</span>
-      <el-button v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'">123</el-button>
+      <el-button v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">select</el-button>
     </div>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">

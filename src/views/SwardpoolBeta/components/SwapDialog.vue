@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import { ElMessageBox, ElNotification } from 'element-plus';
 // import SwapRecordsDialog from './SwapRecordsDialog.vue'
+import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
+import { useAppStore } from '@/store';
+
 
 NP.enableBoundaryChecking(false);
 
@@ -29,6 +32,8 @@ const visible = computed({
   }
 })
 
+const appStore = useAppStore()
+const address = computed(() => appStore.address && 'DB25g9akX91hT4uqCJtBPtUo3NZTJ4oVq5')
 const showRecordDialog = ref(false)
 const { payPool } = useDoge()
 
@@ -54,6 +59,9 @@ const focusName = ref<TokenInputName>('')
 const isWatchStop = ref(false)
 const paying = ref(false)
 const payData = ref<any>({})
+const showSelectTokenDialog = ref(false)
+const transferList = ref<{amt: number, txid: string}[]>([])
+const transferListLoading = ref(false)
 
 watch(() => props.currentPoolState, (currentPoolState) => {
   const { balanceA, balanceB } = currentPoolState
@@ -96,14 +104,35 @@ watch(
   }
 )
 
+watch(showSelectTokenDialog, async (isVisible) => {
+  if (isVisible) {
+    try {
+      transferListLoading.value = true
+      const res = await getTransferList(address.value)
+      const resData = res.data
+      if (resData.status == 'success') {
+        transferList.value = resData.data.transfer_list
+        console.log(transferList.value)
+      }
+    } finally {
+      transferListLoading.value = false
+    }
+  }
+})
+
 function changePool(poolid: string) {
   emit('changePool', poolid)
 }
 
-async function pay() {
+const isLimitAmount = computed(() => payToken.value.swapType == 'SWAP_A_B' && +payToken.value.amount < 10)
 
-  if (+payToken.value.amount < 10) {
-    return ElMessage.error('The minimum doge currency is 10.')
+async function pay() {
+  if (isLimitAmount.value) {
+    return
+  }
+
+  if (payToken.value.amount == 0 && payToken.value.swapType == "SWAP_B_A") {
+    return
   }
 
   await ElMessageBox.confirm('Do you want to pay?', 'Pay', {
@@ -140,9 +169,16 @@ async function pay() {
 }
 
 function change() {
+  isWatchStop.value = true
   const temp = payToken.value
   payToken.value = revToken.value
   revToken.value = temp
+  if (revToken.value.amount == '' || payToken.value.amount == '') {
+    revToken.value.amount = payToken.value.amount = 0
+  }
+  nextTick(() => {
+    isWatchStop.value = false
+  })
 }
 
 function close() {
@@ -151,7 +187,7 @@ function close() {
 
 function selectToken() {
   if (payToken.value.swapType == 'SWAP_B_A') {
-    console.log(123)
+    showSelectTokenDialog.value = true
   }
 }
 
@@ -177,8 +213,8 @@ function selectToken() {
           :min="payToken.min"
           :disabled="payToken.swapType == 'SWAP_B_A'"
           :swap-type="payToken.swapType"
+          @select-token="selectToken"
         ></SwapInput>
-        <div style="color: red;margin-top: 4px" v-if="+payToken.amount < 10">The minimum doge currency is 10.</div>
         <div class="swap-pair_changewrap">
           <div class="swap-pair_change" @click="change">
             <span class="nft">&#xe64f;</span>
@@ -198,8 +234,14 @@ function selectToken() {
           :disabled="payToken.swapType == 'SWAP_B_A'"
           :swap-type="revToken.swapType"
         ></SwapInput>
-        <div class="swap-pair_buy" :style="[+payToken.amount < 10 ? {'background-color': '#aaa', cursor: 'not-allowed'} : {}]" @click="pay">Pay</div>
+        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isLimitAmount">The minimum doge currency is 10.</div>
+        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 ? {cursor: 'not-allowed'} : {}]" @click="pay">Pay</div>
       </div>
+    </div>
+  </el-dialog>
+  <el-dialog v-model="showSelectTokenDialog" width="1000px">
+    <div v-loading="transferListLoading">
+      <div v-for="t in transferList">{{ t.txid }}:{{ t.amt }}</div>
     </div>
   </el-dialog>
   <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
