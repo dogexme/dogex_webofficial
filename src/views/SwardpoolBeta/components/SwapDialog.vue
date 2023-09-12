@@ -39,8 +39,8 @@ const maxInputDialogWidth = 500
 const inputDialogWidth = ref(maxInputDialogWidth)
 
 const appStore = useAppStore()
-const address = computed(() => appStore.address && 'DB25g9akX91hT4uqCJtBPtUo3NZTJ4oVq5')
-const showRecordDialog = ref(false)
+const address = computed(() => appStore.address)
+const showRecordDialog = ref(true)
 const { payPool, transferD20 } = useDoge()
 
 const payToken = ref<TokenInfo>({
