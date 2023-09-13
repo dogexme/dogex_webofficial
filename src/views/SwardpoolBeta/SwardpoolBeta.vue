@@ -77,7 +77,7 @@ onMounted(() => {
         <el-row>
           <el-col :span="24" :md="18">
             <div style="display: flex;align-items: center;">
-              <el-dropdown style="display: inline-block;margin-right: 12px" @command="changePool">
+              <el-dropdown style="display: inline-block;margin-right: 12px" trigger="click" @command="changePool">
                 <el-button>
                   <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
                   <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}
@@ -128,14 +128,14 @@ onMounted(() => {
             <DogLink style="font-size: 12px;margin-top: 12px;" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
           </el-col>
         </el-row>
+        <TransferTable style="margin-top: 24px" :current-pool="(currentPool as SwordPool)"></TransferTable>
       </dog-card>
     </el-col>
-    <el-col :span="24">
+    <!-- <el-col :span="24">
       <dog-card>
         <h4 style="margin-top: 0">Pool Transactions</h4>
-        <TransferTable :current-pool="(currentPool as SwordPool)"></TransferTable>
       </dog-card>
-    </el-col>
+    </el-col> -->
   </el-row>
   <SwapDialog v-model:visible="showSwapDialog" :current-pool="(currentPool as SwordPool)" :current-pool-state="(currentPoolState as TokenState)" @change-pool="changePool" :pools="pools" :loading="loading"></SwapDialog>
 </template>

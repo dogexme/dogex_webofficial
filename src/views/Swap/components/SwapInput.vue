@@ -71,7 +71,7 @@ function changePool(poolid: string) {
       <div class="swap-pair_inputwrap">
         <input type="number" class="swap-pair_input" @input="formattedValue" v-model="amount" :min="props.min" :step="1" :style="[props.loading ? { color: '#a5a5a5' } : {}]" placeholder="Please enter the amount" @focus="emit('focus')" :disabled="props.disabled"/>
       </div>
-      <el-dropdown :disabled="props.loading" @command="changePool" @visible-change="(isVisible) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
+      <el-dropdown trigger="click" :disabled="props.loading" @command="changePool" @visible-change="(isVisible) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
         <div class="swap-pair_token">
           <img class="token-icon" v-if="currentPool?.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}<span class="nft" style="font-size: 12px" >&#xeb6d;</span>
         </div>

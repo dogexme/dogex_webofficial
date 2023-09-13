@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElMessageBox, ElNotification } from 'element-plus';
+import { ElNotification } from 'element-plus';
 // import SwapRecordsDialog from './SwapRecordsDialog.vue'
 import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
@@ -40,7 +40,7 @@ const inputDialogWidth = ref(maxInputDialogWidth)
 
 const appStore = useAppStore()
 const address = computed(() => appStore.address)
-const showRecordDialog = ref(true)
+const showRecordDialog = ref(false)
 const { payPool, transferD20 } = useDoge()
 
 const payToken = ref<TokenInfo>({
@@ -102,7 +102,7 @@ watch(() => props.pools, (pools) => {
 watch(
   () => payToken.value.amount,
   (amount) => {
-    if (focusName.value == 'pay' && !isWatchStop.value || payToken.value.swapType == 'SWAP_B_A') {
+    if (focusName.value == 'pay' && !isWatchStop.value) {
       revToken.value.amount = NP.round(NP.divide(amount, revToken.value.rate), revToken.value.price)
     }
   }
@@ -149,16 +149,12 @@ async function pay() {
     return
   }
 
-  await ElMessageBox.confirm('Do you want to pay?', 'Pay', {
-    confirmButtonText: 'OK',
-    cancelButtonText: 'Cancel',
-  })
+  let txid;
 
   try {
     const { swapType, amount } = payToken.value
     if (amount) {
       paying.value = true
-      let txid;
       if (swapType == 'SWAP_A_B') {
         txid = await payPool(amount, props.currentPool.pooladdress)
       } else {
@@ -177,11 +173,19 @@ async function pay() {
       }
     }
   } catch {
-    await ElNotification({
-      title: 'Error',
-      message: 'Payment failed!',
-      type: 'error',
-    })
+    if (!txid) {
+      await ElNotification({
+        title: 'Error',
+        message: `Please select transferable ghostwriter.`,
+        type: 'error',
+      })
+    } else {
+      await ElNotification({
+        title: 'Error',
+        message: 'Payment failed!',
+        type: 'error',
+      })
+    }
   } finally {
     paying.value = false
   }
@@ -211,9 +215,13 @@ function selectToken() {
 }
 
 function setSelectToken(t: { txid: string, amt: number }) {
+  isWatchStop.value = true
   payToken.value.amount = t.amt
   payToken.value.txid = t.txid
   showSelectTokenDialog.value = false
+  nextTick(() => {
+    isWatchStop.value = false
+  })
 }
 
 </script>
@@ -259,8 +267,8 @@ function setSelectToken(t: { txid: string, amt: number }) {
           :disabled="payToken.swapType == 'SWAP_B_A'"
           :swap-type="revToken.swapType"
         ></SwapInput>
-        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isLimitAmount">The minimum doge currency is 10.</div>
-        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 ? {cursor: 'not-allowed'} : {}]" @click="pay">Pay</div>
+        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
+        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 ? {cursor: 'not-allowed'} : {}]" @click="pay">Swap</div>
       </div>
     </div>
   </el-dialog>
