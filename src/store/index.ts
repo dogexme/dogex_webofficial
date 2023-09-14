@@ -11,7 +11,8 @@ export default store
 export const useAppStore = defineStore('app', {
   state: () => ({
     activeRoute: {} as RouteLocationNormalized,
-    address: ''
+    address: '',
+    transferList: JSON.parse(localStorage.getItem('transfer_list') || '[]')
   }),
   actions: {
     connectDpal() {
@@ -34,10 +35,19 @@ export const useAppStore = defineStore('app', {
         throw code
       })
     },
+    updateTransferList(transfer?: any) {
+      if (transfer) {
+        this.transferList.unshift(transfer)
+      }
+      localStorage.setItem('transfer_list', JSON.stringify(this.transferList))
+    }
   },
   getters: {
     activeRoutePath(state) {
       return state.activeRoute.path
     },
+    transferLoadingCount(state) {
+      return state.transferList.filter((f: { status: '0' }) => f.status == '0').length
+    }
   },
 })

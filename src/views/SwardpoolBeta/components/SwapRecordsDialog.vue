@@ -3,6 +3,7 @@ import { queryTransferStatus } from '@/services/sword'
 import { getSwapType, consumeToken, StatusType } from './TransferTable'
 import { Loading } from '@element-plus/icons-vue'
 import { omitCenterString } from '@/utils'
+import { useAppStore } from '@/store';
 
 const props = withDefaults(
   defineProps<{
@@ -20,20 +21,7 @@ const emit = defineEmits<{
 const currentPool = computed(() => props.currentPool)
 const payData = ref<any>([])
 const timer = ref(0)
-
-watch(() => props.payData, async (data) => {
-  if (data) {
-    payData.value = [data]
-    queryStatusLoop(data)
-  }
-}, {
-  immediate: true
-})
-
-// const { loading, dataSource, total, query } = useTable({
-//   api: getData,
-//   pageSize: 5,
-// })
+const appStore = useAppStore()
 
 const visible = computed({
   get() {
@@ -45,11 +33,19 @@ const visible = computed({
 })
 
 watch(visible, (isVisible) => {
-  if (isVisible) {
-    // query(1)
-  } else {
+  if (!isVisible) {
     stopStatusLoop()
   }
+})
+
+watch(() => props.payData, async (data) => {
+  if (data && visible.value) {
+    payData.value = [data]
+    appStore.updateTransferList(data)
+    queryStatusLoop(data)
+  }
+}, {
+  immediate: true
 })
 
 async function queryStatusLoop(data: any) {
@@ -58,13 +54,17 @@ async function queryStatusLoop(data: any) {
     const resData = res.data.data
 
     if (res.data.status == 'failed') {
+      data.status = '2'
+    } else if(resData.status != '0') {
+      data.status = resData.status
+    }
+
+    if (data.status != '0') {
+      appStore.updateTransferList()
       return stopStatusLoop()
     }
 
-    if(resData.status != '0') {
-      data.status = resData.status
-      stopStatusLoop()
-    } else {
+    if(resData.status == '0') {
       timer.value = window.setTimeout(() => queryStatusLoop(data), 1000)
     }
   } catch {
@@ -75,20 +75,6 @@ async function queryStatusLoop(data: any) {
 function stopStatusLoop() {
   clearTimeout(timer.value)
 }
-
-// async function getData(page: number, pageSize: number) {
-//   const res = await queryPoolTransfers({ pageSize, page, address: address.value })
-//   const { status, data } = res.data
-//   return status == 'success'
-//     ? {
-//         total: data.total,
-//         data: data.list,
-//       }
-//     : {
-//         total: 0,
-//         data: [],
-//       }
-// }
 
 </script>
 <template>
@@ -127,37 +113,6 @@ function stopStatusLoop() {
             </template>
           </el-table-column>
         </el-table>
-        <!-- <h4 style="margin-top: 50px">Pool Transactions</h4>
-        <el-table :data="dataSource">
-          <el-table-column label="Swap" width="200px">
-            <template #default="s">
-              {{ getSwapType(s.row.swapType, currentPool.tokenA, currentPool.tokenB) }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="status" label="Status">
-            <template #default="s">
-              {{ StatusType[s.row.status as 0] }}
-            </template>
-          </el-table-column>
-          <el-table-column prop="txid" label="Txid" width="180px">
-            <template #default="s">
-              <DogLink v-if="s.row.txid" is-copy :to="`https://chain.so/tx/DOGE/${s.row.txid}`" :label="omitCenterString(s.row.txid, 12)" :value="s.row.txid"></DogLink>
-            </template>
-          </el-table-column>
-          <el-table-column label="In">
-            <template #default="s">
-              {{ consumeToken(s.row.inTokenA, s.row.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
-            </template>
-          </el-table-column>
-          <el-table-column label="Out">
-            <template #default="s">
-              {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
-            </template>
-          </el-table-column>
-        </el-table>
-        <div style="margin-top: 12px; display: flex; justify-content: center">
-          <el-pagination :page-size="5" layout="prev, pager, next" :total="total" @current-change="query" />
-        </div> -->
       </div>
     </div>
   </el-dialog>

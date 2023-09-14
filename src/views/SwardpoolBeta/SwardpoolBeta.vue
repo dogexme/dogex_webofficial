@@ -17,6 +17,7 @@ defineOptions({
 const appStore = useAppStore()
 const { connectDpal } = appStore
 const address = computed(() => appStore.address)
+const transferLoadingCount = computed(() => appStore.transferLoadingCount)
 const showSwapDialog = ref(false)
 const pools = ref<any[]>([])
 const poolid = ref('')
@@ -26,7 +27,6 @@ const noticeMessage = ref('')
 const loading = ref(false)
 const balance = ref(0)
 const tabValue = ref('0')
-const transferLoadingCount = ref(1)
 const showTransferDialog = ref(false)
 
 watch(tabValue, (tabValue) => {
