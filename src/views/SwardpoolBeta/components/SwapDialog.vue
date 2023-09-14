@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ElNotification } from 'element-plus';
-// import SwapRecordsDialog from './SwapRecordsDialog.vue'
 import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
 import { useAppStore } from '@/store';
@@ -304,27 +303,6 @@ function setSelectToken(t: { txid: string, amt: number }) {
   </el-dialog>
   <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
 </template>
-<style lang="scss">
-.custom-dialog {
-  background-color: transparent;
-  box-shadow: none;
-  .el-dialog__header {
-    padding: 0;
-  }
-  .el-dialog__body {
-    padding: 0;
-  }
-  .el-dialog__headerbtn {
-    top: 14px;
-    right: 8px;
-    width: 35px;
-    height: 35px;
-  }
-  .el-dialog__close {
-    color: #000;
-  }
-}
-</style>
 <style lang="scss" scoped>
 .swap-container {
   max-width: 500px;

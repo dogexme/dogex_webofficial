@@ -43,6 +43,9 @@ export const queryPoolTransfers = (params: { address?: string } & PageResult) =>
   return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_txs', {
     params
   })
+  // return axios.get('/api/sword/queryPoolTransactionList', {
+  //   params
+  // })
 }
 
 

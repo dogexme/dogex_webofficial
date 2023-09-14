@@ -8,6 +8,7 @@ import QrcodeVue from 'qrcode.vue'
 import {ArrowDown} from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
+import SwapTransferList from './components/SwapTransferList.vue'
 
 defineOptions({
   name: 'swap',
@@ -24,6 +25,15 @@ const currentPoolState = ref<TokenState>()
 const noticeMessage = ref('')
 const loading = ref(false)
 const balance = ref(0)
+const tabValue = ref('0')
+const transferLoadingCount = ref(1)
+const showTransferDialog = ref(false)
+
+watch(tabValue, (tabValue) => {
+  if (tabValue == '1') {
+    showTransferDialog.value = true
+  }
+})
 
 async function queryPoolStatus(poolid: string) {
   try {
@@ -42,8 +52,9 @@ function connect() {
   ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect DpalWallet', {
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
-  }).then(() => {
-    connectDpal()
+  }).then(async () => {
+    await connectDpal()
+    getBalance(address.value)
   })
 }
 
@@ -55,13 +66,14 @@ function changePool(poolid: string) {
   queryPoolStatus(poolid)
   if (pool) {
     currentPool.value = pool
-    getBalance(currentPool.value.pooladdress!)
   }
 }
 
 function getBalance(pooladdress: string) {
   getBalanceByPoolAddress(pooladdress).then((res: any)=> {
-    balance.value = res.data[0].balance
+    if (res.data[0]) {
+      balance.value = res.data[0].balance
+    }
   })
 }
 
@@ -72,7 +84,6 @@ onMounted(() => {
     currentPool.value = pools.value[0]
     noticeMessage.value = res.data.notice_message
     queryPoolStatus(poolid.value)
-    getBalance(currentPool.value.pooladdress!)
   })
 })
 </script>
@@ -89,7 +100,7 @@ onMounted(() => {
               <el-dropdown style="display: inline-block;margin-right: 12px" trigger="click" @command="changePool">
                 <el-button>
                   <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
-                  <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}
+                  <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address">{{balance}}&nbsp;</span>{{ currentPool?.tokenB }}
                   <el-icon><ArrowDown /></el-icon>
                 </el-button>
                 <template #dropdown>
@@ -104,12 +115,17 @@ onMounted(() => {
               <template v-if="address">
                 <div>
                   <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
-                  <!-- <el-button type="info" style="margin:0" disabled>Sword</el-button> -->
                 </div>
               </template>
               <div style="font-size: 14px; display: inline-block;" v-else>
                 <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
               </div>
+            </div>
+            <div style="margin-top: 12px;">
+              <DogTableMenuItem label="Overview" value="0" @click="tabValue = '0'" :selected="tabValue == '0'"/>
+              <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
+                <DogTableMenuItem style="margin-right: 0;" label="History" value="1" @click="tabValue = '1'" :selected="tabValue == '1'"/>
+              </el-badge>
             </div>
             <el-row style="margin: 24px 0">
               <el-col :span="12">
@@ -124,9 +140,6 @@ onMounted(() => {
               <el-col :span="12">
                 <el-statistic title="Block No" :value="currentPoolState?.blockno" />
               </el-col>
-              <el-col :span="12">
-                <el-statistic title="Balance" :value="balance" />
-              </el-col>
             </el-row>
           </el-col>
           <el-col :span="24" :md="6" style="display: flex;flex-direction: column; align-items: center">
@@ -140,20 +153,33 @@ onMounted(() => {
             <DogLink style="font-size: 12px;margin-top: 12px;" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
           </el-col>
         </el-row>
-        <TransferTable v-if="address" style="margin-top: 24px" :current-pool="(currentPool as SwordPool)"></TransferTable>
       </dog-card>
     </el-col>
-    <!-- <el-col :span="24">
+    <el-col :span="24">
       <dog-card>
         <h4 style="margin-top: 0">Pool Transactions</h4>
+        <TransferTable style="margin-top: 24px" :current-pool="(currentPool as SwordPool)"></TransferTable>
       </dog-card>
-    </el-col> -->
+    </el-col>
   </el-row>
   <SwapDialog v-model:visible="showSwapDialog" :current-pool="(currentPool as SwordPool)" :current-pool-state="(currentPoolState as TokenState)" @change-pool="changePool" :pools="pools" :loading="loading"></SwapDialog>
+  <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool" @close="tabValue = '0'"></SwapTransferList>
 </template>
 <style lang="scss" scoped>
 :deep(.el-statistic__number){
   font-size: 18px;
+}
+.swordpool-info {
+  margin-top: 12px;
+  :deep(.dog-tabmenu) {
+    margin-bottom: 12px;
+  }
+  :deep(.dog-card) {
+    padding: 0;
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+  }
 }
 .token-icon {
   width: 20px;
@@ -188,6 +214,34 @@ section {
     background-color: rgb(238, 181, 15);
     color: #333;
     border: 1px solid #333;
+  }
+}
+.dog-tabmenu {
+  margin-bottom: 20px;
+  &_item {
+    display: inline-block;
+    padding: 4px 10px 5px 8px;
+    border-radius: 8px;
+    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+    border: solid 1px #000;
+    background-color: #fafafa;
+    font-size: 14px;
+    margin-right: 12px;
+    cursor: pointer;
+    &:hover {
+      @extend .dog-tabmenu_item--active;
+    }
+    &--active {
+      background-color: #ddc2f9;
+    }
+    &:last-child {
+      margin-right: 0;
+    }
+    @media screen and (max-width: 430px) {
+      & {
+        font-size: 12px;
+      }
+    }
   }
 }
 </style>

@@ -45,6 +45,11 @@ export default defineConfig({
   ],
   css: {
     postcss: {},
+    preprocessorOptions: {
+      scss: {
+        additionalData: `@import "@/assets/styles/global.scss";`
+      }
+    }
   },
   resolve: {
     alias: {
