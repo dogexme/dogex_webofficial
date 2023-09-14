@@ -21,6 +21,7 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:visible', isVisible: boolean): void
   (event: 'changePool', poolid: string): void
+  (event: 'paySuccess'): void
 }>()
 
 const visible = computed({
@@ -170,6 +171,7 @@ async function pay() {
         outTokenA: 0,
         outTokenB: revToken.value.amount,
       }
+      emit('paySuccess')
     }
   } catch {
     if (!txid && swapType == 'SWAP_B_A') {

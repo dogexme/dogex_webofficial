@@ -4,6 +4,7 @@ import { getSwapType, consumeToken, StatusType } from './TransferTable'
 import { Loading } from '@element-plus/icons-vue'
 import { omitCenterString, delay } from '@/utils'
 import { useAppStore } from '@/store';
+import { ElMessageBox } from 'element-plus';
 
 const props = withDefaults(
   defineProps<{
@@ -36,6 +37,7 @@ const transferList = computed(() => appStore.transferList)
 const pageSize = 10
 const page = ref(1)
 const curTransferList = computed(() => transferList.value.slice((page.value - 1) * pageSize, pageSize + pageSize * (page.value - 1)))
+const outField = ref('Expected Out')
 
 watch(visible, async (isVisible) => {
   if (isVisible) {
@@ -62,7 +64,7 @@ async function queryStatusLoop(data: any) {
       const resData = res.data.data
 
       if (res.data.status == 'failed') {
-        data[i].status = '2'
+        data[i].status = '0'
       } else if (resData.status != '0') {
         data[i].status = resData.status
       }
@@ -81,6 +83,7 @@ async function queryStatusLoop(data: any) {
   if (loadingCount > 0) {
     timer.value = window.setTimeout(() => queryStatusLoop(data), 500)
   } else {
+    outField.value = 'Out'
     stopStatusLoop()
   }
 }
@@ -93,11 +96,24 @@ async function next(num: number) {
   page.value = num
   queryStatusLoop(curTransferList.value)
 }
+
+async function clearAllHistory() {
+  await ElMessageBox.confirm('Do you want to clear all transaction history?', {
+    confirmButtonText: 'Yes',
+    cancelButtonText: 'No',
+  })
+  stopStatusLoop()
+  appStore.transferList = []
+  appStore.updateTransferList()
+}
 </script>
 
 <template>
   <el-dialog class="custom-dialog" v-model="visible" :width="inputDialogWidth" @close="emit('close')">
     <div class="doge-tokenlist">
+      <div style="display: flex;justify-content: flex-end;">
+        <DogTableMenuItem label="Clear All" value="0" @click="clearAllHistory"></DogTableMenuItem>
+      </div>
       <el-table :data="curTransferList">
         <el-table-column label="Swap" width="190px">
           <template #default="s">
@@ -122,7 +138,7 @@ async function next(num: number) {
             {{ consumeToken(s.row.inTokenA, s.row.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
           </template>
         </el-table-column>
-        <el-table-column label="Out">
+        <el-table-column :label="outField">
           <template #default="s">
             {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
           </template>

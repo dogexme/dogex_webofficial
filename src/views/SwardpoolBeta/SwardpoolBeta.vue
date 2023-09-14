@@ -5,7 +5,7 @@ import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
 import QrcodeVue from 'qrcode.vue'
-import {ArrowDown} from '@element-plus/icons-vue'
+import {ArrowDown, Refresh} from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
@@ -28,12 +28,7 @@ const loading = ref(false)
 const balance = ref(0)
 const tabValue = ref('0')
 const showTransferDialog = ref(false)
-
-watch(tabValue, (tabValue) => {
-  if (tabValue == '1') {
-    showTransferDialog.value = true
-  }
-})
+const isBalanceLoading = ref(false)
 
 async function queryPoolStatus(poolid: string) {
   try {
@@ -70,11 +65,16 @@ function changePool(poolid: string) {
 }
 
 function getBalance(pooladdress: string) {
+  isBalanceLoading.value = true
   getBalanceByPoolAddress(pooladdress).then((res: any)=> {
     if (res.data[0]) {
       balance.value = res.data[0].balance
     }
-  })
+  }).finally(() => isBalanceLoading.value = false)
+}
+
+function paySuccess() {
+  getBalance(address.value)
 }
 
 onMounted(() => {
@@ -85,6 +85,9 @@ onMounted(() => {
     noticeMessage.value = res.data.notice_message
     queryPoolStatus(poolid.value)
   })
+  if (address.value) {
+    getBalance(address.value)
+  }
 })
 </script>
 
@@ -96,8 +99,8 @@ onMounted(() => {
         <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon style="margin-bottom: 12px"/>
         <el-row>
           <el-col :span="24" :md="18">
-            <div style="display: flex;align-items: center;">
-              <el-dropdown style="display: inline-block;margin-right: 12px" trigger="click" @command="changePool">
+            <div class="selectToken">
+              <el-dropdown style="display: inline-block;margin-right: 6px" trigger="click" @command="changePool">
                 <el-button>
                   <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
                   <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address">{{balance}}&nbsp;</span>{{ currentPool?.tokenB }}
@@ -112,20 +115,16 @@ onMounted(() => {
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
-              <template v-if="address">
-                <div>
-                  <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
-                </div>
-              </template>
+              <el-button v-if="address" :loading="isBalanceLoading" :icon="Refresh" circle style="margin-right: 12px" @click="getBalance(address)"/>
+              <div class="selectToken_bar" v-if="address">
+                <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
+                <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
+                  <DogTableMenuItem style="margin-right: 0;line-height: 30px;padding: 0 10px;" label="History" value="1" @click="showTransferDialog = true"/>
+                </el-badge>
+              </div>
               <div style="font-size: 14px; display: inline-block;" v-else>
                 <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
               </div>
-            </div>
-            <div style="margin-top: 12px;">
-              <DogTableMenuItem label="Overview" value="0" @click="tabValue = '0'" :selected="tabValue == '0'"/>
-              <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
-                <DogTableMenuItem style="margin-right: 0;" label="History" value="1" @click="tabValue = '1'" :selected="tabValue == '1'"/>
-              </el-badge>
             </div>
             <el-row style="margin: 24px 0">
               <el-col :span="12">
@@ -162,12 +161,22 @@ onMounted(() => {
       </dog-card>
     </el-col>
   </el-row>
-  <SwapDialog v-model:visible="showSwapDialog" :current-pool="(currentPool as SwordPool)" :current-pool-state="(currentPoolState as TokenState)" @change-pool="changePool" :pools="pools" :loading="loading"></SwapDialog>
+  <SwapDialog v-model:visible="showSwapDialog" :current-pool="(currentPool as SwordPool)" :current-pool-state="(currentPoolState as TokenState)" @change-pool="changePool" :pools="pools" :loading="loading" @pay-success="paySuccess"></SwapDialog>
   <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool" @close="tabValue = '0'"></SwapTransferList>
 </template>
 <style lang="scss" scoped>
 :deep(.el-statistic__number){
   font-size: 18px;
+}
+.selectToken {
+  display: flex;
+  align-items: center;
+  @media screen and (max-width: 490px) {
+    flex-wrap: wrap;
+    & .swap-pair_buy--connect, & &_bar {
+      margin-top: 12px;
+    }
+  }
 }
 .swordpool-info {
   margin-top: 12px;

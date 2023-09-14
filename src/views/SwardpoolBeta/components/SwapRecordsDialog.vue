@@ -54,7 +54,7 @@ async function queryStatusLoop(data: any) {
     const resData = res.data.data
 
     if (res.data.status == 'failed') {
-      data.status = '2'
+      data.status = '0'
     } else if(resData.status != '0') {
       data.status = resData.status
     }
