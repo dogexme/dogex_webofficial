@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { queryPools, queryPoolState } from '@/services/sword'
+import { getBalanceByPoolAddress, queryPools, queryPoolState } from '@/services/sword'
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
@@ -23,6 +23,7 @@ const currentPool = ref<Partial<SwordPool>>({})
 const currentPoolState = ref<TokenState>()
 const noticeMessage = ref('')
 const loading = ref(false)
+const balance = ref(0)
 
 async function queryPoolStatus(poolid: string) {
   try {
@@ -54,7 +55,14 @@ function changePool(poolid: string) {
   queryPoolStatus(poolid)
   if (pool) {
     currentPool.value = pool
+    getBalance(currentPool.value.pooladdress!)
   }
+}
+
+function getBalance(pooladdress: string) {
+  getBalanceByPoolAddress(pooladdress).then((res: any)=> {
+    balance.value = res.data[0].balance
+  })
 }
 
 onMounted(() => {
@@ -64,6 +72,7 @@ onMounted(() => {
     currentPool.value = pools.value[0]
     noticeMessage.value = res.data.notice_message
     queryPoolStatus(poolid.value)
+    getBalance(currentPool.value.pooladdress!)
   })
 })
 </script>
@@ -95,7 +104,7 @@ onMounted(() => {
               <template v-if="address">
                 <div>
                   <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
-                  <el-button type="info" style="margin:0" disabled>Sword</el-button>
+                  <!-- <el-button type="info" style="margin:0" disabled>Sword</el-button> -->
                 </div>
               </template>
               <div style="font-size: 14px; display: inline-block;" v-else>
@@ -115,6 +124,9 @@ onMounted(() => {
               <el-col :span="12">
                 <el-statistic title="Block No" :value="currentPoolState?.blockno" />
               </el-col>
+              <el-col :span="12">
+                <el-statistic title="Balance" :value="balance" />
+              </el-col>
             </el-row>
           </el-col>
           <el-col :span="24" :md="6" style="display: flex;flex-direction: column; align-items: center">
@@ -128,7 +140,7 @@ onMounted(() => {
             <DogLink style="font-size: 12px;margin-top: 12px;" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
           </el-col>
         </el-row>
-        <TransferTable style="margin-top: 24px" :current-pool="(currentPool as SwordPool)"></TransferTable>
+        <TransferTable v-if="address" style="margin-top: 24px" :current-pool="(currentPool as SwordPool)"></TransferTable>
       </dog-card>
     </el-col>
     <!-- <el-col :span="24">
@@ -175,6 +187,7 @@ section {
   &--connect {
     background-color: rgb(238, 181, 15);
     color: #333;
+    border: 1px solid #333;
   }
 }
 </style>

@@ -98,7 +98,6 @@ watch(() => props.pools, (pools) => {
   revToken.value.pools = pools
 })
 
-
 watch(
   () => payToken.value.amount,
   (amount) => {
@@ -149,16 +148,16 @@ async function pay() {
     return
   }
 
+  const { swapType, amount } = payToken.value
   let txid;
 
   try {
-    const { swapType, amount } = payToken.value
     if (amount) {
       paying.value = true
       if (swapType == 'SWAP_A_B') {
         txid = await payPool(amount, props.currentPool.pooladdress)
       } else {
-        txid = await transferD20(payToken.value.txid as string, props.currentPool.pooladdress)
+        txid = await transferD20(payToken.value.txid as string, props.currentPool.pooladdress, amount, props.currentPool.tokenB)
       }
       visible.value = false
       showRecordDialog.value = true
@@ -173,7 +172,7 @@ async function pay() {
       }
     }
   } catch {
-    if (!txid) {
+    if (!txid && swapType == 'SWAP_B_A') {
       await ElNotification({
         title: 'Error',
         message: `Please select transferable ghostwriter.`,
@@ -297,6 +296,7 @@ function setSelectToken(t: { txid: string, amt: number }) {
           </section>
         </el-col>
       </el-row>
+      <el-empty v-if="transferList.length < 1" description="No data." />
     </div>
   </el-dialog>
   <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
@@ -380,6 +380,7 @@ function setSelectToken(t: { txid: string, amt: number }) {
 
 .doge-tokenlist {
   background-color: #fff;
+  min-height: 350px;
   border-radius: 20px;
   overflow: hidden;
   padding: 50px 20px 20px;

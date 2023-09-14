@@ -3,6 +3,7 @@ import DogLink from '@/components/DogLink.vue'
 import { queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
 import { numberFormat } from '@/utils'
+import { useAppStore } from '@/store'
 
 export const StatusType = {
   0: 'pending',
@@ -37,6 +38,8 @@ export default defineComponent({
       api: getData,
       pageSize: 20,
     })
+    const appStore = useAppStore()
+    const address = computed(() => appStore.address)
 
     const originColumns = [
       {
@@ -128,7 +131,7 @@ export default defineComponent({
     })
 
     async function getData(page: number, pageSize: number) {
-      const res = await queryPoolTransfers({ pageSize, page })
+      const res = await queryPoolTransfers({ pageSize, page, address: address.value })
       const { status, data } = res.data
       return status == 'success' ? {
         total: data.total,

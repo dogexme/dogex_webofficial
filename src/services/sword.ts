@@ -67,3 +67,13 @@ export const queryTransferStatus = (hash: string) => {
     params: {hash}
   })
 }
+/**
+ * 查询交易状态
+ * @param hash
+ * @returns
+ */
+export const getBalanceByPoolAddress = (address: string) => {
+  return axios.get('https://py7xjcgpe9.execute-api.ap-east-1.amazonaws.com/beta/api/balance', {
+    params: {address}
+  })
+}
