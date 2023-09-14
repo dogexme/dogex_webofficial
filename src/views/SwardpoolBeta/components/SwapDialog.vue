@@ -138,13 +138,14 @@ function changePool(poolid: string) {
 }
 
 const isLimitAmount = computed(() => payToken.value.swapType == 'SWAP_A_B' && +payToken.value.amount < 10)
+const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == 'SWAP_B_A')
 
 async function pay() {
   if (isLimitAmount.value) {
     return
   }
 
-  if (payToken.value.amount == 0 && payToken.value.swapType == "SWAP_B_A") {
+  if (!payToken.value.txid && payToken.value.swapType == "SWAP_B_A") {
     return
   }
 
@@ -205,6 +206,7 @@ function change() {
 
 function close() {
    payToken.value.amount = revToken.value.amount = 0
+   payToken.value.txid = ''
 }
 
 function selectToken() {
@@ -267,7 +269,8 @@ function setSelectToken(t: { txid: string, amt: number }) {
           :swap-type="revToken.swapType"
         ></SwapInput>
         <div style="color: red;margin-top: 10px;text-align: center;" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
-        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 ? {cursor: 'not-allowed'} : {}]" @click="pay">Swap</div>
+        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isSelectLimit">Please select transferable ghostwriter.</div>
+        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 || isSelectLimit ? {cursor: 'not-allowed'} : {}]" @click="pay">Swap</div>
       </div>
     </div>
   </el-dialog>
