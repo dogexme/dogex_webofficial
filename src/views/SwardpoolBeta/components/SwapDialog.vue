@@ -217,13 +217,10 @@ function selectToken() {
 }
 
 function setSelectToken(t: { txid: string, amt: number }) {
-  isWatchStop.value = true
+  focusName.value = 'pay'
   payToken.value.amount = t.amt
   payToken.value.txid = t.txid
   showSelectTokenDialog.value = false
-  nextTick(() => {
-    isWatchStop.value = false
-  })
 }
 
 </script>

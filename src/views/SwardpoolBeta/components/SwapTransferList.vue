@@ -59,7 +59,7 @@ async function queryStatusLoop(data: any) {
         continue
       }
 
-      await delay(200)
+      await delay(1000)
       const res = await queryTransferStatus(data[i].txid)
       const resData = res.data.data
 
@@ -81,7 +81,7 @@ async function queryStatusLoop(data: any) {
   }
 
   if (loadingCount > 0) {
-    timer.value = window.setTimeout(() => queryStatusLoop(data), 500)
+    timer.value = window.setTimeout(() => queryStatusLoop(data), 1000 * 30)
   } else {
     outField.value = 'Out'
     stopStatusLoop()

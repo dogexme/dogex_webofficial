@@ -3,6 +3,8 @@ import DogLink from '@/components/DogLink.vue'
 import { queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
 import { numberFormat } from '@/utils'
+import { ElIcon } from 'element-plus'
+import { CircleCloseFilled, Loading, SuccessFilled } from '@element-plus/icons-vue'
 
 export const StatusType = {
   0: 'pending',
@@ -38,6 +40,16 @@ export default defineComponent({
       pageSize: 20,
     })
 
+    const IconStatusDom = {
+      0: <Loading />,
+      1: <SuccessFilled style="color: #67C23A"/>,
+      2: <CircleCloseFilled style="color: #F56C6C"/>
+    }
+
+    function SwapStatusItem(text: 0 | 1 | 2) {
+      return <ElIcon style="font-size: 16px">{IconStatusDom[text] || '-'}</ElIcon>
+    }
+
     const originColumns = [
       {
         title: 'Block No',
@@ -57,7 +69,7 @@ export default defineComponent({
         title: 'Status',
         dataIndex: 'status',
         render(text: 0 | 1 | 2) {
-          return StatusType[text] || '-'
+          return SwapStatusItem(text) || '-'
         }
       },
       {
