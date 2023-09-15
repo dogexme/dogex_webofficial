@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { queryTransferStatus } from '@/services/sword'
-import { getSwapType, consumeToken, StatusType } from './TransferTable'
-import { Loading } from '@element-plus/icons-vue'
+import { consumeToken } from './TransferTable'
 import { omitCenterString } from '@/utils'
 import { useAppStore } from '@/store';
 
@@ -56,7 +55,7 @@ async function queryStatusLoop(data: any) {
     if (res.data.status == 'failed') {
       data.status = '0'
     } else if(resData.status != '0') {
-      data.status = resData.status
+      Object.assign(data, resData)
     }
 
     if (data.status != '0') {
@@ -65,7 +64,7 @@ async function queryStatusLoop(data: any) {
     }
 
     if(resData.status == '0') {
-      timer.value = window.setTimeout(() => queryStatusLoop(data), 1000)
+      timer.value = window.setTimeout(() => queryStatusLoop(data), 5000)
     }
   } catch {
     stopStatusLoop()
@@ -86,15 +85,15 @@ function stopStatusLoop() {
         <el-table :data="payData" :show-header="false" style="margin-bottom: 12px">
           <el-table-column label="Swap" width="200px">
             <template #default="s">
-              {{ getSwapType(s.row.swapType, currentPool.tokenA, currentPool.tokenB) }}
+              <SwapIconExchange :icon-a="currentPool.tokenA" :icon-b="currentPool.tokenB" v-if="s.row.swapType == 'SWAP_A_B'"></SwapIconExchange>
+              <SwapIconExchange :icon-a="currentPool.tokenB" :icon-b="currentPool.tokenA" v-else-if="s.row.swapType == 'SWAP_B_A'"></SwapIconExchange>
+              <span v-else-if="s.row.swapType == 'ROLLBACK_A' || s.row.swapType == 'ROLLBACK_B'">ROLLBACK</span>
+              <span v-else>{{ s.row.swapType }}</span>
             </template>
           </el-table-column>
           <el-table-column prop="status" label="Status">
             <template #default="s">
-              {{ StatusType[s.row.status as 0] || '-'}}
-              <el-icon class="is-loading" v-if="s.row.status == 0" style="vertical-align: middle;">
-                <Loading />
-              </el-icon>
+              <SwapStatusIcon :status="s.row.status"></SwapStatusIcon>
             </template>
           </el-table-column>
           <el-table-column prop="txid" label="Txid" width="180px">
