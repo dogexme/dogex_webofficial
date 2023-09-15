@@ -64,7 +64,7 @@ async function queryStatusLoop(data: any) {
     }
 
     if(resData.status == '0') {
-      timer.value = window.setTimeout(() => queryStatusLoop(data), 5000)
+      timer.value = window.setTimeout(() => queryStatusLoop(data), 1000 * 60)
     }
   } catch {
     stopStatusLoop()

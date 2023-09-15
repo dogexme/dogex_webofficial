@@ -157,27 +157,36 @@ async function pay() {
       paying.value = true
       if (swapType == 'SWAP_A_B') {
         txid = await payPool(amount, props.currentPool.pooladdress)
+        payData.value = {
+          txid,
+          status: '0',
+          swapType,
+          inTokenA: payToken.value.amount,
+          inTokenB: 0,
+          outTokenA: 0,
+          outTokenB: revToken.value.amount,
+        }
       } else {
         txid = await transferD20(payToken.value.txid as string, props.currentPool.pooladdress, amount, props.currentPool.tokenB)
+        payData.value = {
+          txid,
+          status: '0',
+          swapType,
+          inTokenA: 0,
+          inTokenB: payToken.value.amount,
+          outTokenA: revToken.value.amount,
+          outTokenB: 0,
+        }
       }
       visible.value = false
       showRecordDialog.value = true
-      payData.value = {
-        txid,
-        status: '0',
-        swapType,
-        inTokenA: payToken.value.amount,
-        inTokenB: 0,
-        outTokenA: 0,
-        outTokenB: revToken.value.amount,
-      }
       emit('paySuccess')
     }
   } catch {
     if (!txid && swapType == 'SWAP_B_A') {
       await ElNotification({
         title: 'Error',
-        message: `Please select transferable ghostwriter.`,
+        message: `Please select transferable utxo.`,
         type: 'error',
       })
     } else {
@@ -267,7 +276,7 @@ function setSelectToken(t: { txid: string, amt: number }) {
           :swap-type="revToken.swapType"
         ></SwapInput>
         <div style="color: red;margin-top: 10px;text-align: center;" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
-        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isSelectLimit">Please select transferable ghostwriter.</div>
+        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isSelectLimit">Please select transferable utxo.</div>
         <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 || isSelectLimit ? {cursor: 'not-allowed'} : {}]" @click="pay">Swap</div>
       </div>
     </div>

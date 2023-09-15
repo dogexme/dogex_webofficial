@@ -30,7 +30,6 @@ const visible = computed({
 const currentPool = computed(() => props.currentPool)
 const maxInputDialogWidth = 800
 const inputDialogWidth = ref(maxInputDialogWidth)
-const timer = ref(0)
 const appStore = useAppStore()
 const transferList = computed(() => appStore.transferList)
 const pageSize = 10
@@ -41,9 +40,9 @@ const outField = ref('Expected Out')
 watch(visible, async (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+    outField.value = 'Expected Out'
     queryStatusLoop(curTransferList.value)
   } else {
-    stopStatusLoop()
     appStore.updateTransferList()
   }
 })
@@ -58,7 +57,7 @@ async function queryStatusLoop(data: any) {
         continue
       }
 
-      await delay(1000)
+      await delay(300)
       const res = await queryTransferStatus(data[i].txid)
       const resData = res.data.data
 
@@ -79,20 +78,14 @@ async function queryStatusLoop(data: any) {
     }
   }
 
-  if (loadingCount > 0) {
-    timer.value = window.setTimeout(() => queryStatusLoop(data), 1000 * 10)
-  } else {
+  if (loadingCount == 0) {
     outField.value = 'Out'
-    stopStatusLoop()
   }
-}
-
-function stopStatusLoop() {
-  clearTimeout(timer.value)
 }
 
 async function next(num: number) {
   page.value = num
+  outField.value = 'Expected Out'
   queryStatusLoop(curTransferList.value)
 }
 
@@ -101,9 +94,7 @@ async function clearAllHistory() {
     confirmButtonText: 'Yes',
     cancelButtonText: 'No',
   })
-  stopStatusLoop()
   appStore.transferList = []
-  appStore.updateTransferList()
 }
 </script>
 
