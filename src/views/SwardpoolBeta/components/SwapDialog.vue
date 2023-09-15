@@ -202,6 +202,7 @@ async function pay() {
 }
 
 function change() {
+  return
   isWatchStop.value = true
   const temp = payToken.value
   payToken.value = revToken.value
@@ -257,7 +258,7 @@ function setSelectToken(t: { txid: string, amt: number }) {
           @select-token="selectToken"
         ></SwapInput>
         <div class="swap-pair_changewrap">
-          <div class="swap-pair_change" @click="change">
+          <div class="swap-pair_change swap-pair_change--disabled" @click="change">
             <span class="nft">&#xe64f;</span>
           </div>
         </div>
