@@ -3,12 +3,10 @@ import { ElButton } from 'element-plus'
 import s from './DogTable.module.scss'
 import { Refresh } from '@element-plus/icons-vue'
 
-interface ColumnProps {
+export interface ColumnProps {
   dataIndex?: string
-  align?: 'left' | 'right' | 'center'
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  render?: (text: any, record: any, index: number) => any
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  align?: 'left' | 'right' | 'center',
+  render?: (text: any, record: any, index: number) => HTMLElement | Number | String | JSX.Element
   title?: any
   width?: string
 }
@@ -118,7 +116,7 @@ export default defineComponent({
           const text = record[dataIndex!]
           const render = props.columns[columnsIndex].render
           return (
-            <td class={s['dog-table-td']} key={dataIndex}>
+            <td class={s['dog-table-td']} style={{ textAlign: props.columns[columnsIndex].align || 'left' }} key={dataIndex}>
               {render ? render(text, record, i) : text}
             </td>
           )

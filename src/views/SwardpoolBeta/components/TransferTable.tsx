@@ -1,10 +1,10 @@
-import DogTable from '@/components/DogTable/DogTable'
+import DogTable, { ColumnProps } from '@/components/DogTable/DogTable'
 import DogLink from '@/components/DogLink.vue'
+import SwapIconExchange from '@/components/SwapIconExchange.vue'
+import SwapStatusIcon from '@/components/SwapStatusIcon.vue'
 import { queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
 import { numberFormat } from '@/utils'
-import { ElIcon } from 'element-plus'
-import { CircleCloseFilled, Loading, SuccessFilled } from '@element-plus/icons-vue'
 
 export const StatusType = {
   0: 'pending',
@@ -40,35 +40,37 @@ export default defineComponent({
       pageSize: 20,
     })
 
-    const IconStatusDom = {
-      0: <Loading />,
-      1: <SuccessFilled style="color: #67C23A"/>,
-      2: <CircleCloseFilled style="color: #F56C6C"/>
+    function SwapStatusItem(text: '0' | '1' | '2') {
+      return <SwapStatusIcon status={text}></SwapStatusIcon>
     }
 
-    function SwapStatusItem(text: 0 | 1 | 2) {
-      return <ElIcon style="font-size: 16px">{IconStatusDom[text] || '-'}</ElIcon>
+    function SwapType(swapType: string, tokenA: string, tokenB: string) {
+      if (swapType == 'SWAP_B_A') {
+        return <SwapIconExchange iconA={tokenB} iconB={tokenA}/>
+      } else if (swapType == 'SWAP_A_B'){
+        return <SwapIconExchange iconA={tokenA} iconB={tokenB}/>
+      } else if(swapType == 'ROLLBACK_A' || swapType == 'ROLLBACK_B') {
+        return 'ROLLBACK'
+      } else {
+        return swapType
+      }
     }
 
-    const originColumns = [
+    const originColumns: ColumnProps[] = [
       {
         title: 'Block No',
         dataIndex: 'blockno',
       },
-      // {
-      //   title: 'Order Id',
-      //   dataIndex: 'id'
-      // },
       {
         title: 'Swap',
         render(_text: any, r: any) {
-          return getSwapType(r.swapType, props.currentPool?.tokenA, props.currentPool?.tokenB)
+          return SwapType(r.swapType, props.currentPool!.tokenA, props.currentPool!.tokenB)
         }
       },
       {
         title: 'Status',
         dataIndex: 'status',
-        render(text: 0 | 1 | 2) {
+        render(text: '0' | '1' | '2') {
           return SwapStatusItem(text) || '-'
         }
       },
@@ -123,14 +125,6 @@ export default defineComponent({
           return consumeToken(r.outTokenA, r.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
         }
       },
-      // {
-      //   title: 'Old BalanceA',
-      //   dataIndex: 'old_balance_a',
-      // },
-      // {
-      //   title: 'Old BalanceB',
-      //   dataIndex: 'old_balance_b',
-      // },
     ]
 
     const columns = ref(originColumns)
