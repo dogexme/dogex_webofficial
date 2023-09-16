@@ -28,7 +28,7 @@ const visible = computed({
 })
 
 const currentPool = computed(() => props.currentPool)
-const maxInputDialogWidth = 800
+const maxInputDialogWidth = 1000
 const inputDialogWidth = ref(maxInputDialogWidth)
 const appStore = useAppStore()
 const transferList = computed(() => appStore.transferList)
@@ -133,6 +133,7 @@ async function clearAllHistory() {
             {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
           </template>
         </el-table-column>
+        <el-table-column label="Date" prop="date"></el-table-column>
       </el-table>
       <div style="margin-top: 12px; display: flex; justify-content: center">
         <el-pagination :page-size="pageSize" layout="prev, pager, next" :total="transferList.length" @current-change="next" />

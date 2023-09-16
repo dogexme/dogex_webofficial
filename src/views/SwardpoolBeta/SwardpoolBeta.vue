@@ -31,18 +31,13 @@ const tabValue = ref('0')
 const showTransferDialog = ref(false)
 const isBalanceLoading = ref(false)
 const transferSelectList = [
-  { label: 'All', value: 0 },
-  { label: 'Top500', value: 1 },
-  // { label: 'Holder', value: 2 },
+  { label: 'Pool Transactions', value: 0 },
+  { label: 'Holder', value: 1 },
 ]
 const transferSelect = reactive({
   value: transferSelectList[0].value,
   label: transferSelectList[0].label
 })
-
-function selectTransferType(value: number) {
-  Object.assign(transferSelect, transferSelectList[value])
-}
 
 async function queryPoolStatus(poolid: string) {
   try {
@@ -172,21 +167,13 @@ onMounted(() => {
     </el-col>
     <el-col :span="24">
       <dog-card>
-        <h4 style="margin-top: 0">Pool Transactions</h4>
-        <el-dropdown style="position: absolute;" trigger="click" @command="selectTransferType">
-          <el-button>
-            {{ transferSelect.label }}
-            <el-icon style="margin-left: 6px"><ArrowDown /></el-icon>
-          </el-button>
-          <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item v-for="t in transferSelectList" :key="t.value" :command="t.value">{{ t.label }}</el-dropdown-item>
-            </el-dropdown-menu>
-          </template>
-        </el-dropdown>
+        <div style="position: absolute;z-index:2001">
+          <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0"/>
+          <DogTableMenuItem label="Holder" :value="1" @click="transferSelect.value = 1" :selected="transferSelect.value == 1"/>
+        </div>
         <div style="margin-top: 24px">
-          <TransferTable v-if="transferSelect.value == 0" :current-pool="(currentPool as SwordPool)"></TransferTable>
-          <TransferTop500 v-if="transferSelect.value == 1" :current-pool="(currentPool as SwordPool)"></TransferTop500>
+          <TransferTable v-show="transferSelect.value == 0" :current-pool="(currentPool as SwordPool)"></TransferTable>
+          <TransferTop500 v-show="transferSelect.value == 1" :current-pool="(currentPool as SwordPool)"></TransferTop500>
         </div>
       </dog-card>
     </el-col>

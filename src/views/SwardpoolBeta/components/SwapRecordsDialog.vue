@@ -77,7 +77,7 @@ function stopStatusLoop() {
 
 </script>
 <template>
-  <el-dialog class="custom-dialog" width="800px" v-model="visible">
+  <el-dialog class="custom-dialog" width="1000px" v-model="visible">
     <div class="swap-result-dialog">
       <el-result class="swap-result" icon="success" title="Payment success"></el-result>
       <div>
@@ -111,6 +111,7 @@ function stopStatusLoop() {
               {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
             </template>
           </el-table-column>
+          <el-table-column label="Date" prop="date"></el-table-column>
         </el-table>
       </div>
     </div>

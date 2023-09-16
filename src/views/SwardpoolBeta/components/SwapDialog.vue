@@ -165,6 +165,7 @@ async function pay() {
           inTokenB: 0,
           outTokenA: 0,
           outTokenB: revToken.value.amount,
+          date: dateFormat(new Date())
         }
       } else {
         txid = await transferD20(payToken.value.txid as string, props.currentPool.pooladdress, amount, props.currentPool.tokenB)
@@ -176,6 +177,7 @@ async function pay() {
           inTokenB: payToken.value.amount,
           outTokenA: revToken.value.amount,
           outTokenB: 0,
+          date: dateFormat(new Date())
         }
       }
       visible.value = false
