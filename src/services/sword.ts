@@ -80,3 +80,11 @@ export const getBalanceByPoolAddress = (address: string) => {
     params: {address}
   })
 }
+
+/**
+ * 查询top500
+ * @returns
+ */
+export const queryTop500 = () => {
+  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=top500')
+}

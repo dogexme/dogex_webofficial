@@ -9,6 +9,7 @@ import {ArrowDown, Refresh} from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
+import TransferTop500 from './components/TransferTop500'
 
 defineOptions({
   name: 'swap',
@@ -29,6 +30,19 @@ const balance = ref(0)
 const tabValue = ref('0')
 const showTransferDialog = ref(false)
 const isBalanceLoading = ref(false)
+const transferSelectList = [
+  { label: 'All', value: 0 },
+  { label: 'Top500', value: 1 },
+  // { label: 'Holder', value: 2 },
+]
+const transferSelect = reactive({
+  value: transferSelectList[0].value,
+  label: transferSelectList[0].label
+})
+
+function selectTransferType(value: number) {
+  Object.assign(transferSelect, transferSelectList[value])
+}
 
 async function queryPoolStatus(poolid: string) {
   try {
@@ -104,7 +118,7 @@ onMounted(() => {
                 <el-button>
                   <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
                   <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address">{{balance}}&nbsp;</span>{{ currentPool?.tokenB }}
-                  <el-icon><ArrowDown /></el-icon>
+                  <el-icon style="margin-left: 6px"><ArrowDown /></el-icon>
                 </el-button>
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -115,14 +129,16 @@ onMounted(() => {
                   </el-dropdown-menu>
                 </template>
               </el-dropdown>
-              <el-button v-if="address" :loading="isBalanceLoading" :icon="Refresh" circle style="margin-right: 12px" @click="getBalance(address)"/>
-              <div class="selectToken_bar" v-if="address">
-                <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
-                <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
-                  <DogTableMenuItem style="margin-right: 0;line-height: 30px;padding: 0 10px;" label="History" value="1" @click="showTransferDialog = true"/>
-                </el-badge>
-              </div>
-              <div style="font-size: 14px; display: inline-block;" v-else>
+              <template v-if="address && currentPool.pooladdress">
+                <el-button :loading="isBalanceLoading" :icon="Refresh" circle style="margin-right: 12px" @click="getBalance(address)"/>
+                <div class="selectToken_bar">
+                  <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
+                  <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
+                    <DogTableMenuItem style="margin-right: 0;line-height: 30px;padding: 0 10px;" label="History" value="1" @click="showTransferDialog = true"/>
+                  </el-badge>
+                </div>
+              </template>
+              <div v-else-if="currentPool.pooladdress && !address" style="font-size: 14px; display: inline-block;">
                 <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
               </div>
             </div>
@@ -157,7 +173,21 @@ onMounted(() => {
     <el-col :span="24">
       <dog-card>
         <h4 style="margin-top: 0">Pool Transactions</h4>
-        <TransferTable style="margin-top: 24px" :current-pool="(currentPool as SwordPool)"></TransferTable>
+        <el-dropdown style="position: absolute;" trigger="click" @command="selectTransferType">
+          <el-button>
+            {{ transferSelect.label }}
+            <el-icon style="margin-left: 6px"><ArrowDown /></el-icon>
+          </el-button>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item v-for="t in transferSelectList" :key="t.value" :command="t.value">{{ t.label }}</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <div style="margin-top: 24px">
+          <TransferTable v-if="transferSelect.value == 0" :current-pool="(currentPool as SwordPool)"></TransferTable>
+          <TransferTop500 v-if="transferSelect.value == 1" :current-pool="(currentPool as SwordPool)"></TransferTop500>
+        </div>
       </dog-card>
     </el-col>
   </el-row>
