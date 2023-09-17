@@ -16,6 +16,7 @@ const props = withDefaults(
 const emit = defineEmits(['change'])
 
 const currentPage = ref(1)
+const inputTarget = ref<HTMLInputElement | null>(null)
 
 watch(
   () => props.currentPage,
@@ -53,6 +54,7 @@ function handlerJumpPage() {
   jumpPage.value = String(jumpNumber)
   nextTick(() => {
     jumpPage.value = ''
+    inputTarget.value?.blur()
   })
 }
 </script>
@@ -66,7 +68,7 @@ function handlerJumpPage() {
         <i class="dog-icon dog-icon_jiantou-left"></i>
       </div>
       <div class="dog-page_control_item dog-page_control_input-item dog-page_control_page" style="cursor: none; padding: 0 8px">
-        <input v-model="jumpPage" class="dog-page_control_input" :placeholder="`Page 1 of ${pages}`" type="text" @keydown.enter="handlerJumpPage" />
+        <input ref="inputTarget" v-model="jumpPage" class="dog-page_control_input" :placeholder="`Page 1 of ${pages}`" type="text" @keydown.enter="handlerJumpPage" />
       </div>
       <div class="dog-page_control_item dog-page_control_item--disabled" style="font-size: 12px">{{ currentPage }}/{{ pages }}</div>
       <div class="dog-page_control_item dog-page_control_next" @click="currentPage < pages && currentPage++" :class="[currentPage == pages && 'dog-page_control_item--disabled']">
