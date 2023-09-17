@@ -75,7 +75,8 @@ function changePool(poolid: string) {
 
 function getBalance(pooladdress: string) {
   isBalanceLoading.value = true
-  getBalanceByPoolAddress(pooladdress).then((res: any)=> {
+  queryPoolStatus(poolid.value)
+  getBalanceByPoolAddress(pooladdress).then(async (res: any)=> {
     if (res.data[0]) {
       balance.value = res.data[0].balance
     }
