@@ -86,7 +86,7 @@ function paySuccess() {
   getBalance(address.value)
 }
 
-onMounted(() => {
+function init() {
   queryPools().then((res) => {
     pools.value = res.data.pools
     poolid.value = pools.value[0].poolid
@@ -97,7 +97,12 @@ onMounted(() => {
   if (address.value) {
     getBalance(address.value)
   }
+}
+
+onActivated(() => {
+  init()
 })
+
 </script>
 
 <template>
@@ -167,11 +172,11 @@ onMounted(() => {
     </el-col>
     <el-col :span="24">
       <dog-card>
-        <div style="position: absolute;z-index:2001">
+        <div style="position: absolute;z-index:2000">
           <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0"/>
           <DogTableMenuItem label="Holder" :value="1" @click="transferSelect.value = 1" :selected="transferSelect.value == 1"/>
         </div>
-        <div style="margin-top: 24px">
+        <div>
           <TransferTable v-show="transferSelect.value == 0" :current-pool="(currentPool as SwordPool)"></TransferTable>
           <TransferTop500 v-show="transferSelect.value == 1" :current-pool="(currentPool as SwordPool)"></TransferTop500>
         </div>

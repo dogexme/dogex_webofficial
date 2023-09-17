@@ -102,6 +102,30 @@ function triggerDrawer(direction: DrawerDirection) {
 </template>
 
 <style lang="scss" scoped>
+
+.nav-menu {
+  :deep(.el-menu-item) {
+    border-radius: 8px;
+    border-bottom: none;
+    background-color: #fafafa;
+    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+    margin-right: 4px;
+    border: 1px solid #333;
+    &:hover {
+      background-color: #ddc2f9;
+    }
+    &:focus {
+      background-color: #ddc2f9;
+    }
+  }
+  :deep(.is-active) {
+    border-bottom: none;
+    border: 1px solid #333;
+    background-color: #ddc2f9;
+    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+  }
+}
+
 .el-menu--horizontal {
   --el-menu-item-height: 31px;
   margin-left: 15px;
@@ -119,7 +143,7 @@ function triggerDrawer(direction: DrawerDirection) {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 2001;
+  z-index: 2010;
   width: 100%;
   background-color: #fff;
   border-bottom: 1px solid #333;
