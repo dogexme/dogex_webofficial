@@ -55,9 +55,8 @@ export default defineComponent({
     async function getData() {
       const res = await queryTop500()
       const { status, data } = res.data
-      const totalBalance = data.top500.reduce((p: number, q: { balance: number }) => p + q.balance, 0)
       data.top500 = data.top500.map((t: { balance: number, rate: number }) => {
-        t.rate = t.balance / totalBalance
+        t.rate = t.balance / (21 * 100000000)
         return t
       })
       return status == 'success' ? {
