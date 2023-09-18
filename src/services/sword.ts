@@ -1,6 +1,7 @@
 import { PageResult } from './../types.d'
 // import { CollInfo, RequestPageParams } from '@/types'
 import axios from 'axios'
+import { ResultToken, TokenState } from './types'
 
 /**
  * 获取代币池
@@ -14,16 +15,16 @@ export const queryPools = () => {
  */
 export const queryPoolState = (poolid: string) => {
   return axios.get<ResultToken<TokenState>>('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_state', {
-    params: { poolid }
+    params: { poolid },
   })
 }
 
 /**
  * 获取代币交易记录
  */
-export const queryTransaction = (params: { blockno: number, hash: string }) => {
+export const queryTransaction = (params: { blockno: number; hash: string }) => {
   return axios.get('/api/sword/queryTransaction', {
-    params
+    params,
   })
 }
 
@@ -32,7 +33,7 @@ export const queryTransaction = (params: { blockno: number, hash: string }) => {
  */
 export const queryPoolTransactionList = (params: { pair: string } & PageResult) => {
   return axios.get('/api/sword/queryTransaction', {
-    params
+    params,
   })
 }
 
@@ -41,13 +42,12 @@ export const queryPoolTransactionList = (params: { pair: string } & PageResult) 
  */
 export const queryPoolTransfers = (params: { address?: string } & PageResult) => {
   return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_txs', {
-    params
+    params,
   })
   // return axios.get('/api/sword/queryPoolTransactionList', {
   //   params
   // })
 }
-
 
 /**
  * 查询可转移的 dogim 交易api
@@ -56,7 +56,7 @@ export const queryPoolTransfers = (params: { address?: string } & PageResult) =>
  */
 export const getTransferList = (address: string) => {
   return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=get_transfer_list', {
-    params: {address}
+    params: { address },
   })
 }
 
@@ -67,7 +67,7 @@ export const getTransferList = (address: string) => {
  */
 export const queryTransferStatus = (hash: string) => {
   return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_transaction', {
-    params: {hash}
+    params: { hash },
   })
 }
 /**
@@ -77,7 +77,7 @@ export const queryTransferStatus = (hash: string) => {
  */
 export const getBalanceByPoolAddress = (address: string) => {
   return axios.get('https://py7xjcgpe9.execute-api.ap-east-1.amazonaws.com/beta/api/balance', {
-    params: {address}
+    params: { address },
   })
 }
 

@@ -193,7 +193,7 @@ function triggerDrawer(direction: DrawerDirection) {
     background-color: currentColor;
     color: rgb(238, 181, 15);
     :hover {
-      background-color: rgba(0,0,0,.05);
+      background-color: rgba(0, 0, 0, 0.05);
     }
   }
 }

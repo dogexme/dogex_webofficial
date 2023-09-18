@@ -1,21 +1,23 @@
 <script setup lang="ts">
-import { ElNotification } from 'element-plus';
+import { ElNotification } from 'element-plus'
 import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
-import { useAppStore } from '@/store';
+import { useAppStore } from '@/store'
 import { omitCenterString } from '@/utils'
 import icons from '@/config/payIcons'
+import { SwordPool, TokenState, TokenInfo, TokenInputName } from '@/services/types'
 
-NP.enableBoundaryChecking(false);
+NP.enableBoundaryChecking(false)
 
 const props = withDefaults(
   defineProps<{
-    visible: boolean,
-    currentPool: SwordPool,
-    currentPoolState: TokenState,
-    pools: any[],
+    visible: boolean
+    currentPool: SwordPool
+    currentPoolState: TokenState
+    pools: any[]
     loading: boolean
-  }>(), {}
+  }>(),
+  {}
 )
 
 const emit = defineEmits<{
@@ -30,7 +32,7 @@ const visible = computed({
   },
   set(isVisible) {
     emit('update:visible', isVisible)
-  }
+  },
 })
 
 const maxDialogWidth = 1000
@@ -50,7 +52,7 @@ const payToken = ref<TokenInfo>({
   pools: [],
   swapType: 'SWAP_A_B',
   price: 4,
-  txid: ''
+  txid: '',
 })
 
 const revToken = ref<TokenInfo>({
@@ -67,7 +69,7 @@ const isWatchStop = ref(false)
 const paying = ref(false)
 const payData = ref<any>({})
 const showSelectTokenDialog = ref(false)
-const transferList = ref<{amt: number, txid: string}[]>([])
+const transferList = ref<{ amt: number; txid: string }[]>([])
 const transferListLoading = ref(false)
 
 watch(visible, (isVisible) => {
@@ -76,27 +78,33 @@ watch(visible, (isVisible) => {
   }
 })
 
-watch(() => props.currentPoolState, (currentPoolState) => {
-  const { balanceA, balanceB } = currentPoolState
-  const key = focusName.value
+watch(
+  () => props.currentPoolState,
+  (currentPoolState) => {
+    const { balanceA, balanceB } = currentPoolState
+    const key = focusName.value
 
-  payToken.value.rate = NP.divide(balanceB, balanceA)
-  revToken.value.rate = NP.divide(balanceA, balanceB)
+    payToken.value.rate = NP.divide(balanceB, balanceA)
+    revToken.value.rate = NP.divide(balanceA, balanceB)
 
-  isWatchStop.value = true
-  if (key == 'pay') {
-    payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate ), 4)
-  } else {
-    revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), 4)
+    isWatchStop.value = true
+    if (key == 'pay') {
+      payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), 4)
+    } else {
+      revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), 4)
+    }
+    nextTick(() => {
+      isWatchStop.value = false
+    })
   }
-  nextTick(() => {
-    isWatchStop.value = false
-  })
-})
+)
 
-watch(() => props.pools, (pools) => {
-  revToken.value.pools = pools
-})
+watch(
+  () => props.pools,
+  (pools) => {
+    revToken.value.pools = pools
+  }
+)
 
 watch(
   () => payToken.value.amount,
@@ -145,12 +153,12 @@ async function pay() {
     return
   }
 
-  if (!payToken.value.txid && payToken.value.swapType == "SWAP_B_A") {
+  if (!payToken.value.txid && payToken.value.swapType == 'SWAP_B_A') {
     return
   }
 
   const { swapType, amount } = payToken.value
-  let txid;
+  let txid
 
   try {
     if (amount) {
@@ -165,7 +173,7 @@ async function pay() {
           inTokenB: 0,
           outTokenA: 0,
           outTokenB: revToken.value.amount,
-          date: dateFormat(new Date())
+          date: dateFormat(new Date()),
         }
       } else {
         txid = await transferD20(payToken.value.txid as string, props.currentPool.pooladdress, amount, props.currentPool.tokenB)
@@ -177,7 +185,7 @@ async function pay() {
           inTokenB: payToken.value.amount,
           outTokenA: revToken.value.amount,
           outTokenB: 0,
-          date: dateFormat(new Date())
+          date: dateFormat(new Date()),
         }
       }
       visible.value = false
@@ -205,21 +213,21 @@ async function pay() {
 
 function change() {
   return
-  isWatchStop.value = true
-  const temp = payToken.value
-  payToken.value = revToken.value
-  revToken.value = temp
-  if (revToken.value.amount == '' || payToken.value.amount == '') {
-    revToken.value.amount = payToken.value.amount = 0
-  }
-  nextTick(() => {
-    isWatchStop.value = false
-  })
+  // isWatchStop.value = true
+  // const temp = payToken.value
+  // payToken.value = revToken.value
+  // revToken.value = temp
+  // if (revToken.value.amount == '' || payToken.value.amount == '') {
+  //   revToken.value.amount = payToken.value.amount = 0
+  // }
+  // nextTick(() => {
+  //   isWatchStop.value = false
+  // })
 }
 
 function close() {
-   payToken.value.amount = revToken.value.amount = 0
-   payToken.value.txid = ''
+  payToken.value.amount = revToken.value.amount = 0
+  payToken.value.txid = ''
 }
 
 function selectToken() {
@@ -228,13 +236,12 @@ function selectToken() {
   }
 }
 
-function setSelectToken(t: { txid: string, amt: number }) {
+function setSelectToken(t: { txid: string; amt: number }) {
   focusName.value = 'pay'
   payToken.value.amount = t.amt
   payToken.value.txid = t.txid
   showSelectTokenDialog.value = false
 }
-
 </script>
 
 <template>
@@ -278,25 +285,22 @@ function setSelectToken(t: { txid: string, amt: number }) {
           :disabled="payToken.swapType == 'SWAP_B_A'"
           :swap-type="revToken.swapType"
         ></SwapInput>
-        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
-        <div style="color: red;margin-top: 10px;text-align: center;" v-if="isSelectLimit">Please select transferable utxo.</div>
-        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 || isSelectLimit ? {cursor: 'not-allowed'} : {}]" @click="pay">Swap</div>
+        <div style="color: red; margin-top: 10px; text-align: center" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
+        <div style="color: red; margin-top: 10px; text-align: center" v-if="isSelectLimit">Please select transferable utxo.</div>
+        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 || isSelectLimit ? { cursor: 'not-allowed' } : {}]" @click="pay">Swap</div>
       </div>
     </div>
   </el-dialog>
   <el-dialog class="custom-dialog" v-model="showSelectTokenDialog" :width="dialogWidth">
     <div class="doge-tokenlist" v-loading="transferListLoading">
       <el-row :gutter="8">
-        <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="t in transferList">
+        <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="t in transferList" :key="t.txid">
           <section class="doge-tokenitem" @click="setSelectToken(t)">
             <div class="doge-tokenitem_ava">
-              <img :src="icons.dogim" class="doge-tokenitem_avaitem" alt="">
+              <img :src="icons.dogim" class="doge-tokenitem_avaitem" alt="" />
             </div>
             <div>
-              <div class="doge-tokenitem_row">
-                Name:
-                dogim
-              </div>
+              <div class="doge-tokenitem_row">Name: dogim</div>
               <div class="doge-tokenitem_row">
                 Txid:
                 <DogLink is-copy :label="omitCenterString(t.txid, 12)" :value="t.txid"></DogLink>
@@ -386,7 +390,7 @@ function setSelectToken(t: { txid: string, amt: number }) {
   margin-bottom: 8px;
   &:hover {
     border-color: #ffa21e;
-    transition: all .2s;
+    transition: all 0.2s;
     cursor: pointer;
   }
   &_row {
@@ -404,7 +408,7 @@ function setSelectToken(t: { txid: string, amt: number }) {
     height: 70px;
     border-radius: 50%;
   }
-  @media screen and (max-width: 768px){
+  @media screen and (max-width: 768px) {
     flex-direction: row;
     &_ava {
       margin-bottom: 0;
@@ -412,5 +416,4 @@ function setSelectToken(t: { txid: string, amt: number }) {
     }
   }
 }
-
 </style>

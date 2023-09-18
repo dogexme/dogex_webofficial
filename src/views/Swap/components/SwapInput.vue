@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import icons from '@/config/payIcons'
+import { TokenSwapInfo, TokenInputName } from '@/services/types'
 
 const props = withDefaults(
   defineProps<{
@@ -7,24 +8,24 @@ const props = withDefaults(
     modelValue?: number | ''
     currentPool?: TokenSwapInfo
     min?: number
-    name: TokenInputName,
-    loading?: boolean,
-    pools: any[],
-    price: number,
-    disabled: boolean,
+    name: TokenInputName
+    loading?: boolean
+    pools: any[]
+    price: number
+    disabled: boolean
     swapType: 'SWAP_A_B' | 'SWAP_B_A'
   }>(),
   {
     min: 0,
     modelValue: 0,
     loading: false,
-    disabled: false
+    disabled: false,
   }
 )
 const emit = defineEmits<{
-  (event: 'selectToken'): void,
-  (event: 'update:modelValue', amount: number | ''): void,
-  (event: 'focus'): void,
+  (event: 'selectToken'): void
+  (event: 'update:modelValue', amount: number | ''): void
+  (event: 'focus'): void
   (event: 'changePool', poolid: string): void
 }>()
 
@@ -56,24 +57,33 @@ function formattedValue() {
 function changePool(poolid: string) {
   emit('changePool', poolid)
 }
-
 </script>
 
 <template>
   <div class="swap-pair_item">
-    <div style="display: flex; justify-content: space-between;">
+    <div style="display: flex; justify-content: space-between">
       <span class="swap-pair_item_title">{{ props.title }}</span>
-      <div class="swap-pair_select" v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">
-        Select>
-      </div>
+      <div class="swap-pair_select" v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">Select></div>
     </div>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">
-        <input type="number" class="swap-pair_input" @input="formattedValue" v-model="amount" :min="props.min" :step="1" :style="[props.loading ? { color: '#a5a5a5' } : {}]" placeholder="Please enter the amount" @focus="emit('focus')" :disabled="props.disabled"/>
+        <input
+          type="number"
+          class="swap-pair_input"
+          @input="formattedValue"
+          v-model="amount"
+          :min="props.min"
+          :step="1"
+          :style="[props.loading ? { color: '#a5a5a5' } : {}]"
+          placeholder="Please enter the amount"
+          @focus="emit('focus')"
+          :disabled="props.disabled"
+        />
       </div>
       <el-dropdown trigger="click" :disabled="props.loading" @command="changePool" @visible-change="(isVisible) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
         <div class="swap-pair_token">
-          <img class="token-icon" v-if="currentPool?.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB }}<span class="nft" style="font-size: 12px" >&#xeb6d;</span>
+          <img class="token-icon" v-if="currentPool?.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB
+          }}<span class="nft" style="font-size: 12px">&#xeb6d;</span>
         </div>
         <template #dropdown>
           <el-dropdown-menu>
@@ -83,7 +93,7 @@ function changePool(poolid: string) {
           </el-dropdown-menu>
         </template>
       </el-dropdown>
-      <div class="swap-pair_token" style="cursor: default;" v-else><img class="token-icon" :src="icons.doge" alt="" />doge</div>
+      <div class="swap-pair_token" style="cursor: default" v-else><img class="token-icon" :src="icons.doge" alt="" />doge</div>
     </section>
   </div>
 </template>

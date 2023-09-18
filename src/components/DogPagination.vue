@@ -24,12 +24,9 @@ watch(
   }
 )
 
-watch(
-  currentPage,
-  (p) => {
-    emit('change', p)
-  }
-)
+watch(currentPage, (p) => {
+  emit('change', p)
+})
 
 const jumpPage = ref('')
 const pages = computed(() => props.pages)

@@ -18,5 +18,7 @@ module.exports = {
     'vue/multi-word-component-names': 'off',
     'vue/no-v-model-argument': 'off',
     'vue/no-setup-props-destructure': 'off',
-    'vue/no-dupe-keys': 'off'
+    'vue/no-dupe-keys': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
+  },
 }

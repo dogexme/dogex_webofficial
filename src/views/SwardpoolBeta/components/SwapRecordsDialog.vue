@@ -2,12 +2,12 @@
 import { queryTransferStatus } from '@/services/sword'
 import { consumeToken } from './TransferTable'
 import { omitCenterString } from '@/utils'
-import { useAppStore } from '@/store';
+import { useAppStore } from '@/store'
 
 const props = withDefaults(
   defineProps<{
     visible: boolean
-    currentPool: any,
+    currentPool: any
     payData: any
   }>(),
   {}
@@ -37,15 +37,19 @@ watch(visible, (isVisible) => {
   }
 })
 
-watch(() => props.payData, async (data) => {
-  if (data && visible.value) {
-    payData.value = [data]
-    appStore.updateTransferList(data)
-    queryStatusLoop(data)
+watch(
+  () => props.payData,
+  async (data) => {
+    if (data && visible.value) {
+      payData.value = [data]
+      appStore.updateTransferList(data)
+      queryStatusLoop(data)
+    }
+  },
+  {
+    immediate: true,
   }
-}, {
-  immediate: true
-})
+)
 
 async function queryStatusLoop(data: any) {
   try {
@@ -54,7 +58,7 @@ async function queryStatusLoop(data: any) {
 
     if (res.data.status == 'failed') {
       data.status = '0'
-    } else if(resData.status != '0') {
+    } else if (resData.status != '0') {
       Object.assign(data, resData)
     }
 
@@ -63,7 +67,7 @@ async function queryStatusLoop(data: any) {
       return stopStatusLoop()
     }
 
-    if(resData.status == '0') {
+    if (resData.status == '0') {
       timer.value = window.setTimeout(() => queryStatusLoop(data), 1000 * 60)
     }
   } catch {
@@ -74,7 +78,6 @@ async function queryStatusLoop(data: any) {
 function stopStatusLoop() {
   clearTimeout(timer.value)
 }
-
 </script>
 <template>
   <el-dialog class="custom-dialog" width="1000px" v-model="visible">

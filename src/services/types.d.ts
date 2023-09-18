@@ -1,37 +1,37 @@
-interface TokenSwapInfo {
+export interface TokenSwapInfo {
   pooladdress: string
   poolid: string
   tokenA: string
   tokenB: string
 }
 
-interface TokenInfo {
+export interface TokenInfo {
   amount: number | ''
   rate: number
   min?: number
   isSelectToken?: boolean
   currentPool?: TokenSwapInfo
-  loading?: boolean,
-  pools: any,
-  price: number,
-  swapType: 'SWAP_A_B' | 'SWAP_B_A',
+  loading?: boolean
+  pools: any
+  price: number
+  swapType: 'SWAP_A_B' | 'SWAP_B_A'
   txid?: string
 }
 
-type TokenInputName = 'pay' | 'rev' | ''
+export type TokenInputName = 'pay' | 'rev' | ''
 
-type TokenState = {
+export type TokenState = {
   balanceA: number
   balanceB: number
   blockno: number
 }
 
-type ResultToken<D = any> = {
-  data: D,
+export type ResultToken<D = any> = {
+  data: D
   status: 'success' | 'fail'
 }
 
-interface SwordPool {
+export interface SwordPool {
   pooladdress: string
   poolid: string
   status: string

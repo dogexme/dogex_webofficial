@@ -147,16 +147,23 @@ onMounted(() => {
     <div class="coll-wrapper" v-if="showContent && routeName == 'nft'">
       <DogTabs v-if="!isNotFount" keep-dom v-model="curTabValue" :tabs="tabs" @change="changeTab">
         <DogTabsItem value="overview">
-          <Overview :ref="(ref) => tables['holders'] = ref" v-loading="loadingSearch" :collInfo="collInfo"></Overview>
+          <Overview :ref="(ref) => (tables['holders'] = ref)" v-loading="loadingSearch" :collInfo="collInfo"></Overview>
         </DogTabsItem>
         <DogTabsItem value="holders">
-          <HolderTable :ref="(ref) => tables['holders'] = ref" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
+          <HolderTable :ref="(ref) => (tables['holders'] = ref)" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
         </DogTabsItem>
         <DogTabsItem value="transfers">
-          <TransfersTable :ref="(ref) => tables['transfers'] = ref" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></TransfersTable>
+          <TransfersTable
+            :ref="(ref) => (tables['transfers'] = ref)"
+            v-model:isLoading="loadingSearch"
+            :collInfo="collInfo!"
+            :txid="txidCopy"
+            :tabVal="curTabValue"
+            :error="handleNotFount"
+          ></TransfersTable>
         </DogTabsItem>
         <DogTabsItem value="assets">
-          <AssetsTable :ref="(ref) => tables['assets'] = ref" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
+          <AssetsTable :ref="(ref) => (tables['assets'] = ref)" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
         </DogTabsItem>
       </DogTabs>
       <el-empty v-else></el-empty>

@@ -2,8 +2,8 @@
 import { queryTransferStatus } from '@/services/sword'
 import { consumeToken } from './TransferTable'
 import { omitCenterString, delay } from '@/utils'
-import { useAppStore } from '@/store';
-import { ElMessageBox } from 'element-plus';
+import { useAppStore } from '@/store'
+import { ElMessageBox } from 'element-plus'
 
 const props = withDefaults(
   defineProps<{
@@ -71,7 +71,6 @@ async function queryStatusLoop(data: any) {
         loadingCount--
         continue
       }
-
     } catch {
       loadingCount--
       continue
@@ -101,7 +100,7 @@ async function clearAllHistory() {
 <template>
   <el-dialog class="custom-dialog" v-model="visible" :width="inputDialogWidth" @close="emit('close')">
     <div class="doge-tokenlist">
-      <div style="display: flex;justify-content: flex-end;">
+      <div style="display: flex; justify-content: flex-end">
         <DogTableMenuItem label="Clear All" value="0" @click="clearAllHistory"></DogTableMenuItem>
       </div>
       <el-table :data="curTransferList">

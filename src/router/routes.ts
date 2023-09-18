@@ -31,8 +31,8 @@ export default [
       {
         path: 'swordpoolBeta',
         name: 'swordpoolBeta',
-        component: () => import('@/views/SwardpoolBeta/SwardpoolBeta.vue')
-      }
+        component: () => import('@/views/SwardpoolBeta/SwardpoolBeta.vue'),
+      },
       // {
       //   path: 'swap',
       //   name: 'swap',

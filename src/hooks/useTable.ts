@@ -49,6 +49,6 @@ export function useTable(options: TableHookOptions) {
     page,
     total,
     query,
-    refresh
+    refresh,
   }
 }

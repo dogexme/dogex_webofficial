@@ -22,7 +22,13 @@ const props = defineProps<{
     </div>
     <div class="dog-token-item_row">
       <span class="dog-token-item_label">Hash: </span>
-      <span class="dog-token-item_value"><DogLink is-copy :label="omitCenterString('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff', 10)" :value="'1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff'"></DogLink></span>
+      <span class="dog-token-item_value"
+        ><DogLink
+          is-copy
+          :label="omitCenterString('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff', 10)"
+          :value="'1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff'"
+        ></DogLink
+      ></span>
     </div>
   </div>
 </template>

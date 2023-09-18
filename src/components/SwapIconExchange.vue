@@ -1,37 +1,37 @@
 <script lang="ts">
-  import {Right} from '@element-plus/icons-vue'
-  import TokenIcons from '@/config/payIcons'
+import { Right } from '@element-plus/icons-vue'
+import TokenIcons from '@/config/payIcons'
 
-  export default {
-    components: {
-      Right
+export default {
+  components: {
+    Right,
+  },
+  props: {
+    iconA: {
+      type: String,
+      required: true,
     },
-    props: {
-      iconA: {
-        type: String,
-        required: true
-      },
-      iconB: {
-        type: String,
-        required: true
-      }
+    iconB: {
+      type: String,
+      required: true,
     },
-    setup(props) {
-      const iconASrc = computed(() => TokenIcons[props.iconA])
-      const iconBSrc = computed(() => TokenIcons[props.iconB])
-      return {
-        iconASrc,
-        iconBSrc
-      }
+  },
+  setup(props) {
+    const iconASrc = computed(() => TokenIcons[props.iconA])
+    const iconBSrc = computed(() => TokenIcons[props.iconB])
+    return {
+      iconASrc,
+      iconBSrc,
     }
-  }
+  },
+}
 </script>
 
 <template>
-  <div style="display:flex;align-items:center">
-    <img class="tokenIcon" :src="iconASrc"/>
-    <el-icon style="font-size:18px;margin: 0 6px"><Right /></el-icon>
-    <img class="tokenIcon" :src="iconBSrc"/>
+  <div style="display: flex; align-items: center">
+    <img class="tokenIcon" :src="iconASrc" />
+    <el-icon style="font-size: 18px; margin: 0 6px"><Right /></el-icon>
+    <img class="tokenIcon" :src="iconBSrc" />
   </div>
 </template>
 

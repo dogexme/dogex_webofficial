@@ -24,7 +24,7 @@ export function useDoge() {
   async function payPool(cast: number, poolAddress: string) {
     const doge = window?.DogeApi
     if (await doge.isEnabled()) {
-      const rs = await doge.useDoge(cast, poolAddress, 'swap');
+      const rs = await doge.useDoge(cast, poolAddress, 'swap')
       if (rs?.txid) {
         return rs?.txid
       }
@@ -35,7 +35,7 @@ export function useDoge() {
   async function transferD20(inscriptionid: string, address: string, amt = 0, tick = 'dogim', indexerType = '1') {
     const doge = window?.DogeApi
     if (await doge.isEnabled()) {
-      const rs = await doge.transferd20(inscriptionid, address, amt, tick, indexerType);
+      const rs = await doge.transferd20(inscriptionid, address, amt, tick, indexerType)
       if (rs?.txid) {
         return rs?.txid
       }
@@ -46,6 +46,6 @@ export function useDoge() {
   return {
     connectDpal,
     payPool,
-    transferD20
+    transferD20,
   }
 }

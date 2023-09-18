@@ -18,8 +18,8 @@ export default defineComponent({
       },
       {
         title: 'Listed',
-        dataIndex: 'listed'
-      }
+        dataIndex: 'listed',
+      },
     ]
 
     async function api(page: number, pageSize: number) {
@@ -48,11 +48,23 @@ export default defineComponent({
       router.push({
         name: 'marketTokens',
         query: {
-          hash: 123
-        }
+          hash: 123,
+        },
       })
     }
 
-    return () => <DogTable rowClick loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={nextPage} onRow-click={handleRowClick} onRefresh={refresh}/>
+    return () => (
+      <DogTable
+        rowClick
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns}
+        currentPage={page.value}
+        total={total.value}
+        onCurrent-change={nextPage}
+        onRow-click={handleRowClick}
+        onRefresh={refresh}
+      />
+    )
   },
 })

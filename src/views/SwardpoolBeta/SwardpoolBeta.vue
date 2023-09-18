@@ -5,11 +5,12 @@ import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
 import QrcodeVue from 'qrcode.vue'
-import {ArrowDown, Refresh} from '@element-plus/icons-vue'
+import { ArrowDown, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
 import TransferTop500 from './components/TransferTop500'
+import { SwordPool, TokenState } from '@/services/types'
 
 defineOptions({
   name: 'swap',
@@ -36,7 +37,7 @@ const transferSelectList = [
 ]
 const transferSelect = reactive({
   value: transferSelectList[0].value,
-  label: transferSelectList[0].label
+  label: transferSelectList[0].label,
 })
 
 async function queryPoolStatus(poolid: string) {
@@ -75,11 +76,13 @@ function changePool(poolid: string) {
 
 function getBalance(pooladdress: string) {
   isBalanceLoading.value = true
-  getBalanceByPoolAddress(pooladdress).then((res: any)=> {
-    if (res.data[0]) {
-      balance.value = res.data[0].balance
-    }
-  }).finally(() => isBalanceLoading.value = false)
+  getBalanceByPoolAddress(pooladdress)
+    .then((res: any) => {
+      if (res.data[0]) {
+        balance.value = res.data[0].balance
+      }
+    })
+    .finally(() => (isBalanceLoading.value = false))
 }
 
 function paySuccess() {
@@ -105,14 +108,15 @@ onMounted(() => {
     <el-col :span="24" style="margin-bottom: 12px">
       <dog-card>
         <h4 style="margin-top: 0">Swordpool</h4>
-        <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon style="margin-bottom: 12px"/>
+        <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon style="margin-bottom: 12px" />
         <el-row>
           <el-col :span="24" :md="18">
             <div class="selectToken">
-              <el-dropdown style="display: inline-block;margin-right: 6px" trigger="click" @command="changePool">
+              <el-dropdown style="display: inline-block; margin-right: 6px" trigger="click" @command="changePool">
                 <el-button>
                   <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
-                  <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address">{{balance}}&nbsp;</span>{{ currentPool?.tokenB }}
+                  <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address">{{ balance }}&nbsp;</span
+                  >{{ currentPool?.tokenB }}
                   <el-icon style="margin-left: 6px"><ArrowDown /></el-icon>
                 </el-button>
                 <template #dropdown>
@@ -125,15 +129,15 @@ onMounted(() => {
                 </template>
               </el-dropdown>
               <template v-if="address && currentPool.pooladdress">
-                <el-button :loading="isBalanceLoading" :icon="Refresh" circle style="margin-right: 12px" @click="getBalance(address)"/>
+                <el-button :loading="isBalanceLoading" :icon="Refresh" circle style="margin-right: 12px" @click="getBalance(address)" />
                 <div class="selectToken_bar">
                   <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
                   <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
-                    <DogTableMenuItem style="margin-right: 0;line-height: 30px;padding: 0 10px;" label="History" value="1" @click="showTransferDialog = true"/>
+                    <DogTableMenuItem style="margin-right: 0; line-height: 30px; padding: 0 10px" label="History" value="1" @click="showTransferDialog = true" />
                   </el-badge>
                 </div>
               </template>
-              <div v-else-if="currentPool.pooladdress && !address" style="font-size: 14px; display: inline-block;">
+              <div v-else-if="currentPool.pooladdress && !address" style="font-size: 14px; display: inline-block">
                 <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
               </div>
             </div>
@@ -152,37 +156,45 @@ onMounted(() => {
               </el-col>
             </el-row>
           </el-col>
-          <el-col :span="24" :md="6" style="display: flex;flex-direction: column; align-items: center">
-            <el-link href="https://github.com/dpalwallet/swordpool" style="margin-bottom:12px" target="_blank">
+          <el-col :span="24" :md="6" style="display: flex; flex-direction: column; align-items: center">
+            <el-link href="https://github.com/dpalwallet/swordpool" style="margin-bottom: 12px" target="_blank">
               <img class="token-icon" src="/logo.png" alt="" />
               Swordpool Rule Beta
             </el-link>
-            <div style="border: 2px solid rgb(238, 181, 15);padding: 12px;border-radius: 24px;">
+            <div style="border: 2px solid rgb(238, 181, 15); padding: 12px; border-radius: 24px">
               <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
             </div>
-            <DogLink style="font-size: 12px;margin-top: 12px;" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
+            <DogLink style="font-size: 12px; margin-top: 12px" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
           </el-col>
         </el-row>
       </dog-card>
     </el-col>
     <el-col :span="24">
       <dog-card>
-        <div style="position: absolute;z-index:2001">
-          <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0"/>
-          <DogTableMenuItem label="Holder" :value="1" @click="transferSelect.value = 1" :selected="transferSelect.value == 1"/>
+        <div style="position: absolute; z-index: 2001">
+          <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0" />
+          <DogTableMenuItem label="Holder" :value="1" @click="transferSelect.value = 1" :selected="transferSelect.value == 1" />
         </div>
         <div style="margin-top: 24px">
-          <TransferTable v-show="transferSelect.value == 0" :current-pool="(currentPool as SwordPool)"></TransferTable>
-          <TransferTop500 v-show="transferSelect.value == 1" :current-pool="(currentPool as SwordPool)"></TransferTop500>
+          <TransferTable v-show="transferSelect.value == 0" :current-pool="currentPool as SwordPool"></TransferTable>
+          <TransferTop500 v-show="transferSelect.value == 1" :current-pool="currentPool as SwordPool"></TransferTop500>
         </div>
       </dog-card>
     </el-col>
   </el-row>
-  <SwapDialog v-model:visible="showSwapDialog" :current-pool="(currentPool as SwordPool)" :current-pool-state="(currentPoolState as TokenState)" @change-pool="changePool" :pools="pools" :loading="loading" @pay-success="paySuccess"></SwapDialog>
+  <SwapDialog
+    v-model:visible="showSwapDialog"
+    :current-pool="currentPool as SwordPool"
+    :current-pool-state="currentPoolState as TokenState"
+    @change-pool="changePool"
+    :pools="pools"
+    :loading="loading"
+    @pay-success="paySuccess"
+  ></SwapDialog>
   <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool" @close="tabValue = '0'"></SwapTransferList>
 </template>
 <style lang="scss" scoped>
-:deep(.el-statistic__number){
+:deep(.el-statistic__number) {
   font-size: 18px;
 }
 .selectToken {
@@ -190,7 +202,8 @@ onMounted(() => {
   align-items: center;
   @media screen and (max-width: 490px) {
     flex-wrap: wrap;
-    & .swap-pair_buy--connect, & &_bar {
+    & .swap-pair_buy--connect,
+    & &_bar {
       margin-top: 12px;
     }
   }

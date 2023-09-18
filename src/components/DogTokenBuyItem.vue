@@ -8,7 +8,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits(['click-buy'])
-
 </script>
 <template>
   <div class="dog-token-item dog-token-item--hover">
@@ -25,7 +24,13 @@ const emit = defineEmits(['click-buy'])
     </div>
     <div class="dog-token-item_row">
       <span class="dog-token-item_label">Hash: </span>
-      <span class="dog-token-item_value"><DogLink is-copy :label="omitCenterString('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff', 10)" :value="'1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff'"></DogLink></span>
+      <span class="dog-token-item_value"
+        ><DogLink
+          is-copy
+          :label="omitCenterString('1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff', 10)"
+          :value="'1ba28f9aeebb6831fb4f2ecc8484acdcce96c10d12ee203ac1b5fbe769c6dfff'"
+        ></DogLink
+      ></span>
     </div>
     <div class="dog-token-item_row dog-token-item--amount">
       <span class="dog-token-item_label">1ÐOGE</span>
@@ -44,9 +49,9 @@ const emit = defineEmits(['click-buy'])
   background-color: #fff;
   font-size: 12px;
   &--hover {
-    transition: all .5s;
+    transition: all 0.5s;
     &:hover {
-      border-color:	#DA70D6;
+      border-color: #da70d6;
     }
   }
   &--amount {
@@ -85,8 +90,8 @@ const emit = defineEmits(['click-buy'])
     text-align: center;
     cursor: pointer;
     font-size: 14px;
-    background-color: #DA70D6;
-    transition: all .2s;
+    background-color: #da70d6;
+    transition: all 0.2s;
     &:hover {
       background-color: #ee7bea;
     }

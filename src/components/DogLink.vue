@@ -48,7 +48,8 @@ async function copy(value?: string) {
 <style lang="scss">
 .doglink {
   display: inline;
-  &_link, &_link:hover {
+  &_link,
+  &_link:hover {
     color: #f9b864;
   }
 }

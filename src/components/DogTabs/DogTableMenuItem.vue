@@ -1,12 +1,12 @@
 <script setup lang="ts">
 const props = withDefaults(
   defineProps<{
-    label: string,
-    value: string | number,
+    label: string
+    value: string | number
     selected?: boolean
   }>(),
   {
-    selected: false
+    selected: false,
   }
 )
 

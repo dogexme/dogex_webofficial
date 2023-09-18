@@ -12,7 +12,7 @@ async function loadCollMap() {
     document.body.removeChild(document.getElementById('loading-container')!)
     clearTimeout(timer)
   } catch {
-    timer = window.setTimeout(loadCollMap, 1000);
+    timer = window.setTimeout(loadCollMap, 1000)
   }
 }
 
