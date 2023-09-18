@@ -76,8 +76,9 @@ function changePool(poolid: string) {
 
 function getBalance(pooladdress: string) {
   isBalanceLoading.value = true
+  queryPoolStatus(poolid.value)
   getBalanceByPoolAddress(pooladdress)
-    .then((res: any) => {
+    .then(async (res: any) => {
       if (res.data[0]) {
         balance.value = res.data[0].balance
       }
@@ -89,7 +90,7 @@ function paySuccess() {
   getBalance(address.value)
 }
 
-onMounted(() => {
+function init() {
   queryPools().then((res) => {
     pools.value = res.data.pools
     poolid.value = pools.value[0].poolid
@@ -100,6 +101,10 @@ onMounted(() => {
   if (address.value) {
     getBalance(address.value)
   }
+}
+
+onActivated(() => {
+  init()
 })
 </script>
 
@@ -141,7 +146,7 @@ onMounted(() => {
                 <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
               </div>
             </div>
-            <el-row style="margin: 24px 0">
+            <el-row style="margin: 24px 0" v-if="currentPoolState">
               <el-col :span="12">
                 <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="currentPoolState?.balanceA" />
               </el-col>
@@ -171,11 +176,11 @@ onMounted(() => {
     </el-col>
     <el-col :span="24">
       <dog-card>
-        <div style="position: absolute; z-index: 2001">
+        <div style="position: absolute; z-index: 2000">
           <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0" />
           <DogTableMenuItem label="Holder" :value="1" @click="transferSelect.value = 1" :selected="transferSelect.value == 1" />
         </div>
-        <div style="margin-top: 24px">
+        <div>
           <TransferTable v-show="transferSelect.value == 0" :current-pool="currentPool as SwordPool"></TransferTable>
           <TransferTop500 v-show="transferSelect.value == 1" :current-pool="currentPool as SwordPool"></TransferTop500>
         </div>
@@ -183,6 +188,7 @@ onMounted(() => {
     </el-col>
   </el-row>
   <SwapDialog
+    v-if="currentPoolState"
     v-model:visible="showSwapDialog"
     :current-pool="currentPool as SwordPool"
     :current-pool-state="currentPoolState as TokenState"

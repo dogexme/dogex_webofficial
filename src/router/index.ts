@@ -5,6 +5,9 @@ import { useAppStore } from '../store'
 const router = VueRouter.createRouter({
   history: VueRouter.createWebHistory(),
   routes,
+  scrollBehavior (_to, _from, _savedPosition) {
+    return { top: 0 }
+  }
 })
 
 router.beforeEach((to, _form, next) => {
