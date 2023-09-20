@@ -13,7 +13,7 @@ const props = withDefaults(
   defineProps<{
     visible: boolean
     currentPool: SwordPool
-    currentPoolState: TokenState
+    currentPoolState?: TokenState
     pools: any[]
     loading: boolean
   }>(),
@@ -81,7 +81,7 @@ watch(visible, (isVisible) => {
 watch(
   () => props.currentPoolState,
   (currentPoolState) => {
-    const { balanceA, balanceB } = currentPoolState
+    const { balanceA = 1, balanceB = 1 } = currentPoolState || {}
     const key = focusName.value
 
     payToken.value.rate = NP.divide(balanceB, balanceA)

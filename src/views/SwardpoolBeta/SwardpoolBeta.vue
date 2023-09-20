@@ -188,15 +188,14 @@ onActivated(() => {
     </el-col>
   </el-row>
   <SwapDialog
-    v-if="currentPoolState"
     v-model:visible="showSwapDialog"
     :current-pool="currentPool as SwordPool"
-    :current-pool-state="currentPoolState as TokenState"
+    :current-pool-state="currentPoolState"
     @change-pool="changePool"
     :pools="pools"
     :loading="loading"
     @pay-success="paySuccess"
-  ></SwapDialog>
+  />
   <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool" @close="tabValue = '0'"></SwapTransferList>
 </template>
 <style lang="scss" scoped>

@@ -102,7 +102,6 @@ function triggerDrawer(direction: DrawerDirection) {
 </template>
 
 <style lang="scss" scoped>
-
 .nav-menu {
   :deep(.el-menu-item) {
     border-radius: 8px;
@@ -143,7 +142,7 @@ function triggerDrawer(direction: DrawerDirection) {
   position: fixed;
   top: 0;
   left: 0;
-  z-index: 2010;
+  z-index: 2007;
   width: 100%;
   background-color: #fff;
   border-bottom: 1px solid #333;
