@@ -45,24 +45,31 @@ const address = computed(() => appStore.address)
 const showRecordDialog = ref(false)
 const { payPool, transferD20 } = useDoge()
 
-const payToken = ref<TokenInfo>({
-  amount: 0,
-  rate: 1,
-  loading: false,
-  pools: [],
-  swapType: 'SWAP_A_B',
-  price: 4,
-  txid: '',
-})
+function resetPayToken(): TokenInfo {
+  return {
+    amount: 0,
+    rate: 1,
+    loading: false,
+    pools: [],
+    swapType: 'SWAP_A_B',
+    price: 4,
+    txid: '',
+  }
+}
 
-const revToken = ref<TokenInfo>({
-  amount: 0,
-  rate: 1,
-  loading: false,
-  pools: [],
-  price: 0,
-  swapType: 'SWAP_B_A',
-})
+function resetRevToken(): TokenInfo {
+  return {
+    amount: 0,
+    rate: 1,
+    loading: false,
+    pools: [],
+    price: 0,
+    swapType: 'SWAP_B_A',
+  }
+}
+
+const payToken = ref<TokenInfo>(resetPayToken())
+const revToken = ref<TokenInfo>(resetRevToken())
 
 const focusName = ref<TokenInputName>('')
 const isWatchStop = ref(false)
@@ -75,27 +82,38 @@ const transferListLoading = ref(false)
 watch(visible, (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+  } else {
+    payToken.value = resetPayToken()
+    revToken.value = resetRevToken()
+    if (props.pools) {
+      revToken.value.pools = props.pools
+    }
+    resetPoolState()
   }
 })
 
+function resetPoolState() {
+  const { balanceA = 1, balanceB = 1 } = props.currentPoolState || {}
+  const key = focusName.value
+
+  payToken.value.rate = NP.divide(balanceB, balanceA)
+  revToken.value.rate = NP.divide(balanceA, balanceB)
+
+  isWatchStop.value = true
+  if (key == 'pay') {
+    payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), 4)
+  } else {
+    revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), 4)
+  }
+  nextTick(() => {
+    isWatchStop.value = false
+  })
+}
+
 watch(
   () => props.currentPoolState,
-  (currentPoolState) => {
-    const { balanceA = 1, balanceB = 1 } = currentPoolState || {}
-    const key = focusName.value
-
-    payToken.value.rate = NP.divide(balanceB, balanceA)
-    revToken.value.rate = NP.divide(balanceA, balanceB)
-
-    isWatchStop.value = true
-    if (key == 'pay') {
-      payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), 4)
-    } else {
-      revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), 4)
-    }
-    nextTick(() => {
-      isWatchStop.value = false
-    })
+  () => {
+    resetPoolState()
   }
 )
 
