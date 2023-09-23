@@ -164,7 +164,7 @@ onActivated(() => {
           <el-col :span="24" :md="6" style="display: flex; flex-direction: column; align-items: center">
             <el-link href="https://github.com/dpalwallet/swordpool" style="margin-bottom: 12px" target="_blank">
               <img class="token-icon" src="/logo.png" alt="" />
-              Swordpool Rule Beta
+              Swordpool Rule
             </el-link>
             <div style="border: 2px solid rgb(238, 181, 15); padding: 12px; border-radius: 24px">
               <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
