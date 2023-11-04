@@ -3,6 +3,7 @@ import store from './store'
 import router from './router'
 import App from './App.vue'
 import Elementui from './element-ui'
+import './echarts'
 import 'normalize.css'
 import './style.css'
 

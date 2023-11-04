@@ -101,6 +101,12 @@ function triggerDrawer(direction: DrawerDirection) {
   </div>
 </template>
 
+<style>
+.nav-drawer {
+  z-index: 2010 !important;
+}
+</style>
+
 <style lang="scss" scoped>
 .nav-menu {
   :deep(.el-menu-item) {

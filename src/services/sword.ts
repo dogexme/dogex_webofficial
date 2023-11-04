@@ -88,3 +88,19 @@ export const getBalanceByPoolAddress = (address: string) => {
 export const queryTop500 = () => {
   return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=top500')
 }
+
+/**
+ * 获取代币信息
+ * @returns
+ */
+export const getTokenInfo = () => {
+  return axios.get('https://py7xjcgpe9.execute-api.ap-east-1.amazonaws.com/beta/api/drcinfo')
+}
+
+/**
+ * 获取成交量
+ * @returns
+ */
+export const getTokenTransferData = () => {
+  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=tvl')
+}

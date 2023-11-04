@@ -1,3 +1,6 @@
+@tailwind components;
+@tailwind utilities;
+
 .dog-icon {
   display: inline-block;
   width: 16px;

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getBalanceByPoolAddress, queryPools, queryPoolState } from '@/services/sword'
+import { getBalanceByPoolAddress, getTokenInfo, queryPools, queryPoolState, getTokenTransferData } from '@/services/sword'
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
@@ -11,6 +11,9 @@ import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
 import TransferTop500 from './components/TransferTop500'
 import { SwordPool, TokenState } from '@/services/types'
+import VChart from 'vue-echarts'
+import ECharts from 'vue-echarts'
+import { TokenMarketInfo } from '@/types'
 
 defineOptions({
   name: 'swap',
@@ -25,6 +28,7 @@ const pools = ref<any[]>([])
 const poolid = ref('')
 const currentPool = ref<Partial<SwordPool>>({})
 const currentPoolState = ref<TokenState>()
+const tokenInfo = ref({})
 const noticeMessage = ref('')
 const loading = ref(false)
 const balance = ref(0)
@@ -40,6 +44,15 @@ const transferSelect = reactive({
   label: transferSelectList[0].label,
 })
 
+const currentPrice = computed(() => {
+  const { balanceA = 0, balanceB = 0 } = currentPoolState.value || {}
+  const price = np.divide(balanceA, balanceB) || 0
+  return {
+    oldPrice: price,
+    price: np.round(price, 6),
+  }
+})
+
 async function queryPoolStatus(poolid: string) {
   try {
     loading.value = true
@@ -47,6 +60,7 @@ async function queryPoolStatus(poolid: string) {
     const { status, data } = res.data
     if (status == 'success') {
       currentPoolState.value = data
+      showPriceVal.value = currentPrice.value.price
     }
   } finally {
     loading.value = false
@@ -90,6 +104,13 @@ function paySuccess() {
   getBalance(address.value)
 }
 
+const vchart = ref(ECharts)
+const showUpdownVal = ref(0)
+const showPriceVal = ref(0)
+const isShowTip = ref(false)
+const newData = new Map()
+const tdCountMap = new Map()
+
 function init() {
   queryPools().then((res) => {
     pools.value = res.data.pools
@@ -101,75 +122,220 @@ function init() {
   if (address.value) {
     getBalance(address.value)
   }
+  getTokenInfo().then((res) => {
+    tokenInfo.value = res.data[0]
+  })
 }
 
 onActivated(() => {
   init()
 })
+
+onMounted(() => {
+  getTokenTransferData().then((res) => {
+    const result = res.data
+    if (result.status == 'success') {
+      const data = result.data
+      const marketData = data.market_data
+      loadTransferData(marketData)
+    }
+  })
+})
+
+let xLabel = []
+let data: any = []
+
+function loadTransferData(marketData: TokenMarketInfo[]) {
+  marketData.forEach((td) => {
+    const data = tdCountMap.get(td.block_no)
+    if (!tdCountMap.has(td.block_no)) {
+      tdCountMap.set(td.block_no, 1)
+      newData.set(`${td.block_no}_1`, td)
+    } else {
+      tdCountMap.set(td.block_no, data + 1)
+      newData.set(`${td.block_no}_${data + 1}`, td)
+    }
+  })
+
+  xLabel = Array.from(newData.keys()).reverse()
+  data = Array.from(newData.entries())
+    .map(([block_no, d]) => {
+      return {
+        custom: d,
+        value: [block_no, d.price],
+      }
+    })
+    .reverse()
+
+  showUpdownVal.value = data[data.length - 1].custom.upordown
+
+  vchart.value.setOption(
+    {
+      title: {
+        show: false,
+      },
+      grid: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+      },
+      dataZoom: [
+        {
+          id: 'dataZoomX',
+          type: 'inside',
+          xAxisIndex: [0],
+          minSpan: 5,
+          start: 90,
+          end: 100,
+        },
+      ],
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params: any) {
+          const opts = params[0]
+          const data = opts.data.custom
+          const [, price] = opts.value
+          isShowTip.value = true
+          showPriceVal.value = price
+          showUpdownVal.value = data.upordown
+          return `Ð ${price}`
+        },
+        axisPointer: {
+          animation: false,
+        },
+      },
+      xAxis: {
+        show: false,
+        data: xLabel,
+        splitLine: {
+          show: false,
+        },
+      },
+      yAxis: {
+        show: false,
+        type: 'value',
+        splitLine: {
+          show: false,
+        },
+      },
+      series: [
+        {
+          name: 'price',
+          type: 'line',
+          showSymbol: false,
+          lineStyle: {
+            color: 'rgb(238,181,15)',
+          },
+          data,
+        },
+      ],
+    },
+    true
+  )
+}
+
+function hideTipHandle() {
+  isShowTip.value = false
+  showPriceVal.value = currentPrice.value.price
+  if (data.length > 0) {
+    showUpdownVal.value = data[data.length - 1].custom.upordown
+  }
+}
 </script>
 
 <template>
   <el-row :gutter="12">
-    <el-col :span="24" style="margin-bottom: 12px">
+    <el-col :span="24" class="mb-3">
       <dog-card>
-        <h4 style="margin-top: 0">Swordpool</h4>
-        <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon style="margin-bottom: 12px" />
-        <el-row>
-          <el-col :span="24" :md="18">
-            <div class="selectToken">
-              <el-dropdown style="display: inline-block; margin-right: 6px" trigger="click" @command="changePool">
-                <el-button>
-                  <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA }}<span class="split-word">/</span>
-                  <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address">{{ balance }}&nbsp;</span
-                  >{{ currentPool?.tokenB }}
-                  <el-icon style="margin-left: 6px"><ArrowDown /></el-icon>
-                </el-button>
-                <template #dropdown>
-                  <el-dropdown-menu>
-                    <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="!!noticeMessage || item.status != 0">
-                      <img class="token-icon" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
-                      <img class="token-icon" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
-                    </el-dropdown-item>
-                  </el-dropdown-menu>
-                </template>
-              </el-dropdown>
-              <template v-if="address && currentPool.pooladdress">
-                <el-button :loading="isBalanceLoading" :icon="Refresh" circle style="margin-right: 12px" @click="getBalance(address)" />
-                <div class="selectToken_bar">
-                  <el-button type="primary" style="margin-right: 12px" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
-                  <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
-                    <DogTableMenuItem style="margin-right: 0; line-height: 30px; padding: 0 10px" label="History" value="1" @click="showTransferDialog = true" />
-                  </el-badge>
+        <div class="flex justify-between">
+          <h4 class="mt-0" style="font-size: 18px">Swordpool</h4>
+          <div class="text-center">
+            <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 14px; font-weight: bold" target="_blank">
+              <img class="token-icon" src="/logo.png" alt="" />
+              Swordpool Rule
+            </el-link>
+          </div>
+        </div>
+        <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon class="mb-3" />
+        <el-row style="margin-top: 12px">
+          <el-col :span="24" :md="12">
+            <el-row>
+              <el-col>
+                <div class="selectToken">
+                  <el-dropdown class="inline-block mr-4" trigger="click" @command="changePool">
+                    <el-button>
+                      <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA
+                      }}<span class="split-word">/</span> <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address"
+                        >{{ balance }}&nbsp;</span
+                      >{{ currentPool?.tokenB }}
+                      <el-icon class="ml-2"><ArrowDown /></el-icon>
+                    </el-button>
+                    <template #dropdown>
+                      <el-dropdown-menu>
+                        <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="!!noticeMessage || item.status != 0">
+                          <img class="token-icon" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
+                          <img class="token-icon" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
+                        </el-dropdown-item>
+                      </el-dropdown-menu>
+                    </template>
+                  </el-dropdown>
+                  <template v-if="address && currentPool.pooladdress">
+                    <el-button class="mr-3" :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
+                    <div class="selectToken_bar">
+                      <el-button class="mr-3" type="primary" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
+                      <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
+                        <DogTableMenuItem style="margin-right: 0; line-height: 30px; padding: 0 10px" label="History" value="1" @click="showTransferDialog = true" />
+                      </el-badge>
+                    </div>
+                  </template>
+                  <div class="inline-block" style="font-size: 14px" v-else-if="currentPool.pooladdress && !address">
+                    <div class="swap-pair_buy swap-pair_buy--connect size" @click="connect">Connect DpalWallet</div>
+                  </div>
                 </div>
-              </template>
-              <div v-else-if="currentPool.pooladdress && !address" style="font-size: 14px; display: inline-block">
-                <div class="swap-pair_buy swap-pair_buy--connect" @click="connect">Connect DpalWallet</div>
-              </div>
-            </div>
+              </el-col>
+            </el-row>
             <el-row style="margin: 24px 0" v-if="currentPoolState">
+              <el-col :span="12">
+                <h4 style="font-size: 26px; margin: 0"><span style="margin-right: 6px; font-size: 30px">Ð</span>{{ np.round(showPriceVal, 6) }}</h4>
+                <p style="font-size: 16px; color: #777; vertical-align: middle">
+                  <span style="margin-right: 4px">{{ Math.abs(np.round(showUpdownVal * 100, 2)) }}%</span>
+                  <svg v-show="showUpdownVal >= 0" style="vertical-align: middle" width="18" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M573.056 272l308.8 404.608A76.8 76.8 0 0 1 820.736 800H203.232a76.8 76.8 0 0 1-61.056-123.392L450.976 272a76.8 76.8 0 0 1 122.08 0z" fill="rgb(64, 180, 105)" />
+                  </svg>
+                  <svg v-show="showUpdownVal < 0" style="vertical-align: middle" width="18" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M573.056 752l308.8-404.608A76.8 76.8 0 0 0 820.736 224H203.232a76.8 76.8 0 0 0-61.056 123.392l308.8 404.608a76.8 76.8 0 0 0 122.08 0z" fill="rgb(255, 90, 80)" />
+                  </svg>
+                </p>
+              </el-col>
+              <el-col :span="12">
+                <el-statistic title="Block No" :value="currentPoolState?.blockno" />
+              </el-col>
               <el-col :span="12">
                 <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="currentPoolState?.balanceA" />
               </el-col>
               <el-col :span="12">
                 <el-statistic :title="`Current ${currentPool?.tokenB} Balance`" :precision="5" :value="currentPoolState?.balanceB" />
               </el-col>
-              <el-col :span="12">
+              <!-- <el-col :span="12">
                 <el-statistic title="Price" :precision="6" :value="np.divide(currentPoolState?.balanceA || 0, currentPoolState?.balanceB || 0) || 0" />
-              </el-col>
-              <el-col :span="12">
-                <el-statistic title="Block No" :value="currentPoolState?.blockno" />
-              </el-col>
+              </el-col> -->
             </el-row>
           </el-col>
-          <el-col :span="24" :md="6" style="display: flex; flex-direction: column; align-items: center">
-            <el-link href="https://github.com/dpalwallet/swordpool" style="margin-bottom: 12px" target="_blank">
-              <img class="token-icon" src="/logo.png" alt="" />
-              Swordpool Rule
-            </el-link>
-            <div style="border: 2px solid rgb(238, 181, 15); padding: 12px; border-radius: 24px">
-              <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
+          <el-col :span="24" :md="12">
+            <v-chart ref="vchart" class="chart" autoresize @hideTip="hideTipHandle" />
+            <div class="flex justify-center">
+              <el-dropdown placement="top">
+                <DogLink class="cursor-pointer" style="font-size: 14px" disabledTooltip is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
+                <template #dropdown>
+                  <div class="flex flex-col items-center p-5">
+                    <div style="border: 2px solid rgb(238, 181, 15); padding: 12px; border-radius: 24px">
+                      <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
+                    </div>
+                  </div>
+                </template>
+              </el-dropdown>
             </div>
-            <DogLink style="font-size: 12px; margin-top: 12px" is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
           </el-col>
         </el-row>
       </dog-card>
@@ -179,10 +345,12 @@ onActivated(() => {
         <div style="position: absolute; z-index: 2000">
           <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0" />
           <DogTableMenuItem label="Holder" :value="1" @click="transferSelect.value = 1" :selected="transferSelect.value == 1" />
+          <DogTableMenuItem label="Info" :value="2" @click="transferSelect.value = 2" :selected="transferSelect.value == 2" />
         </div>
         <div>
           <TransferTable v-show="transferSelect.value == 0" :current-pool="currentPool as SwordPool"></TransferTable>
           <TransferTop500 v-show="transferSelect.value == 1" :current-pool="currentPool as SwordPool"></TransferTop500>
+          <Info style="margin-top: 45px" v-show="transferSelect.value == 2" :token-info="tokenInfo"></Info>
         </div>
       </dog-card>
     </el-col>
@@ -201,6 +369,14 @@ onActivated(() => {
 <style lang="scss" scoped>
 :deep(.el-statistic__number) {
   font-size: 18px;
+}
+
+:deep(.doglink .doglink_link) {
+  color: rgb(238, 181, 15);
+}
+
+.chart {
+  height: 180px;
 }
 .selectToken {
   display: flex;
