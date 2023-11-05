@@ -221,16 +221,16 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
         top: 0,
         bottom: 0,
       },
-      dataZoom: [
-        {
-          id: 'dataZoomX',
-          type: 'inside',
-          xAxisIndex: [0],
-          minSpan: 5,
-          start: 90,
-          end: 100,
-        },
-      ],
+      // dataZoom: [
+      //   {
+      //     id: 'dataZoomX',
+      //     type: 'inside',
+      //     xAxisIndex: [0],
+      //     minSpan: 5,
+      //     start: 90,
+      //     end: 100,
+      //   },
+      // ],
       tooltip: {
         trigger: 'axis',
         formatter: function (params: any) {
