@@ -24,17 +24,19 @@ export function useTable(options: TableHookOptions) {
   async function query(p: number) {
     loading.value = true
     try {
-      const { total: tol, data } = await api(p, pageSize)
+      const result = await api(p, pageSize)
+      const { total: tol, data } = result
       dataSource.value = data
       total.value = tol
       page.value = p
+      return result
     } finally {
       loading.value = false
     }
   }
 
   function refresh() {
-    query(page.value)
+    return query(page.value)
   }
 
   onMounted(() => {

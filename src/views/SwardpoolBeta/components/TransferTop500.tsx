@@ -12,8 +12,9 @@ export default defineComponent({
       type: Object as PropType<SwordPool>,
     },
   },
-  setup(props) {
-    const { loading, dataSource, total, page, query } = useTable({
+  setup(props, { expose }) {
+    const { loading, dataSource, total, page, query, refresh } = useTable({
+      first: false,
       api: getData,
       pageSize: 500,
     })
@@ -51,13 +52,6 @@ export default defineComponent({
 
     const columns = ref(originColumns)
 
-    watch(
-      () => props.currentPool?.pooladdress,
-      () => {
-        query(1)
-      }
-    )
-
     async function getData() {
       const res = await queryTop500()
       const { status, data } = res.data
@@ -67,6 +61,7 @@ export default defineComponent({
       })
       return status == 'success'
         ? {
+            status,
             total: 500,
             data: data.top500,
           }
@@ -75,6 +70,10 @@ export default defineComponent({
             data: [],
           }
     }
+
+    expose({
+      load: refresh,
+    })
 
     return () => (
       <DogTable

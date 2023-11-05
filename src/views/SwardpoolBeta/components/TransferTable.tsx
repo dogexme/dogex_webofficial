@@ -37,6 +37,7 @@ export default defineComponent({
   },
   setup(props) {
     const { loading, dataSource, total, page, query } = useTable({
+      first: false,
       api: getData,
       pageSize: 20,
     })

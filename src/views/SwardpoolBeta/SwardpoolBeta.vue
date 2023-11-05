@@ -5,7 +5,7 @@ import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
 import QrcodeVue from 'qrcode.vue'
-import { ArrowDown, Refresh } from '@element-plus/icons-vue'
+import { ArrowDown, Refresh, CopyDocument } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
@@ -14,11 +14,13 @@ import { SwordPool, TokenState } from '@/services/types'
 import VChart from 'vue-echarts'
 import ECharts from 'vue-echarts'
 import { TokenMarketInfo } from '@/types'
+import clipboard3 from 'vue-clipboard3'
 
 defineOptions({
   name: 'swap',
 })
 
+const { toClipboard } = clipboard3()
 const appStore = useAppStore()
 const { connectDpal } = appStore
 const address = computed(() => appStore.address)
@@ -31,6 +33,7 @@ const currentPoolState = ref<TokenState>()
 const tokenInfo = ref({})
 const noticeMessage = ref('')
 const loading = ref(false)
+const listLoading = ref(false)
 const balance = ref(0)
 const tabValue = ref('0')
 const showTransferDialog = ref(false)
@@ -122,9 +125,47 @@ function init() {
   if (address.value) {
     getBalance(address.value)
   }
-  getTokenInfo().then((res) => {
-    tokenInfo.value = res.data[0]
-  })
+}
+
+getTokenInfoHandle.isLoaded = false
+function getTokenInfoHandle() {
+  if (getTokenInfoHandle.isLoaded) {
+    transferSelect.value = 2
+    return
+  }
+  listLoading.value = true
+  getTokenInfo()
+    .then((res) => {
+      tokenInfo.value = res.data[0]
+      getTokenInfoHandle.isLoaded = true
+      transferSelect.value = 2
+    })
+    .finally(() => {
+      listLoading.value = false
+    })
+}
+
+const TransferTop500Ref = ref()
+getHolderData.loaded = false
+async function getHolderData() {
+  if (getHolderData.loaded) {
+    transferSelect.value = 1
+    return
+  }
+  if (TransferTop500Ref.value) {
+    listLoading.value = true
+    TransferTop500Ref.value
+      .load()
+      .then((result: any) => {
+        if (result.status == 'success') {
+          transferSelect.value = 1
+          getHolderData.loaded = true
+        }
+      })
+      .finally(() => {
+        listLoading.value = false
+      })
+  }
 }
 
 onActivated(() => {
@@ -326,9 +367,16 @@ function hideTipHandle() {
             <v-chart ref="vchart" class="chart" autoresize @hideTip="hideTipHandle" />
             <div class="flex justify-center">
               <el-dropdown placement="top">
-                <DogLink class="cursor-pointer" style="font-size: 14px" disabledTooltip is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></DogLink>
+                <div class="cursor-pointer outline-none">
+                  <span style="color: rgb(238, 181, 15)">{{ currentPool?.pooladdress }}</span>
+                  <el-icon class="ml-1" @click="toClipboard(currentPool.pooladdress!)">
+                    <CopyDocument />
+                  </el-icon>
+                </div>
                 <template #dropdown>
                   <div class="flex flex-col items-center p-5">
+                    <!-- <DogLink class="cursor-pointer" style="font-size: 14px" disabledTooltip is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></
+                      DogLink> -->
                     <div style="border: 2px solid rgb(238, 181, 15); padding: 12px; border-radius: 24px">
                       <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
                     </div>
@@ -341,15 +389,15 @@ function hideTipHandle() {
       </dog-card>
     </el-col>
     <el-col :span="24">
-      <dog-card>
+      <dog-card v-loading="listLoading">
         <div style="position: absolute; z-index: 2000">
           <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0" />
-          <DogTableMenuItem label="Holder" :value="1" @click="transferSelect.value = 1" :selected="transferSelect.value == 1" />
-          <DogTableMenuItem label="Info" :value="2" @click="transferSelect.value = 2" :selected="transferSelect.value == 2" />
+          <DogTableMenuItem label="Holder" :value="1" @click="getHolderData" :selected="transferSelect.value == 1" />
+          <DogTableMenuItem label="Info" :value="2" @click="getTokenInfoHandle" :selected="transferSelect.value == 2" />
         </div>
         <div>
           <TransferTable v-show="transferSelect.value == 0" :current-pool="currentPool as SwordPool"></TransferTable>
-          <TransferTop500 v-show="transferSelect.value == 1" :current-pool="currentPool as SwordPool"></TransferTop500>
+          <TransferTop500 ref="TransferTop500Ref" v-show="transferSelect.value == 1" :current-pool="currentPool as SwordPool"></TransferTop500>
           <Info style="margin-top: 45px" v-show="transferSelect.value == 2" :token-info="tokenInfo"></Info>
         </div>
       </dog-card>
