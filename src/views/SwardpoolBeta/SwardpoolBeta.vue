@@ -56,17 +56,27 @@ const currentPrice = computed(() => {
   }
 })
 
-async function queryPoolStatus(poolid: string) {
+const queryPoolStatusTimer = ref<number | undefined>(0)
+
+async function queryPoolStatus(poolid: string, timer = false) {
   try {
     loading.value = true
     const res = await queryPoolState(poolid)
     const { status, data } = res.data
     if (status == 'success') {
       currentPoolState.value = data
-      showPriceVal.value = currentPrice.value.price
+      if (!isShowTip.value) {
+        showPriceVal.value = currentPrice.value.price
+        showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
+      }
     }
   } finally {
     loading.value = false
+    if (timer) {
+      queryPoolStatusTimer.value = window.setTimeout(() => {
+        queryPoolStatus(poolid, true)
+      }, 5000)
+    }
   }
 }
 
@@ -120,7 +130,7 @@ function init() {
     poolid.value = pools.value[0].poolid
     currentPool.value = pools.value[0]
     noticeMessage.value = res.data.notice_message
-    queryPoolStatus(poolid.value)
+    queryPoolStatus(poolid.value, true)
   })
   if (address.value) {
     getBalance(address.value)
@@ -184,7 +194,7 @@ onMounted(() => {
 })
 
 let xLabel = []
-let data: any = []
+let chartsData: any = []
 
 function loadTransferData(marketData: TokenMarketInfo[]) {
   marketData.forEach((td) => {
@@ -199,7 +209,7 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
   })
 
   xLabel = Array.from(newData.keys()).reverse()
-  data = Array.from(newData.entries())
+  chartsData = Array.from(newData.entries())
     .map(([block_no, d]) => {
       return {
         custom: d,
@@ -208,7 +218,7 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
     })
     .reverse()
 
-  showUpdownVal.value = data[data.length - 1].custom.upordown
+  showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
 
   vchart.value.setOption(
     {
@@ -268,7 +278,7 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
           lineStyle: {
             color: 'rgb(238,181,15)',
           },
-          data,
+          data: chartsData,
         },
       ],
     },
@@ -279,8 +289,8 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
 function hideTipHandle() {
   isShowTip.value = false
   showPriceVal.value = currentPrice.value.price
-  if (data.length > 0) {
-    showUpdownVal.value = data[data.length - 1].custom.upordown
+  if (chartsData.length > 0) {
+    showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
   }
 }
 </script>
@@ -324,6 +334,7 @@ function hideTipHandle() {
                   <template v-if="address && currentPool.pooladdress">
                     <el-button class="mr-3" :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
                     <div class="selectToken_bar">
+                      <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                       <el-button class="mr-3" type="primary" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
                       <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
                         <DogTableMenuItem style="margin-right: 0; line-height: 30px; padding: 0 10px" label="History" value="1" @click="showTransferDialog = true" />

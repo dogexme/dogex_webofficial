@@ -7,6 +7,15 @@ import { omitCenterString } from '@/utils'
 import icons from '@/config/payIcons'
 import { SwordPool, TokenState, TokenInfo, TokenInputName } from '@/services/types'
 
+type S_AB = 'SWAP_A_B'
+type S_BA = 'SWAP_B_A'
+type SwapType = S_AB | S_BA
+
+const SwapTypeEnum: { [k in 'AB' | 'BA']: SwapType } = {
+  AB: 'SWAP_A_B',
+  BA: 'SWAP_B_A',
+}
+
 NP.enableBoundaryChecking(false)
 
 const props = withDefaults(
@@ -35,6 +44,7 @@ const visible = computed({
   },
 })
 
+const currentSwapType = ref<SwapType>(SwapTypeEnum.AB)
 const maxDialogWidth = 1000
 const dialogWidth = ref(maxDialogWidth)
 const maxInputDialogWidth = 500
@@ -51,8 +61,8 @@ function resetPayToken(): TokenInfo {
     rate: 1,
     loading: false,
     pools: [],
-    swapType: 'SWAP_A_B',
-    price: 4,
+    swapType: SwapTypeEnum.AB,
+    price: 2,
     txid: '',
   }
 }
@@ -64,7 +74,7 @@ function resetRevToken(): TokenInfo {
     loading: false,
     pools: [],
     price: 0,
-    swapType: 'SWAP_B_A',
+    swapType: SwapTypeEnum.BA,
   }
 }
 
@@ -94,17 +104,17 @@ watch(visible, (isVisible) => {
 
 function resetPoolState() {
   const { balanceA = 1, balanceB = 1 } = props.currentPoolState || {}
-  const key = focusName.value
-
   payToken.value.rate = NP.divide(balanceB, balanceA)
   revToken.value.rate = NP.divide(balanceA, balanceB)
 
   isWatchStop.value = true
-  if (key == 'pay') {
-    payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), 4)
+
+  if (currentSwapType.value == SwapTypeEnum.AB) {
+    revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), revToken.value.price)
   } else {
-    revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), 4)
+    payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), payToken.value.price)
   }
+
   nextTick(() => {
     isWatchStop.value = false
   })
@@ -163,15 +173,15 @@ function changePool(poolid: string) {
   emit('changePool', poolid)
 }
 
-const isLimitAmount = computed(() => payToken.value.swapType == 'SWAP_A_B' && +payToken.value.amount < 10)
-const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == 'SWAP_B_A')
+const isLimitAmount = computed(() => payToken.value.swapType == SwapTypeEnum.AB && +payToken.value.amount < 10)
+const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == SwapTypeEnum.BA)
 
 async function pay() {
   if (isLimitAmount.value) {
     return
   }
 
-  if (!payToken.value.txid && payToken.value.swapType == 'SWAP_B_A') {
+  if (!payToken.value.txid && payToken.value.swapType == SwapTypeEnum.BA) {
     return
   }
 
@@ -181,7 +191,7 @@ async function pay() {
   try {
     if (amount) {
       paying.value = true
-      if (swapType == 'SWAP_A_B') {
+      if (swapType == SwapTypeEnum.AB) {
         txid = await payPool(amount, props.currentPool.pooladdress)
         payData.value = {
           txid,
@@ -211,7 +221,7 @@ async function pay() {
       emit('paySuccess')
     }
   } catch {
-    if (!txid && swapType == 'SWAP_B_A') {
+    if (!txid && swapType == SwapTypeEnum.BA) {
       await ElNotification({
         title: 'Error',
         message: `Please select transferable utxo.`,
@@ -232,6 +242,7 @@ async function pay() {
 function change() {
   isWatchStop.value = true
   const temp = payToken.value
+  currentSwapType.value = currentSwapType.value == SwapTypeEnum.AB ? SwapTypeEnum.BA : SwapTypeEnum.AB
   payToken.value = revToken.value
   revToken.value = temp
   if (revToken.value.amount == '' || payToken.value.amount == '') {
@@ -248,7 +259,7 @@ function close() {
 }
 
 function selectToken() {
-  if (payToken.value.swapType == 'SWAP_B_A') {
+  if (payToken.value.swapType == SwapTypeEnum.BA) {
     showSelectTokenDialog.value = true
   }
 }
@@ -272,14 +283,13 @@ function setSelectToken(t: { txid: string; amt: number }) {
           name="pay"
           v-model="payToken.amount"
           :price="payToken.price"
-          :loading="loading"
           title="You pay"
           @focus="focusName = 'pay'"
           :currentPool="props.currentPool"
           :pools="payToken.pools"
           @change-pool="changePool"
           :min="payToken.min"
-          :disabled="payToken.swapType == 'SWAP_B_A'"
+          :disabled="payToken.swapType == SwapTypeEnum.BA"
           :swap-type="payToken.swapType"
           @select-token="selectToken"
         ></SwapInput>
@@ -291,7 +301,6 @@ function setSelectToken(t: { txid: string; amt: number }) {
         <SwapInput
           name="rev"
           v-model="revToken.amount"
-          :loading="loading"
           title="You will receive"
           @focus="focusName = 'rev'"
           :currentPool="props.currentPool"
@@ -299,7 +308,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
           :price="revToken.price"
           @change-pool="changePool"
           :min="revToken.min"
-          :disabled="payToken.swapType == 'SWAP_B_A'"
+          :disabled="payToken.swapType == SwapTypeEnum.BA"
           :swap-type="revToken.swapType"
         ></SwapInput>
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
