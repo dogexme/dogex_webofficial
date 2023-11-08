@@ -67,7 +67,7 @@ async function queryPoolStatus(poolid: string, timer = false) {
       currentPoolState.value = data
       if (!isShowTip.value) {
         showPriceVal.value = currentPrice.value.price
-        showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
+        showUpdownVal.value = chartsData[chartsData.length - 1]?.custom.upordown
       }
     }
   } finally {

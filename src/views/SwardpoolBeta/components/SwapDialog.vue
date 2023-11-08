@@ -109,19 +109,12 @@ function resetPoolState() {
 
   isWatchStop.value = true
 
-  console.log(currentSwapType.value)
-
   if (currentSwapType.value == SwapTypeEnum.BA) {
     revToken.value.amount = NP.round(NP.divide(payToken.value.amount, payToken.value.rate), revToken.value.price)
-    console.log(revToken.value.amount)
-  } else {
-    // payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), payToken.value.price)
-    // console.log(payToken.value.amount)
   }
 
   if (currentSwapType.value == SwapTypeEnum.AB) {
     revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), revToken.value.price)
-    console.log(revToken.value.amount)
   }
 
   nextTick(() => {
@@ -146,17 +139,19 @@ watch(
 watch(
   () => payToken.value.amount,
   (amount) => {
-    if (focusName.value == 'pay' && !isWatchStop.value) {
-      revToken.value.amount = NP.round(NP.divide(amount, revToken.value.rate), revToken.value.price)
+    if (isWatchStop.value) {
+      return
     }
+
+    revToken.value.amount = NP.round(NP.divide(amount, revToken.value.rate), revToken.value.price)
   }
 )
 
 watch(
   () => revToken.value.amount,
   (amount) => {
-    if (focusName.value == 'rev' && !isWatchStop.value) {
-      payToken.value.amount = NP.round(NP.divide(amount, payToken.value.rate), 4)
+    if (currentSwapType.value == SwapTypeEnum.AB && focusName.value == 'rev') {
+      payToken.value.amount = NP.round(NP.divide(amount, revToken.value.rate), payToken.value.price)
     }
   }
 )
