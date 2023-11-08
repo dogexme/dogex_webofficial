@@ -75,7 +75,7 @@ async function queryPoolStatus(poolid: string, timer = false) {
     if (timer) {
       queryPoolStatusTimer.value = window.setTimeout(() => {
         queryPoolStatus(poolid, true)
-      }, 5000)
+      }, 3000)
     }
   }
 }

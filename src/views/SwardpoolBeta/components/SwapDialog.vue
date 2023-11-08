@@ -109,10 +109,19 @@ function resetPoolState() {
 
   isWatchStop.value = true
 
+  console.log(currentSwapType.value)
+
+  if (currentSwapType.value == SwapTypeEnum.BA) {
+    revToken.value.amount = NP.round(NP.divide(payToken.value.amount, payToken.value.rate), revToken.value.price)
+    console.log(revToken.value.amount)
+  } else {
+    // payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), payToken.value.price)
+    // console.log(payToken.value.amount)
+  }
+
   if (currentSwapType.value == SwapTypeEnum.AB) {
     revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), revToken.value.price)
-  } else {
-    payToken.value.amount = NP.round(NP.divide(revToken.value.amount, revToken.value.rate), payToken.value.price)
+    console.log(revToken.value.amount)
   }
 
   nextTick(() => {
