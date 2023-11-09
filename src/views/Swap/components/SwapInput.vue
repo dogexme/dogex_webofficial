@@ -78,6 +78,7 @@ function changePool(poolid: string) {
           placeholder="Please enter the amount"
           @focus="emit('focus')"
           :disabled="props.disabled"
+          title=""
         />
       </div>
       <el-dropdown trigger="click" :disabled="props.loading" @command="changePool" @visible-change="(isVisible) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">

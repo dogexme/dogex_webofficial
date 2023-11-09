@@ -7,7 +7,6 @@ export interface TokenSwapInfo {
 
 export interface TokenInfo {
   amount: number | ''
-  rate: number
   min?: number
   isSelectToken?: boolean
   currentPool?: TokenSwapInfo

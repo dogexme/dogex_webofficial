@@ -6,6 +6,7 @@ import { useAppStore } from '@/store'
 import { omitCenterString } from '@/utils'
 import icons from '@/config/payIcons'
 import { SwordPool, TokenState, TokenInfo, TokenInputName } from '@/services/types'
+import { calculateOutA, calculateOutB } from '../computePrice'
 
 type S_AB = 'SWAP_A_B'
 type S_BA = 'SWAP_B_A'
@@ -17,6 +18,28 @@ const SwapTypeEnum: { [k in 'AB' | 'BA']: SwapType } = {
 }
 
 NP.enableBoundaryChecking(false)
+
+//初始化函数
+function resetPayToken(): TokenInfo {
+  return {
+    amount: 0,
+    loading: false,
+    pools: [],
+    swapType: SwapTypeEnum.AB,
+    price: 2,
+    txid: '',
+  }
+}
+
+function resetRevToken(): TokenInfo {
+  return {
+    amount: 0,
+    loading: false,
+    pools: [],
+    price: 0,
+    swapType: SwapTypeEnum.BA,
+  }
+}
 
 const props = withDefaults(
   defineProps<{
@@ -44,43 +67,18 @@ const visible = computed({
   },
 })
 
-const currentSwapType = ref<SwapType>(SwapTypeEnum.AB)
 const maxDialogWidth = 1000
-const dialogWidth = ref(maxDialogWidth)
 const maxInputDialogWidth = 500
-const inputDialogWidth = ref(maxInputDialogWidth)
 
 const appStore = useAppStore()
-const address = computed(() => appStore.address)
-const showRecordDialog = ref(false)
 const { payPool, transferD20 } = useDoge()
 
-function resetPayToken(): TokenInfo {
-  return {
-    amount: 0,
-    rate: 1,
-    loading: false,
-    pools: [],
-    swapType: SwapTypeEnum.AB,
-    price: 2,
-    txid: '',
-  }
-}
-
-function resetRevToken(): TokenInfo {
-  return {
-    amount: 0,
-    rate: 1,
-    loading: false,
-    pools: [],
-    price: 0,
-    swapType: SwapTypeEnum.BA,
-  }
-}
-
+const currentSwapType = ref<SwapType>(SwapTypeEnum.AB)
+const dialogWidth = ref(maxDialogWidth)
+const inputDialogWidth = ref(maxInputDialogWidth)
+const showRecordDialog = ref(false)
 const payToken = ref<TokenInfo>(resetPayToken())
 const revToken = ref<TokenInfo>(resetRevToken())
-
 const focusName = ref<TokenInputName>('')
 const isWatchStop = ref(false)
 const paying = ref(false)
@@ -88,6 +86,17 @@ const payData = ref<any>({})
 const showSelectTokenDialog = ref(false)
 const transferList = ref<{ amt: number; txid: string }[]>([])
 const transferListLoading = ref(false)
+
+const address = computed(() => appStore.address)
+const currentBalance = computed(() => {
+  const { balanceA = 1, balanceB = 1 } = props.currentPoolState || {}
+  return {
+    balanceA,
+    balanceB,
+  }
+})
+const isLimitAmount = computed(() => payToken.value.swapType == SwapTypeEnum.AB && +payToken.value.amount < 10)
+const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == SwapTypeEnum.BA)
 
 watch(visible, (isVisible) => {
   if (isVisible) {
@@ -101,26 +110,6 @@ watch(visible, (isVisible) => {
     resetPoolState()
   }
 })
-
-function resetPoolState() {
-  const { balanceA = 1, balanceB = 1 } = props.currentPoolState || {}
-  payToken.value.rate = NP.divide(balanceB, balanceA)
-  revToken.value.rate = NP.divide(balanceA, balanceB)
-
-  isWatchStop.value = true
-
-  if (currentSwapType.value == SwapTypeEnum.BA) {
-    revToken.value.amount = NP.round(NP.divide(payToken.value.amount, payToken.value.rate), revToken.value.price)
-  }
-
-  if (currentSwapType.value == SwapTypeEnum.AB) {
-    revToken.value.amount = NP.round(NP.divide(payToken.value.amount, revToken.value.rate), revToken.value.price)
-  }
-
-  nextTick(() => {
-    isWatchStop.value = false
-  })
-}
 
 watch(
   () => props.currentPoolState,
@@ -143,15 +132,21 @@ watch(
       return
     }
 
-    revToken.value.amount = NP.round(NP.divide(amount, revToken.value.rate), revToken.value.price)
+    if (currentSwapType.value == SwapTypeEnum.AB && focusName.value == 'pay') {
+      calAmountB(+amount)
+    }
   }
 )
 
 watch(
   () => revToken.value.amount,
   (amount) => {
+    if (isWatchStop.value) {
+      return
+    }
+
     if (currentSwapType.value == SwapTypeEnum.AB && focusName.value == 'rev') {
-      payToken.value.amount = NP.round(NP.divide(amount, revToken.value.rate), payToken.value.price)
+      calAmountA(+amount)
     }
   }
 )
@@ -165,7 +160,6 @@ watch(showSelectTokenDialog, async (isVisible) => {
       const resData = res.data
       if (resData.status == 'success') {
         transferList.value = resData.data.transfer_list
-        console.log(transferList.value)
       }
     } finally {
       transferListLoading.value = false
@@ -173,12 +167,43 @@ watch(showSelectTokenDialog, async (isVisible) => {
   }
 })
 
+function calAmountA(amountB: number) {
+  const { balanceA, balanceB } = currentBalance.value
+
+  if (currentSwapType.value == SwapTypeEnum.AB) {
+    payToken.value.amount = calculateOutA(+amountB, balanceA, balanceB, payToken.value.price)
+  } else {
+    revToken.value.amount = calculateOutA(+amountB, balanceA, balanceB, revToken.value.price)
+  }
+}
+
+function calAmountB(amountA: number) {
+  const { balanceA, balanceB } = currentBalance.value
+
+  if (currentSwapType.value == SwapTypeEnum.AB) {
+    revToken.value.amount = calculateOutB(+amountA, balanceA, balanceB, revToken.value.price)
+  } else {
+    payToken.value.amount = calculateOutB(+amountA, balanceA, balanceB, payToken.value.price)
+  }
+}
+
+function resetPoolState() {
+  isWatchStop.value = true
+
+  if (currentSwapType.value == SwapTypeEnum.AB) {
+    calAmountB(+payToken.value.amount)
+  } else {
+    calAmountA(+payToken.value.amount)
+  }
+
+  nextTick(() => {
+    isWatchStop.value = false
+  })
+}
+
 function changePool(poolid: string) {
   emit('changePool', poolid)
 }
-
-const isLimitAmount = computed(() => payToken.value.swapType == SwapTypeEnum.AB && +payToken.value.amount < 10)
-const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == SwapTypeEnum.BA)
 
 async function pay() {
   if (isLimitAmount.value) {
@@ -245,19 +270,28 @@ async function pay() {
 
 function change() {
   isWatchStop.value = true
+
   const temp = payToken.value
-  currentSwapType.value = currentSwapType.value == SwapTypeEnum.AB ? SwapTypeEnum.BA : SwapTypeEnum.AB
   payToken.value = revToken.value
   revToken.value = temp
+  currentSwapType.value = currentSwapType.value == SwapTypeEnum.AB ? SwapTypeEnum.BA : SwapTypeEnum.AB
+
+  if (currentSwapType.value == SwapTypeEnum.BA) {
+    payToken.value.txid = ''
+    payToken.value.amount = 0
+  }
+
   if (revToken.value.amount == '' || payToken.value.amount == '') {
     revToken.value.amount = payToken.value.amount = 0
   }
+
   nextTick(() => {
     isWatchStop.value = false
   })
 }
 
 function close() {
+  currentSwapType.value = SwapTypeEnum.AB
   payToken.value.amount = revToken.value.amount = 0
   payToken.value.txid = ''
 }
@@ -272,6 +306,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
   focusName.value = 'pay'
   payToken.value.amount = t.amt
   payToken.value.txid = t.txid
+  calAmountA(t.amt)
   showSelectTokenDialog.value = false
 }
 </script>

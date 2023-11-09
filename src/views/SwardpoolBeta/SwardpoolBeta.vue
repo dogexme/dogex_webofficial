@@ -130,7 +130,8 @@ function init() {
     poolid.value = pools.value[0].poolid
     currentPool.value = pools.value[0]
     noticeMessage.value = res.data.notice_message
-    queryPoolStatus(poolid.value, true)
+    // 第二个参数开启实时金额
+    queryPoolStatus(poolid.value, false)
   })
   if (address.value) {
     getBalance(address.value)
