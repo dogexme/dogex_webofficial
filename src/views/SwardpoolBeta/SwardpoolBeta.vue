@@ -362,7 +362,7 @@ function hideTipHandle() {
                 </p>
               </el-col>
               <el-col :span="12">
-                <el-statistic title="Block No" :value="currentPoolState?.blockno" />
+                <el-statistic title="Processed Blocks" :value="currentPoolState?.blockno" />
               </el-col>
               <el-col :span="12">
                 <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="currentPoolState?.balanceA" />
