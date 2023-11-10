@@ -26,7 +26,7 @@ function resetPayToken(): TokenInfo {
     loading: false,
     pools: [],
     swapType: SwapTypeEnum.AB,
-    price: 2,
+    price: 4,
     txid: '',
   }
 }
