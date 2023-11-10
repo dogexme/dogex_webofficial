@@ -10,6 +10,7 @@ async function loadCollMap() {
     localStorage.setItem('nfts', JSON.stringify(res.data))
     loading.value = false
     document.body.removeChild(document.getElementById('loading-container')!)
+    document.body.classList.remove('loading-body')
     clearTimeout(timer)
   } catch {
     timer = window.setTimeout(loadCollMap, 1000)
@@ -17,6 +18,7 @@ async function loadCollMap() {
 }
 
 onMounted(async () => {
+  document.body.classList.add('loading-body')
   loadCollMap()
 })
 </script>
@@ -44,5 +46,9 @@ onMounted(async () => {
     border-radius: 4px;
     border: 1px solid #333;
   }
+}
+
+.loading-body {
+  height: 100vh;
 }
 </style>
