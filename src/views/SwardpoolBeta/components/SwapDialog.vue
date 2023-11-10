@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElNotification } from 'element-plus'
+import { ElNotification, NotificationHandle } from 'element-plus'
 import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
 import { useAppStore } from '@/store'
@@ -97,10 +97,18 @@ const currentBalance = computed(() => {
 })
 const isLimitAmount = computed(() => payToken.value.swapType == SwapTypeEnum.AB && +payToken.value.amount < 10)
 const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == SwapTypeEnum.BA)
+const transNotifier = ref<NotificationHandle>()
 
 watch(visible, (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+    transNotifier.value = ElNotification({
+      title: 'Transaction Reminder',
+      message: `There may be differences in the current transaction amount.`,
+      type: 'warning',
+      showClose: false,
+      duration: 0,
+    })
   } else {
     payToken.value = resetPayToken()
     revToken.value = resetRevToken()
@@ -108,6 +116,7 @@ watch(visible, (isVisible) => {
       revToken.value.pools = props.pools
     }
     resetPoolState()
+    transNotifier.value?.close()
   }
 })
 
@@ -340,7 +349,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
         <SwapInput
           name="rev"
           v-model="revToken.amount"
-          title="You will receive"
+          title="You expect to receive"
           @focus="focusName = 'rev'"
           :currentPool="props.currentPool"
           :pools="revToken.pools"

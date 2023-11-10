@@ -47,6 +47,9 @@ onMounted(async () => {
     border: 1px solid #333;
   }
 }
+.el-notification__content {
+  text-align: left !important;
+}
 
 .loading-body {
   height: 100vh;

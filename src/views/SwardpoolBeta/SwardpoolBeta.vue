@@ -4,8 +4,7 @@ import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
-import QrcodeVue from 'qrcode.vue'
-import { ArrowDown, Refresh, CopyDocument } from '@element-plus/icons-vue'
+import { ArrowDown, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
@@ -14,13 +13,11 @@ import { SwordPool, TokenState } from '@/services/types'
 import VChart from 'vue-echarts'
 import ECharts from 'vue-echarts'
 import { TokenMarketInfo } from '@/types'
-import clipboard3 from 'vue-clipboard3'
 
 defineOptions({
   name: 'swap',
 })
 
-const { toClipboard } = clipboard3()
 const appStore = useAppStore()
 const { connectDpal } = appStore
 const address = computed(() => appStore.address)
@@ -377,7 +374,7 @@ function hideTipHandle() {
           </el-col>
           <el-col :span="24" :md="12">
             <v-chart ref="vchart" class="chart" autoresize @hideTip="hideTipHandle" />
-            <div class="flex justify-center">
+            <!-- <div class="flex justify-center">
               <el-dropdown placement="top">
                 <div class="cursor-pointer outline-none">
                   <span style="color: rgb(238, 181, 15)">{{ currentPool?.pooladdress }}</span>
@@ -387,15 +384,15 @@ function hideTipHandle() {
                 </div>
                 <template #dropdown>
                   <div class="flex flex-col items-center p-5">
-                    <!-- <DogLink class="cursor-pointer" style="font-size: 14px" disabledTooltip is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></
-                      DogLink> -->
+                    <DogLink class="cursor-pointer" style="font-size: 14px" disabledTooltip is-copy :label="currentPool?.pooladdress" :value="currentPool?.pooladdress"></
+                      DogLink>
                     <div style="border: 2px solid rgb(238, 181, 15); padding: 12px; border-radius: 24px">
                       <qrcode-vue :value="currentPool?.pooladdress" :size="150" level="H" />
                     </div>
                   </div>
                 </template>
               </el-dropdown>
-            </div>
+            </div> -->
           </el-col>
         </el-row>
       </dog-card>
@@ -436,7 +433,7 @@ function hideTipHandle() {
 }
 
 .chart {
-  height: 180px;
+  height: 200px;
 }
 .selectToken {
   display: flex;
