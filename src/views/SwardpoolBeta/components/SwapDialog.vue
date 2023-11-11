@@ -106,8 +106,8 @@ watch(visible, (isVisible) => {
       title: 'Transaction Reminder',
       message: `There may be differences in the current transaction amount.`,
       type: 'warning',
-      showClose: false,
       duration: 0,
+      customClass: 'trans-notifier',
     })
   } else {
     payToken.value = resetPayToken()
@@ -362,6 +362,12 @@ function setSelectToken(t: { txid: string; amt: number }) {
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isSelectLimit">Please select transferable utxo.</div>
         <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 || isSelectLimit ? { cursor: 'not-allowed' } : {}]" @click="pay">Swap</div>
+        <div class="flex justify-center mt-2">
+          <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 12px" target="_blank">
+            <img class="token-icon" src="/logo.png" alt="" style="width: 16px; height: 16px" />
+            Swordpool Rule
+          </el-link>
+        </div>
       </div>
     </div>
   </el-dialog>
@@ -392,6 +398,22 @@ function setSelectToken(t: { txid: string; amt: number }) {
   </el-dialog>
   <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
 </template>
+<style lang="scss">
+.trans-notifier {
+  background-color: rgb(222, 99, 111);
+  border: none;
+  .el-notification__icon {
+    display: none;
+  }
+  .el-notification__closeBtn {
+    color: #fff;
+  }
+  .el-notification__title,
+  .el-notification__content {
+    color: #fff;
+  }
+}
+</style>
 <style lang="scss" scoped>
 .swap-container {
   max-width: 500px;

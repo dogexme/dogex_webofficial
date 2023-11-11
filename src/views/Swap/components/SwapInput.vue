@@ -63,10 +63,6 @@ function changePool(poolid: string) {
   <div class="swap-pair_item">
     <div style="display: flex; justify-content: space-between">
       <span class="swap-pair_item_title">{{ props.title }}</span>
-      <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 12px" target="_blank" v-if="props.name == 'rev'">
-        <img class="token-icon" src="/logo.png" alt="" style="width: 16px; height: 16px" />
-        Swordpool Rule
-      </el-link>
       <div class="swap-pair_select" v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">Select></div>
     </div>
     <section class="swap-pair_main">
