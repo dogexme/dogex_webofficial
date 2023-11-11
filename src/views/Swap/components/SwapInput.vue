@@ -81,7 +81,7 @@ function changePool(poolid: string) {
           title=""
         />
       </div>
-      <el-dropdown trigger="click" :disabled="props.loading" @command="changePool" @visible-change="(isVisible) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
+      <el-dropdown trigger="click" :disabled="props.loading" @command="changePool" @visible-change="(isVisible: any) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
         <div class="swap-pair_token">
           <img class="token-icon" v-if="currentPool?.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB
           }}<span class="nft" style="font-size: 12px">&#xeb6d;</span>

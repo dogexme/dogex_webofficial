@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ElNotification, NotificationHandle } from 'element-plus'
+import { ElNotification } from 'element-plus'
 import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
 import { useAppStore } from '@/store'
@@ -97,18 +97,19 @@ const currentBalance = computed(() => {
 })
 const isLimitAmount = computed(() => payToken.value.swapType == SwapTypeEnum.AB && +payToken.value.amount < 10)
 const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == SwapTypeEnum.BA)
-const transNotifier = ref<NotificationHandle>()
+const isDisabledPay = computed(() => isLimitAmount.value || payToken.value.amount == 0 || isSelectLimit.value)
+// const transNotifier = ref<NotificationHandle>()
 
 watch(visible, (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
-    transNotifier.value = ElNotification({
-      title: 'Transaction Reminder',
-      message: `There may be differences in the current transaction amount.`,
-      type: 'warning',
-      duration: 0,
-      customClass: 'trans-notifier',
-    })
+    // transNotifier.value = ElNotification({
+    //   title: 'Transaction Reminder',
+    //   message: `There may be differences in the current transaction amount.`,
+    //   type: 'warning',
+    //   duration: 0,
+    //   customClass: 'trans-notifier',
+    // })
   } else {
     payToken.value = resetPayToken()
     revToken.value = resetRevToken()
@@ -116,7 +117,7 @@ watch(visible, (isVisible) => {
       revToken.value.pools = props.pools
     }
     resetPoolState()
-    transNotifier.value?.close()
+    // transNotifier.value?.close()
   }
 })
 
@@ -361,7 +362,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
         ></SwapInput>
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isSelectLimit">Please select transferable utxo.</div>
-        <div class="swap-pair_buy" :style="[isLimitAmount || payToken.amount == 0 || isSelectLimit ? { cursor: 'not-allowed' } : {}]" @click="pay">Swap</div>
+        <div class="swap-pair_buy" :class="{ 'swap-pair_buy--disabled': isDisabledPay }" @click="pay">Swap</div>
         <div class="flex justify-center mt-2">
           <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 12px" target="_blank">
             <img class="token-icon" src="/logo.png" alt="" style="width: 16px; height: 16px" />
@@ -463,9 +464,22 @@ function setSelectToken(t: { txid: string; amt: number }) {
     background-color: #ffa21e;
     color: #fff;
     box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+    &:hover {
+      opacity: 0.8;
+    }
+    &:active {
+      background-color: #d28b28;
+    }
     &--connect {
       background-color: rgb(238, 181, 15);
       color: #333;
+    }
+    &--disabled {
+      cursor: not-allowed;
+      background: #fcbb60;
+      &:active {
+        background: #fcbb60;
+      }
     }
   }
 }
