@@ -23,7 +23,7 @@ export default defineComponent({
     const { loading, dataSource, total, page, query } = useTable({
       api: getData,
       pageSize: 15,
-      first: false
+      first: false,
     })
 
     watch(loading, (isLoading) => {
@@ -107,9 +107,19 @@ export default defineComponent({
       },
       setLoad(isLoad: boolean) {
         isLoaded.value = isLoad
-      }
+      },
     })
 
-    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns.value} currentPage={page.value} total={total.value} onCurrent-change={query} onRefresh={() => query(page.value)}/>
+    return () => (
+      <DogTable
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns.value}
+        currentPage={page.value}
+        total={total.value}
+        onCurrent-change={query}
+        onRefresh={() => query(page.value)}
+      />
+    )
   },
 })

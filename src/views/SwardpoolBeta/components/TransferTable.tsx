@@ -2,6 +2,7 @@ import DogTable, { ColumnProps } from '@/components/DogTable/DogTable'
 import DogLink from '@/components/DogLink.vue'
 import SwapIconExchange from '@/components/SwapIconExchange.vue'
 import SwapStatusIcon from '@/components/SwapStatusIcon.vue'
+import DogSearch from '@/components/DogSearch.vue'
 import { queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
 import { numberFormat } from '@/utils'
@@ -153,17 +154,20 @@ export default defineComponent({
     }
 
     return () => (
-      <DogTable
-        defaultPageSize={20}
-        rowkey="id"
-        loading={loading.value}
-        dataSource={dataSource.value}
-        columns={columns.value}
-        total={total.value}
-        currentPage={page.value}
-        onCurrent-change={query}
-        onRefresh={() => query(page.value)}
-      />
+      <>
+        <DogSearch></DogSearch>
+        <DogTable
+          defaultPageSize={20}
+          rowkey="id"
+          loading={loading.value}
+          dataSource={dataSource.value}
+          columns={columns.value}
+          total={total.value}
+          currentPage={page.value}
+          onCurrent-change={query}
+          onRefresh={() => query(page.value)}
+        />
+      </>
     )
   },
 })
