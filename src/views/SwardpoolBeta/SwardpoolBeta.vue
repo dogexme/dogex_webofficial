@@ -180,7 +180,21 @@ onActivated(() => {
   init()
 })
 
+function hideHideTipOrPointerEvent(e: Event) {
+  if ((e.target as HTMLElement).tagName != 'CANVAS') {
+    vchart.value.dispatchAction({
+      type: 'hideTip',
+    })
+    vchart.value.dispatchAction({
+      type: 'updateAxisPointer',
+      currTrigger: 'leave',
+    })
+  }
+}
+
 onMounted(() => {
+  document.documentElement.addEventListener('touchstart', hideHideTipOrPointerEvent)
+
   getTokenTransferData().then((res) => {
     const result = res.data
     if (result.status == 'success') {
@@ -189,6 +203,10 @@ onMounted(() => {
       loadTransferData(marketData)
     }
   })
+})
+
+onUnmounted(() => {
+  document.documentElement.removeEventListener('touchstart', hideHideTipOrPointerEvent)
 })
 
 let xLabel = []
@@ -249,9 +267,6 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
           showPriceVal.value = price
           showUpdownVal.value = data.upordown
           return `Ð ${price}`
-        },
-        axisPointer: {
-          animation: false,
         },
       },
       xAxis: {
