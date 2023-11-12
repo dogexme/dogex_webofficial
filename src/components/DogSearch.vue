@@ -1,9 +1,10 @@
 <script setup lang="ts">
+import { CircleCloseFilled, Loading } from '@element-plus/icons-vue'
+
 const props = withDefaults(
   defineProps<{
     modelValue: string
-    loading: boolean
-    size: 'default' | 'small'
+    loading?: boolean
   }>(),
   {
     modelValue: '',
@@ -13,6 +14,8 @@ const props = withDefaults(
 
 const emit = defineEmits<{
   (event: 'update:modelValue', value: string): void
+  (event: 'search'): void
+  (event: 'clear'): void
 }>()
 
 const text = computed({
@@ -23,17 +26,48 @@ const text = computed({
     emit('update:modelValue', val)
   },
 })
+
+function search() {
+  if (props.loading) {
+    return
+  }
+  text.value = text.value.trim()
+  emit('search')
+}
+
+function clear() {
+  text.value = ''
+  emit('clear')
+}
 </script>
 <template>
   <form @submit.prevent class="nav-search_inputwrap">
-    <i class="dog-icon dog-icon_search"></i>
-    <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="text" />
-    <el-icon v-if="loading" class="loading-icon"><Loading /></el-icon>
-    <el-icon v-if="!loading && text.length" style="cursor: pointer" @click="text = ''"><CircleCloseFilled /></el-icon>
+    <i class="dog-icon dog-icon_search" style="width: 12px; height: 12px"></i>
+    <input class="nav-search-input" type="text" maxlength="128" placeholder="Address" v-model="text" @keydown.enter="search" />
+    <el-icon v-if="props.loading" class="loading-icon"><Loading /></el-icon>
+    <el-icon v-if="!props.loading && text.length" style="cursor: pointer" @click="clear"><CircleCloseFilled /></el-icon>
   </form>
 </template>
 
 <style lang="scss" scoped>
+.nav-search_inputwrap {
+  display: flex;
+  align-items: center;
+  align-self: center;
+  width: 340px;
+  height: 32px;
+  background: #fff;
+  padding: 0 12px;
+  border-radius: 15px;
+  box-sizing: border-box;
+  border: 1px solid #333;
+  box-shadow: inset 0 -2px 0 0 rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  @media screen and (max-width: 600px) {
+    width: 280px;
+  }
+}
+
 .nav-search-input {
   flex: 1;
   width: 100%;
@@ -41,27 +75,7 @@ const text = computed({
   background: transparent;
   border: none;
   outline: none;
-  font-size: 16px;
-  margin-right: 10px;
-  margin-left: 10px;
-  font-family: SistemnyjC;
-}
-.nav-search_inputwrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-  align-self: center;
-  width: 95%;
-  max-width: 740px;
-  height: 12vmin;
-  max-height: 66px;
-  background: #fff;
-  padding: 0 24px;
-  border-radius: 40px;
-  box-sizing: border-box;
-  border: 1px solid #333;
-  outline: 3px solid #ddc2f9;
-  box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+  font-size: 12px;
+  margin: 0 8px;
 }
 </style>

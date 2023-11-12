@@ -43,6 +43,10 @@ export default defineComponent({
       pageSize: 20,
     })
 
+    const params = reactive({
+      address: '',
+    })
+
     function SwapStatusItem(text: '0' | '1' | '2') {
       return <SwapStatusIcon status={text}></SwapStatusIcon>
     }
@@ -140,7 +144,7 @@ export default defineComponent({
     )
 
     async function getData(page: number, pageSize: number) {
-      const res = await queryPoolTransfers({ pageSize, page })
+      const res = await queryPoolTransfers({ pageSize, page, address: params.address })
       const { status, data } = res.data
       return status == 'success'
         ? {
@@ -154,8 +158,19 @@ export default defineComponent({
     }
 
     return () => (
-      <>
-        <DogSearch></DogSearch>
+      <div class="relative mt-12">
+        <DogSearch
+          class="absolute"
+          v-model={params.address}
+          loading={loading.value}
+          onSearch={() => {
+            query(1)
+          }}
+          onClear={() => {
+            params.address = ''
+            query(1)
+          }}
+        ></DogSearch>
         <DogTable
           defaultPageSize={20}
           rowkey="id"
@@ -167,7 +182,7 @@ export default defineComponent({
           onCurrent-change={query}
           onRefresh={() => query(page.value)}
         />
-      </>
+      </div>
     )
   },
 })

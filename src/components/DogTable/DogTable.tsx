@@ -5,8 +5,8 @@ import { Refresh } from '@element-plus/icons-vue'
 
 export interface ColumnProps {
   dataIndex?: string
-  align?: 'left' | 'right' | 'center',
-  render?: (text: any, record: any, index: number) => HTMLElement | Number | String | JSX.Element
+  align?: 'left' | 'right' | 'center'
+  render?: (text: any, record: any, index: number) => HTMLElement | number | string | JSX.Element
   title?: any
   width?: string
 }
@@ -54,12 +54,12 @@ export default defineComponent({
     },
     showPagination: {
       type: Boolean,
-      default: true
+      default: true,
     },
     refresh: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   emits: ['current-change', 'row-click', 'refresh'],
   setup(props, { emit }) {
@@ -126,12 +126,11 @@ export default defineComponent({
     return () => {
       return (
         <div class={s['table-wrapper']} v-loading={props.loading}>
-          {
-            props.refresh &&
+          {props.refresh && (
             <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
-            <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
-          </div>
-          }
+              <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
+            </div>
+          )}
           {props.showPagination && pages.value > 1 && (
             <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
