@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { queryTransferStatus } from '@/services/sword'
 import { consumeToken } from './TransferTable'
 import { omitCenterString } from '@/utils'
 import { useAppStore } from '@/store'
@@ -16,10 +15,10 @@ const props = withDefaults(
 const emit = defineEmits<{
   (event: 'update:visible', isVisible: boolean): void
 }>()
-
+const maxInputDialogWidth = 1000
+const inputDialogWidth = ref(maxInputDialogWidth)
 const currentPool = computed(() => props.currentPool)
 const payData = ref<any>([])
-const timer = ref(0)
 const appStore = useAppStore()
 
 const visible = computed({
@@ -32,8 +31,8 @@ const visible = computed({
 })
 
 watch(visible, (isVisible) => {
-  if (!isVisible) {
-    stopStatusLoop()
+  if (isVisible) {
+    inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
   }
 })
 
@@ -43,50 +42,21 @@ watch(
     if (data && visible.value) {
       payData.value = [data]
       appStore.updateTransferList(data)
-      queryStatusLoop(data)
     }
   },
   {
     immediate: true,
   }
 )
-
-async function queryStatusLoop(data: any) {
-  try {
-    const res = await queryTransferStatus(data.txid)
-    const resData = res.data.data
-
-    if (res.data.status == 'failed') {
-      data.status = '0'
-    } else if (resData.status != '0') {
-      Object.assign(data, resData)
-    }
-
-    if (data.status != '0') {
-      appStore.updateTransferList()
-      return stopStatusLoop()
-    }
-
-    if (resData.status == '0') {
-      timer.value = window.setTimeout(() => queryStatusLoop(data), 1000 * 60)
-    }
-  } catch {
-    stopStatusLoop()
-  }
-}
-
-function stopStatusLoop() {
-  clearTimeout(timer.value)
-}
 </script>
 <template>
-  <el-dialog class="custom-dialog" width="1000px" v-model="visible">
+  <el-dialog class="custom-dialog" :width="inputDialogWidth" v-model="visible">
     <div class="swap-result-dialog">
       <el-result class="swap-result" icon="success" title="Payment success"></el-result>
       <div>
         <h4>Pay Data</h4>
         <el-table :data="payData" :show-header="false" style="margin-bottom: 12px">
-          <el-table-column label="Swap" width="200px">
+          <el-table-column label="Swap" width="100px">
             <template #default="s">
               <SwapIconExchange :icon-a="currentPool.tokenA" :icon-b="currentPool.tokenB" v-if="s.row.swapType == 'SWAP_A_B'"></SwapIconExchange>
               <SwapIconExchange :icon-a="currentPool.tokenB" :icon-b="currentPool.tokenA" v-else-if="s.row.swapType == 'SWAP_B_A'"></SwapIconExchange>
@@ -94,27 +64,27 @@ function stopStatusLoop() {
               <span v-else>{{ s.row.swapType }}</span>
             </template>
           </el-table-column>
-          <el-table-column prop="status" label="Status">
+          <el-table-column prop="status" align="center" label="Status">
             <template #default="s">
               <SwapStatusIcon :status="s.row.status"></SwapStatusIcon>
             </template>
           </el-table-column>
-          <el-table-column prop="txid" label="Txid" width="180px">
+          <el-table-column prop="txid" label="Txid" width="200px">
             <template #default="s">
               <DogLink v-if="s.row.txid" is-copy :to="`https://chain.so/tx/DOGE/${s.row.txid}`" :label="omitCenterString(s.row.txid, 12)" :value="s.row.txid"></DogLink>
             </template>
           </el-table-column>
-          <el-table-column label="In">
+          <el-table-column label="In" width="150px">
             <template #default="s">
               {{ consumeToken(s.row.inTokenA, s.row.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
             </template>
           </el-table-column>
-          <el-table-column label="Out">
+          <el-table-column label="Out" width="200px">
             <template #default="s">
               {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
             </template>
           </el-table-column>
-          <el-table-column label="Date" prop="date"></el-table-column>
+          <el-table-column label="Date" prop="date" width="190px"></el-table-column>
         </el-table>
       </div>
     </div>

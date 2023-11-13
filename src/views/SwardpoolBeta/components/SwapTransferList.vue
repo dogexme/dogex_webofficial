@@ -92,6 +92,7 @@ async function clearAllHistory() {
   await ElMessageBox.confirm('Do you want to clear all transaction history?', {
     confirmButtonText: 'Yes',
     cancelButtonText: 'No',
+    customClass: 'messageBox-dialog',
   })
   appStore.transferList = []
 }
@@ -112,7 +113,7 @@ async function clearAllHistory() {
             <span v-else>{{ s.row.swapType }}</span>
           </template>
         </el-table-column>
-        <el-table-column prop="status" align="center" label="Status" width="80px">
+        <el-table-column prop="status" align="center" label="Status">
           <template #default="s">
             <SwapStatusIcon :status="s.row.status"></SwapStatusIcon>
           </template>
@@ -122,17 +123,17 @@ async function clearAllHistory() {
             <DogLink v-if="s.row.txid" is-copy :to="`https://chain.so/tx/DOGE/${s.row.txid}`" :label="omitCenterString(s.row.txid, 12)" :value="s.row.txid"></DogLink>
           </template>
         </el-table-column>
-        <el-table-column label="In">
+        <el-table-column label="In" width="150px">
           <template #default="s">
             {{ consumeToken(s.row.inTokenA, s.row.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
           </template>
         </el-table-column>
-        <el-table-column :label="outField">
+        <el-table-column :label="outField" width="200px">
           <template #default="s">
             {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
           </template>
         </el-table-column>
-        <el-table-column label="Date" prop="date"></el-table-column>
+        <el-table-column label="Date" prop="date" width="190px"></el-table-column>
       </el-table>
       <div style="margin-top: 12px; display: flex; justify-content: center">
         <el-pagination :page-size="pageSize" layout="prev, pager, next" :total="transferList.length" @current-change="next" />
@@ -140,28 +141,6 @@ async function clearAllHistory() {
     </div>
   </el-dialog>
 </template>
-
-<style lang="scss">
-.custom-dialog {
-  background-color: transparent;
-  box-shadow: none;
-  .el-dialog__header {
-    padding: 0;
-  }
-  .el-dialog__body {
-    padding: 0;
-  }
-  .el-dialog__headerbtn {
-    top: 14px;
-    right: 8px;
-    width: 35px;
-    height: 35px;
-  }
-  .el-dialog__close {
-    color: #000;
-  }
-}
-</style>
 
 <style lang="scss" scoped>
 .doge-tokenlist {

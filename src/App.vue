@@ -50,6 +50,31 @@ onMounted(async () => {
 .el-notification__content {
   text-align: left !important;
 }
+.custom-dialog {
+  --el-dialog-bg-color: transparant !important;
+  background-color: transparent;
+  box-shadow: none;
+  .el-dialog__header {
+    padding: 0;
+  }
+  .el-dialog__body {
+    padding: 0;
+    border-radius: 20px;
+  }
+  .el-dialog__headerbtn {
+    top: 14px;
+    right: 8px;
+    width: 35px;
+    height: 35px;
+  }
+  .el-dialog__close {
+    color: #000;
+  }
+}
+
+.messageBox-dialog {
+  border-radius: 15px;
+}
 
 .loading-body {
   height: 100vh;

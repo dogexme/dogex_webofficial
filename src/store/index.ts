@@ -28,6 +28,7 @@ export const useAppStore = defineStore('app', {
             ElMessageBox.confirm('please install dpal wallet?', '', {
               confirmButtonText: 'Install',
               type: 'warning',
+              customClass: 'messageBox-dialog',
             }).then(() => {
               window.open('https://dpalwallet.io')
             })
