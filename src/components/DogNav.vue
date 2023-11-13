@@ -24,6 +24,7 @@ function connect() {
   ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect DpalWallet', {
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
+    customClass: 'messageBox-dialog',
   }).then(() => {
     connectDpal()
       .then((userAddress) => {
