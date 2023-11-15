@@ -384,7 +384,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
               <div class="doge-tokenitem_row">Name: dogim</div>
               <div class="doge-tokenitem_row">
                 Txid:
-                <DogLink is-copy :label="omitCenterString(t.txid, 12)" :value="t.txid"></DogLink>
+                <DogLink disabledTooltip is-copy :label="omitCenterString(t.txid, 12)" :value="t.txid"></DogLink>
               </div>
               <div class="doge-tokenitem_row">
                 Amount:
@@ -500,6 +500,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
   margin-bottom: 8px;
   &:hover {
     border-color: #ffa21e;
+    background-color: #ffa21e40;
     transition: all 0.2s;
     cursor: pointer;
   }
