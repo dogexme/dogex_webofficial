@@ -12,7 +12,7 @@ export default defineComponent({
 
     const { dataSource, total, page, loading, query } = useTable({
       api: getData,
-      pageSize: defaultPageSize
+      pageSize: defaultPageSize,
     })
 
     async function getData(page: number, pageSize: number) {
@@ -25,7 +25,7 @@ export default defineComponent({
       total.value = res.data.total
       return {
         total: res.data.total,
-        data: setCollectionLogo(res.data.data)
+        data: setCollectionLogo(res.data.data),
       }
     }
 

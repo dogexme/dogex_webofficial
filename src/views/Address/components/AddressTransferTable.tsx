@@ -76,12 +76,12 @@ export default defineComponent({
     async function getData() {
       return {
         total: 0,
-        data: []
+        data: [],
       }
     }
 
     expose({
-      reload: page.value = 1,
+      reload: (page.value = 1),
     })
 
     return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} />

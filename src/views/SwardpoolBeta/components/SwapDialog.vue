@@ -3,7 +3,6 @@ import { ElNotification } from 'element-plus'
 import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
 import { useAppStore } from '@/store'
-import { omitCenterString } from '@/utils'
 import icons from '@/config/payIcons'
 import { SwordPool, TokenState, TokenInfo, TokenInputName } from '@/services/types'
 import { calculateOutA, calculateOutB } from '../computePrice'
@@ -362,7 +361,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
         ></SwapInput>
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isSelectLimit">Please select transferable utxo.</div>
-        <div class="swap-pair_buy" :class="{ 'swap-pair_buy--disabled': isDisabledPay }" @click="pay">Swap</div>
+        <div class="swap-sub-btn" :class="{ 'swap-sub-btn--disabled': isDisabledPay }" @click="pay">Swap</div>
         <div class="flex justify-center mt-2">
           <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 12px" target="_blank">
             <img class="token-icon" src="/logo.png" alt="" style="width: 16px; height: 16px" />
@@ -372,31 +371,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
       </div>
     </div>
   </el-dialog>
-  <el-dialog class="custom-dialog" v-model="showSelectTokenDialog" :width="dialogWidth">
-    <div class="doge-tokenlist" v-loading="transferListLoading">
-      <el-row :gutter="8">
-        <el-col :xs="24" :sm="12" :md="8" :lg="6" v-for="t in transferList" :key="t.txid">
-          <section class="doge-tokenitem" @click="setSelectToken(t)">
-            <div class="doge-tokenitem_ava">
-              <img :src="icons.dogim" class="doge-tokenitem_avaitem" alt="" />
-            </div>
-            <div>
-              <div class="doge-tokenitem_row">Name: dogim</div>
-              <div class="doge-tokenitem_row">
-                Txid:
-                <DogLink disabledTooltip is-copy :label="omitCenterString(t.txid, 12)" :value="t.txid"></DogLink>
-              </div>
-              <div class="doge-tokenitem_row">
-                Amount:
-                {{ t.amt }}
-              </div>
-            </div>
-          </section>
-        </el-col>
-      </el-row>
-      <el-empty v-if="transferList.length < 1" description="No data." />
-    </div>
-  </el-dialog>
+  <SwapSelectTokenDialog v-model:visible="showSelectTokenDialog" :list="transferList" @select="setSelectToken" :loading="transferListLoading" :icon="icons.dogim"></SwapSelectTokenDialog>
   <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
 </template>
 <style lang="scss">
@@ -451,79 +426,6 @@ function setSelectToken(t: { txid: string; amt: number }) {
     &--disabled {
       background-color: #aaa;
       cursor: not-allowed;
-    }
-  }
-  &_buy {
-    text-align: center;
-    line-height: 55px;
-    margin-top: 12px;
-    border-radius: 20px;
-    font-size: 18px;
-    cursor: pointer;
-    border: 2px solid #fff;
-    background-color: #ffa21e;
-    color: #fff;
-    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
-    &:hover {
-      opacity: 0.8;
-    }
-    &:active {
-      background-color: #d28b28;
-    }
-    &--connect {
-      background-color: rgb(238, 181, 15);
-      color: #333;
-    }
-    &--disabled {
-      cursor: not-allowed;
-      background: #fcbb60;
-      &:active {
-        background: #fcbb60;
-      }
-    }
-  }
-}
-
-.doge-tokenlist {
-  background-color: #fff;
-  min-height: 350px;
-  border-radius: 20px;
-  overflow: hidden;
-  padding: 50px 20px 20px;
-}
-.doge-tokenitem {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid #000;
-  padding: 12px;
-  border-radius: 14px;
-  margin-bottom: 8px;
-  &:hover {
-    border-color: #ffa21e;
-    background-color: #ffa21e40;
-    transition: all 0.2s;
-    cursor: pointer;
-  }
-  &_row {
-    margin-bottom: 12px;
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-  &_ava {
-    align-self: center;
-    margin-bottom: 12px;
-  }
-  &_avaitem {
-    width: 70px;
-    height: 70px;
-    border-radius: 50%;
-  }
-  @media screen and (max-width: 768px) {
-    flex-direction: row;
-    &_ava {
-      margin-bottom: 0;
-      margin-right: 12px;
     }
   }
 }

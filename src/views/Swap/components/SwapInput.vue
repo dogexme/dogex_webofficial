@@ -10,9 +10,9 @@ const props = withDefaults(
     min?: number
     name: TokenInputName
     loading?: boolean
-    pools: any[]
+    pools?: any[]
     price: number
-    disabled: boolean
+    disabled?: boolean
     swapType: 'SWAP_A_B' | 'SWAP_B_A'
   }>(),
   {
@@ -20,6 +20,7 @@ const props = withDefaults(
     modelValue: 0,
     loading: false,
     disabled: false,
+    pools: () => [],
   }
 )
 const emit = defineEmits<{
@@ -81,20 +82,22 @@ function changePool(poolid: string) {
           title=""
         />
       </div>
-      <el-dropdown trigger="click" :disabled="props.loading" @command="changePool" @visible-change="(isVisible: any) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
-        <div class="swap-pair_token">
-          <img class="token-icon" v-if="currentPool?.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB
-          }}<span class="nft" style="font-size: 12px">&#xeb6d;</span>
-        </div>
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
-              <img class="token-icon" v-if="item?.tokenB && icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
-      <div class="swap-pair_token" style="cursor: default" v-else><img class="token-icon" :src="icons.doge" alt="" />doge</div>
+      <slot name="right">
+        <el-dropdown trigger="click" :disabled="props.loading" @command="changePool" @visible-change="(isVisible: any) => isVisible && emit('focus')" v-if="props.pools.length && currentPool">
+          <div class="swap-pair_token">
+            <img class="token-icon" v-if="currentPool?.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{ currentPool?.tokenB
+            }}<span class="nft" style="font-size: 12px">&#xeb6d;</span>
+          </div>
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
+                <img class="token-icon" v-if="item?.tokenB && icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
+              </el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
+        <div class="swap-pair_token" style="cursor: default" v-else><img class="token-icon" :src="icons.doge" alt="" />doge</div>
+      </slot>
     </section>
   </div>
 </template>
