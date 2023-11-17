@@ -60,6 +60,7 @@ onMounted(async () => {
   .el-dialog__body {
     padding: 0;
     border-radius: 20px;
+    overflow: hidden;
   }
   .el-dialog__headerbtn {
     top: 14px;
@@ -78,5 +79,35 @@ onMounted(async () => {
 
 .loading-body {
   height: 100vh;
+}
+
+.swap-sub-btn {
+  text-align: center;
+  line-height: 55px;
+  margin-top: 12px;
+  border-radius: 20px;
+  font-size: 18px;
+  cursor: pointer;
+  border: 2px solid #fff;
+  background-color: #ffa21e;
+  color: #fff;
+  box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+  &:hover {
+    opacity: 0.8;
+  }
+  &:active {
+    background-color: #d28b28;
+  }
+  &--connect {
+    background-color: rgb(238, 181, 15);
+    color: #333;
+  }
+  &--disabled {
+    cursor: not-allowed;
+    background: #fcbb60;
+    &:active {
+      background: #fcbb60;
+    }
+  }
 }
 </style>

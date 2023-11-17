@@ -71,7 +71,7 @@ function triggerDrawer(direction: DrawerDirection) {
           </li>
           <li style="margin-left: 12px" v-else>
             <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to assets" placement="bottom">
-              <router-link :to="`/address/${address}`" style="display: flex; align-items: center"
+              <router-link :to="`/address/${address}?type=token`" style="display: flex; align-items: center"
                 >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png"
               /></router-link>
             </el-tooltip>
@@ -93,7 +93,7 @@ function triggerDrawer(direction: DrawerDirection) {
         </component>
       </el-menu>
       <el-menu v-else router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
-        <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address } }">
+        <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address }, query: { type: 'token' } }">
           {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" />
         </el-menu-item>
         <el-menu-item v-else @click="connect"> Connect DpalWallet </el-menu-item>
@@ -137,6 +137,7 @@ function triggerDrawer(direction: DrawerDirection) {
   margin-left: 15px;
   border: none;
   flex: 1;
+  height: auto;
 }
 
 .nav-protocol-tag {

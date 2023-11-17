@@ -21,7 +21,7 @@ export default defineComponent({
   },
   emits: ['update:isLoading'],
   setup(props, { expose, emit }) {
-    const {dataSource, page, total, loading, query} = useTable({
+    const { dataSource, page, total, loading, query } = useTable({
       api: getData,
     })
 
@@ -80,7 +80,7 @@ export default defineComponent({
 
         return {
           total: res.data.total,
-          data: setCollectionLogo(res.data.data)
+          data: setCollectionLogo(res.data.data),
         }
       } catch (e: unknown) {
         props.error?.(e as Error)
@@ -89,9 +89,11 @@ export default defineComponent({
     }
 
     expose({
-      reload: page.value = 1,
+      reload: (page.value = 1),
     })
 
-    return () => <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} onRefresh={() => query(page.value)}/>
+    return () => (
+      <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} onRefresh={() => query(page.value)} />
+    )
   },
 })

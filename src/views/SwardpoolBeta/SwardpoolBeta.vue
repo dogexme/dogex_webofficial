@@ -417,6 +417,7 @@ function hideTipHandle() {
       <dog-card v-loading="listLoading">
         <div style="position: absolute; z-index: 2000">
           <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0" />
+          <DogTableMenuItem label="Query" :value="3" @click="transferSelect.value = 3" :selected="transferSelect.value == 3" />
           <DogTableMenuItem label="Holder" :value="1" @click="getHolderData" :selected="transferSelect.value == 1" />
           <DogTableMenuItem label="Info" :value="2" @click="getTokenInfoHandle" :selected="transferSelect.value == 2" />
         </div>
@@ -424,6 +425,7 @@ function hideTipHandle() {
           <TransferTable v-show="transferSelect.value == 0" :current-pool="currentPool as SwordPool"></TransferTable>
           <TransferTop500 ref="TransferTop500Ref" v-show="transferSelect.value == 1" :current-pool="currentPool as SwordPool"></TransferTop500>
           <Info style="margin-top: 45px" v-show="transferSelect.value == 2" :token-info="tokenInfo"></Info>
+          <QueryAddress v-show="transferSelect.value == 3" :current-pool="currentPool as SwordPool"></QueryAddress>
         </div>
       </dog-card>
     </el-col>
