@@ -8,6 +8,7 @@ import { PropType } from 'vue'
 import { numberFormat } from '@/utils'
 import { SwordPool } from '@/services/types'
 import icon from '@/config/payIcons'
+import NP from 'number-precision'
 
 export const StatusType = {
   0: 'pending',
@@ -83,6 +84,31 @@ export default defineComponent({
         },
       },
       {
+        title: 'Address',
+        dataIndex: 'address',
+        render(text: string) {
+          return <DogLink is-copy label={omitCenterString(text, 12)} value={text}></DogLink>
+        },
+      },
+      {
+        title: 'In',
+        render(_text: any, r: any) {
+          return consumeToken(r.inTokenA, r.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
+        },
+      },
+      {
+        title: 'Out',
+        render(_text: any, r: any) {
+          return consumeToken(r.outTokenA, r.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
+        },
+      },
+      {
+        title: 'Price',
+        render(_text: any, r: any) {
+          return 'Ð ' + NP.round(NP.divide(r.balanceA, r.balanceB), 4)
+        },
+      },
+      {
         title: 'Txid',
         dataIndex: 'txid',
         render(text: string) {
@@ -94,13 +120,6 @@ export default defineComponent({
         dataIndex: 'processedTxid',
         render(text: string) {
           return <>{text ? <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink> : '-'}</>
-        },
-      },
-      {
-        title: 'Address',
-        dataIndex: 'address',
-        render(text: string) {
-          return <DogLink is-copy label={omitCenterString(text, 12)} value={text}></DogLink>
         },
       },
       {
@@ -120,18 +139,6 @@ export default defineComponent({
       {
         title: 'Gas',
         dataIndex: 'gas',
-      },
-      {
-        title: 'In',
-        render(_text: any, r: any) {
-          return consumeToken(r.inTokenA, r.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
-        },
-      },
-      {
-        title: 'Out',
-        render(_text: any, r: any) {
-          return consumeToken(r.outTokenA, r.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
-        },
       },
     ]
 
