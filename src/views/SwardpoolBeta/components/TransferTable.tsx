@@ -10,6 +10,10 @@ import { SwordPool } from '@/services/types'
 import icon from '@/config/payIcons'
 import NP from 'number-precision'
 
+export function consumeNumFormat(num: number, tokenName?: string) {
+  return `${numberFormat(num)} ${tokenName}`
+}
+
 export const StatusType = {
   0: 'pending',
   1: 'success',
@@ -28,8 +32,14 @@ export function getSwapType(swapType: string, tokenA?: string, tokenB?: string) 
   }
 }
 
-export function consumeToken(tokenANum: number, tokenBNum: number, tokenA?: string, tokenB?: string) {
-  return tokenANum > 0 ? `${numberFormat(tokenANum)} ${tokenA}` : `${numberFormat(tokenBNum)} ${tokenB}`
+export function consumeToken(swapType: string, tokenANum: number, tokenBNum: number, tokenA?: string, tokenB?: string, isIn = true) {
+  if (swapType == 'SWAP_A_B') {
+    return isIn ? consumeNumFormat(tokenANum, tokenA) : consumeNumFormat(tokenBNum, tokenB)
+  } else if (swapType == 'SWAP_B_A') {
+    return isIn ? consumeNumFormat(tokenBNum, tokenB) : consumeNumFormat(tokenANum, tokenA)
+  } else {
+    return tokenANum > 0 ? consumeNumFormat(tokenANum, tokenA) : consumeNumFormat(tokenBNum, tokenB)
+  }
 }
 
 export default defineComponent({
@@ -93,13 +103,13 @@ export default defineComponent({
       {
         title: 'In',
         render(_text: any, r: any) {
-          return consumeToken(r.inTokenA, r.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
+          return consumeToken(r.swapType, r.inTokenA, r.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
         },
       },
       {
         title: 'Out',
         render(_text: any, r: any) {
-          return consumeToken(r.outTokenA, r.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB)
+          return consumeToken(r.swapType, r.outTokenA, r.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB, false)
         },
       },
       {

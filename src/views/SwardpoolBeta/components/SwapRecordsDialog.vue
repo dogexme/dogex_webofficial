@@ -76,12 +76,12 @@ watch(
           </el-table-column>
           <el-table-column label="In" width="150px">
             <template #default="s">
-              {{ consumeToken(s.row.inTokenA, s.row.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
+              {{ consumeToken(s.row.swapType, s.row.inTokenA, s.row.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
             </template>
           </el-table-column>
           <el-table-column label="Out" width="200px">
             <template #default="s">
-              {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
+              {{ consumeToken(s.row.swapType, s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB, false) }}
             </template>
           </el-table-column>
           <el-table-column label="Date" prop="date" width="190px"></el-table-column>
