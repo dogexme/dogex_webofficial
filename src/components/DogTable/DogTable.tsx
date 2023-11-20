@@ -71,12 +71,18 @@ export default defineComponent({
     const currentPage = ref(1)
     const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
     const actionType = ref(ActionType.Pagination)
-
+    const tableWrap = ref()
+    let isFrist = true
     watch(
       () => props.loading,
       (loading) => {
-        if (!loading && actionType.value == ActionType.Pagination && !props.disabledSlide) {
-          resetPositionTop()
+        if (!loading && actionType.value == ActionType.Pagination && !props.disabledSlide && !isFrist) {
+          nextTick(() => {
+            resetPositionTop()
+          })
+        }
+        if (!loading) {
+          isFrist = false
         }
       }
     )
@@ -103,12 +109,14 @@ export default defineComponent({
     }
 
     function resetPositionTop() {
+      const top = tableWrap.value?.getBoundingClientRect().top || 0
       const resetPosition: ScrollToOptions = {
         top: 0,
         left: 0,
         behavior: 'smooth',
       }
       containerRef.value?.scrollTo(resetPosition)
+      resetPosition.top = top + window.scrollY - 120
       window.scrollTo(resetPosition)
     }
 
@@ -129,7 +137,7 @@ export default defineComponent({
 
     return () => {
       return (
-        <div class={s['table-wrapper']} v-loading={props.loading}>
+        <div ref={(tw) => (tableWrap.value = tw)} class={s['table-wrapper']} v-loading={props.loading}>
           {props.refresh && (
             <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
               <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
