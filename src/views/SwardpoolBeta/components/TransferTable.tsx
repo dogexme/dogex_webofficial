@@ -37,9 +37,15 @@ export function consumeToken(swapType: string, tokenANum: number, tokenBNum: num
     return isIn ? consumeNumFormat(tokenANum, tokenA) : consumeNumFormat(tokenBNum, tokenB)
   } else if (swapType == 'SWAP_B_A') {
     return isIn ? consumeNumFormat(tokenBNum, tokenB) : consumeNumFormat(tokenANum, tokenA)
-  } else {
-    return tokenANum > 0 ? consumeNumFormat(tokenANum, tokenA) : consumeNumFormat(tokenBNum, tokenB)
   }
+
+  if (swapType == 'ROLLBACK_A') {
+    return consumeNumFormat(tokenANum, tokenA)
+  } else if (swapType == 'ROLLBACK_B') {
+    return consumeNumFormat(tokenBNum, tokenB)
+  }
+
+  return tokenANum > 0 ? consumeNumFormat(tokenANum, tokenA) : consumeNumFormat(tokenBNum, tokenB)
 }
 
 export default defineComponent({
