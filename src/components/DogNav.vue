@@ -50,7 +50,7 @@ function triggerDrawer(direction: DrawerDirection) {
       <div class="nav-wrap">
         <div class="logo-wrap">
           <a class="nav-more" href="javascript:void(0)" @click="triggerDrawer('ltr')">&#xe66c;</a>
-          <!-- <span class="nav-logo"></span> -->
+          <span class="nav-logo"></span>
           <a href="/" class="nav-title">dogex.me</a>
           <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
@@ -159,7 +159,7 @@ function triggerDrawer(direction: DrawerDirection) {
 .nav-logo {
   --size: 29px;
   display: inline-block;
-  background: url('/logo.png');
+  background: url('@/assets/img/logo32.png');
   background-size: 100%;
   width: var(--size);
   height: var(--size);
@@ -242,9 +242,10 @@ function triggerDrawer(direction: DrawerDirection) {
 
 .nav-title {
   font-family: SistemnyjC;
-  margin-left: 20px;
+  margin-left: 12px;
   font-weight: bold;
   font-size: 24px;
+  line-height: 1;
 }
 
 @media screen and (max-width: 876px) {
@@ -256,6 +257,9 @@ function triggerDrawer(direction: DrawerDirection) {
   }
   .nav-active + .nav-active-more {
     display: block;
+  }
+  .nav-logo {
+    margin-left: 12px;
   }
 }
 
