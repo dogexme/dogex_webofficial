@@ -317,7 +317,7 @@ function hideTipHandle() {
           <h4 class="mt-0" style="font-size: 18px">Swordpool</h4>
           <div class="text-center">
             <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 14px; font-weight: bold" target="_blank">
-              <img class="token-icon" src="@/assets/img/dogim_logo.png" alt="" />
+              <img class="token-icon" src="@/assets/img/logo32.png" alt="" />
               Swordpool Rule
             </el-link>
           </div>
