@@ -72,8 +72,8 @@ function triggerDrawer(direction: DrawerDirection) {
           <li style="margin-left: 12px" v-else>
             <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to assets" placement="bottom">
               <router-link :to="`/address/${address}?type=token`" style="display: flex; align-items: center"
-                >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png"
-              /></router-link>
+                >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" :src="require('@/assets/img/dogim_logo.png')" /></router-link
+              >''
             </el-tooltip>
           </li>
         </ul>
@@ -94,7 +94,7 @@ function triggerDrawer(direction: DrawerDirection) {
       </el-menu>
       <el-menu v-else router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
         <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address }, query: { type: 'token' } }">
-          {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" src="/logo.png" />
+          {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" :src="require('@/assets/img/dogim_logo.png')" />
         </el-menu-item>
         <el-menu-item v-else @click="connect"> Connect DpalWallet </el-menu-item>
       </el-menu>

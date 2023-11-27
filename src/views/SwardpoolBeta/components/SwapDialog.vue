@@ -364,7 +364,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
         <div class="swap-sub-btn" :class="{ 'swap-sub-btn--disabled': isDisabledPay }" @click="pay">Swap</div>
         <div class="flex justify-center mt-2">
           <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 12px" target="_blank">
-            <img class="token-icon" src="/logo.png" alt="" style="width: 16px; height: 16px" />
+            <img class="token-icon" src="@/assets/img/dogim_logo.png" alt="" style="width: 16px; height: 16px" />
             Swordpool Rule
           </el-link>
         </div>
