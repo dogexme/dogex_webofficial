@@ -33,6 +33,17 @@ export default [
         name: 'swordpool',
         component: () => import('@/views/SwardpoolBeta/SwardpoolBeta.vue'),
       },
+      {
+        path: '/drc20',
+        name: 'drc20',
+        component: () => import('@/views/Drc20/Drc20.vue'),
+        children: [
+          {
+            path: 'item/:hash',
+            component: () => import('@/views/Drc20/DrcItem.vue'),
+          },
+        ],
+      },
       // {
       //   path: 'swap',
       //   name: 'swap',
