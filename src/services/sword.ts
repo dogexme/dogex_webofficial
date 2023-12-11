@@ -102,3 +102,12 @@ export const getTokenInfo = () => {
 export const getTokenTransferData = () => {
   return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=tvl')
 }
+
+/**
+ * 查询地址交易记录
+ */
+export const queryTransAddress = (params: { address?: string } & PageResult) => {
+  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=transactions', {
+    params,
+  })
+}

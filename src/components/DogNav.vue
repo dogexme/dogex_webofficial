@@ -52,7 +52,6 @@ function triggerDrawer(direction: DrawerDirection) {
           <a class="nav-more" href="javascript:void(0)" @click="triggerDrawer('ltr')">&#xe66c;</a>
           <!-- <span class="nav-logo"></span> -->
           <a href="/" class="nav-title">dogex.me</a>
-          <div class="nav-active-item nav-protocol-tag">DRC721</div>
         </div>
         <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
           <component v-for="n in navlist" :is="n.children ? ElSubMenu : ElMenuItem" :index="n.path" :key="n.title">
@@ -138,12 +137,6 @@ function triggerDrawer(direction: DrawerDirection) {
   border: none;
   flex: 1;
   height: auto;
-}
-
-.nav-protocol-tag {
-  padding: 2px 8px;
-  font-weight: bold;
-  font-size: 16px;
 }
 
 .nav {
