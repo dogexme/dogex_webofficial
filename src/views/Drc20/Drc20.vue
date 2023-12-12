@@ -13,12 +13,14 @@ const loadingSearch = ref(false)
 const appStore = useAppStore()
 const blockCount = computed(() => appStore.blockCount)
 
-console.log(route.name)
-
 async function search() {
   tick.value = tick.value.trim()
 
   if (!tick.value || loadingSearch.value) return
+
+  if (tick.value.length > 6) {
+    return router.push(`/address/${tick.value}`)
+  }
 
   if (route.fullPath.startsWith('/drc20/item')) {
     router.replace(`/drc20/item/${tick.value}`)
@@ -32,7 +34,7 @@ async function search() {
     <div class="nav-search">
       <form @submit.prevent class="nav-search_inputwrap">
         <i class="dog-icon dog-icon_search"></i>
-        <input class="nav-search-input" type="text" maxlength="128" placeholder="Search for tokens" v-model="tick" @keydown.enter="search" />
+        <input class="nav-search-input" type="text" maxlength="128" placeholder="Search for tokens, wallet address" v-model="tick" @keydown.enter="search" />
         <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
         <el-icon v-if="!loadingSearch && tick.length" style="cursor: pointer" @click="tick = ''"><CircleCloseFilled /></el-icon>
       </form>

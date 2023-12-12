@@ -2,6 +2,7 @@ import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import { numberFormat } from '@/utils'
 import { queryDrcList } from '@/services/drc'
+import { ElImage } from 'element-plus'
 
 export default defineComponent({
   emits: ['search'],
@@ -14,25 +15,20 @@ export default defineComponent({
     const router = useRouter()
 
     const columns = [
-      // {
-      //   title: 'Logo',
-      //   dataIndex: 'logo',
-      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      //   render: (logo: string, r: any) => {
-      //     return (
-      //       <DogCollValid show={r.valid == 0}>
-      //         {logo ? <ElImage v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={logo} fit="cover"></ElImage> : r.tick}
-      //       </DogCollValid>
-      //     )
-      //   },
-      // },
-      // {
-      //   title: 'Txid',
-      //   dataIndex: 'txid',
-      //   render(text: string) {
-      //     return <>{text && <DogLink onClick={handleClickTxid} is-copy style="cursor: pointer;" label={omitCenterString(text, 24)} value={text}></DogLink>}</>
-      //   },
-      // },
+      {
+        title: 'Logo',
+        dataIndex: 'logo',
+        render: (_: string, r: any) => {
+          return (
+            <ElImage
+              v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }}
+              style="width: 40px; height: 40px; border-radius: 5px"
+              src={`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${r.tick == 'dogi' ? 'dogim' : r.tick}.png`}
+              fit="cover"
+            ></ElImage>
+          )
+        },
+      },
       {
         title: 'Tick',
         dataIndex: 'tick',

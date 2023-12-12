@@ -30,9 +30,9 @@ async function copy(value?: string) {
 <template>
   <div class="doglink" v-if="value">
     <el-tooltip :hide-after="0" :disabled="disabledTooltip" effect="dark" :content="props.value" placement="top">
-      <router-link class="doglink_link" v-if="props.to && props.route" :to="props.to" @click="emit('click', props.value)">{{ props.label }}</router-link>
-      <a class="doglink_link" v-else-if="props.to" :href="props.to" target="_blank" @click="emit('click', props.value)">{{ props.label }}</a>
-      <span class="doglink_link" @click="emit('click', props.value)" v-else>{{ props.label }}</span>
+      <router-link class="doglink_link" v-if="props.to && props.route" :to="props.to" @click.stop="emit('click', props.value)">{{ props.label }}</router-link>
+      <a class="doglink_link" v-else-if="props.to" :href="props.to" target="_blank" @click.stop="emit('click', props.value)">{{ props.label }}</a>
+      <span class="doglink_link" @click.stop="emit('click', props.value)" v-else>{{ props.label }}</span>
     </el-tooltip>
     <el-icon class="copy-icon" @click.stop="copy(props.value)" v-if="props.isCopy && !isCopySuccess">
       <CopyDocument />

@@ -11,9 +11,10 @@ export default defineComponent({
     },
   },
   setup(props, { expose }) {
+    const pageSize = 20
     const { loading, dataSource, total, page, query } = useTable({
       api: getData,
-      pageSize: 15,
+      pageSize,
       first: false,
     })
 
@@ -73,7 +74,16 @@ export default defineComponent({
     })
 
     return () => (
-      <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} onRefresh={() => query(page.value)} />
+      <DogTable
+        defaultPageSize={pageSize}
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns}
+        currentPage={page.value}
+        total={total.value}
+        onCurrent-change={query}
+        onRefresh={() => query(page.value)}
+      />
     )
   },
 })

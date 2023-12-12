@@ -11,7 +11,7 @@ export default [
   },
   {
     path: '/drc20',
-    title: 'Drc20',
+    title: 'DRC-20',
   },
   {
     path: '/swordpool',
