@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { useAppStore } from '@/store'
 import { Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 
 defineOptions({
@@ -10,8 +9,6 @@ const route = useRoute()
 const router = useRouter()
 const tick = ref('')
 const loadingSearch = ref(false)
-const appStore = useAppStore()
-const blockCount = computed(() => appStore.blockCount)
 
 function pushRoute(path: string, startsWiths: string[]) {
   if (startsWiths.some((path) => route.fullPath.startsWith(path))) {
@@ -42,10 +39,10 @@ async function search() {
         <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
         <el-icon v-if="!loadingSearch && tick.length" style="cursor: pointer" @click="tick = ''"><CircleCloseFilled /></el-icon>
       </form>
-      <div class="blocks-number">
+      <!-- <div class="blocks-number">
         <i class="dog-icon dog-icon_block"></i>
         Processed Blocks: <span v-if="blockCount">{{ blockCount }}</span>
-      </div>
+      </div> -->
     </div>
     <DogCard v-show="route.name == 'drc20'" style="margin-top: 12px">
       <DrcCast @search="search"></DrcCast>
