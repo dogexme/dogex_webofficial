@@ -13,19 +13,23 @@ const loadingSearch = ref(false)
 const appStore = useAppStore()
 const blockCount = computed(() => appStore.blockCount)
 
+function pushRoute(path: string, startsWiths: string[]) {
+  if (startsWiths.some((path) => route.fullPath.startsWith(path))) {
+    router.replace(path)
+  } else {
+    router.push(path)
+  }
+}
+
 async function search() {
   tick.value = tick.value.trim()
 
   if (!tick.value || loadingSearch.value) return
 
   if (tick.value.length > 6) {
-    return router.push(`/address/${tick.value}`)
-  }
-
-  if (route.fullPath.startsWith('/drc20/item')) {
-    router.replace(`/drc20/item/${tick.value}`)
+    pushRoute(`/drc20/wallet/${tick.value}`, ['/drc20/wallet', '/drc20/item'])
   } else {
-    router.push(`/drc20/item/${tick.value}`)
+    pushRoute(`/drc20/item/${tick.value}`, ['/drc20/item'])
   }
 }
 </script>

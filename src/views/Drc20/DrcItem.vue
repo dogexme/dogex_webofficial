@@ -58,6 +58,7 @@ onMounted(updateTick)
 </script>
 <template>
   <div class="coll-wrapper" v-loading="loading">
+    <DogPageHeader isBack title="DRC-20"></DogPageHeader>
     <DogTabs v-if="!isNotFount" keep-dom v-model="curTabValue" :tabs="tabs" @change="changeTab">
       <DogTabsItem value="overview">
         <DrcOverview :ref="(ref) => (tables['overview'] = ref)" :tickInfo="tickInfo"></DrcOverview>

@@ -111,7 +111,8 @@ function triggerDrawer(direction: DrawerDirection) {
 .nav-menu {
   --activeColor: rgb(238, 181, 15);
   :deep(.el-menu-item) {
-    font-weight: 500;
+    font-size: 13px;
+    font-family: SistemnyjC;
     &:hover {
       background-color: transparent;
     }
@@ -120,7 +121,6 @@ function triggerDrawer(direction: DrawerDirection) {
     }
   }
   :deep(.is-active) {
-    font-weight: 800;
     color: var(--activeColor) !important;
     border-color: var(--activeColor) !important;
     transition: none;
@@ -233,7 +233,7 @@ function triggerDrawer(direction: DrawerDirection) {
   font-family: SistemnyjC;
   margin-left: 20px;
   font-weight: bold;
-  font-size: 24px;
+  font-size: 18px;
 }
 
 @media screen and (max-width: 876px) {

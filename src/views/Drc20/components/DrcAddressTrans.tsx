@@ -1,19 +1,26 @@
 import DogTable from '@/components/DogTable/DogTable'
-import { queryDrcHolderTickAmount } from '@/services/drc'
 import { ElImage } from 'element-plus'
+import { queryDrcHolderTickAmount } from '@/services/drc'
 
 export default defineComponent({
   props: {
     address: {
       type: String,
-      required: true,
+      default: '',
     },
   },
   setup(props, { expose }) {
-    const { dataSource, page, total, loading, query } = useTable({
+    const pageSize = 20
+    const { loading, dataSource, total, page, query, disabledSlide } = useTable({
       api: getData,
+      pageSize,
       first: false,
     })
+
+    watch(
+      () => props.address,
+      (address) => address && query(1, true)
+    )
 
     const columns = [
       {
@@ -38,12 +45,7 @@ export default defineComponent({
         title: 'Balance',
         dataIndex: 'balance',
         render(amt: number) {
-          return (
-            <div class="flex items-center">
-              {numberFormat(amt)}
-              {/* <img class="ml-2" style={{ borderRadius: '50%', width: '24px' }} src={icon.dogim} alt="" /> */}
-            </div>
-          )
+          return <div class="flex items-center">{numberFormat(amt)}</div>
         },
       },
     ]
@@ -64,15 +66,27 @@ export default defineComponent({
     let isLoaded = false
 
     expose({
-      load: async () => {
-        if (isLoaded) return
-        await query(1)
+      reload: async () => {
+        if (isLoaded) {
+          return
+        }
+        await query(1, true)
         isLoaded = true
       },
     })
 
     return () => (
-      <DogTable loading={loading.value} dataSource={dataSource.value} columns={columns} currentPage={page.value} total={total.value} onCurrent-change={query} onRefresh={() => query(page.value)} />
+      <DogTable
+        defaultPageSize={pageSize}
+        disabledSlide={disabledSlide.value}
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns}
+        currentPage={page.value}
+        total={total.value}
+        onCurrent-change={query}
+        onRefresh={() => query(page.value)}
+      />
     )
   },
 })

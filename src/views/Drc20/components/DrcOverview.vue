@@ -84,7 +84,7 @@ const props = withDefaults(
   position: relative;
   display: inline-flex;
   .coll-logo-img {
-    --size: 32px;
+    --size: 48px;
     width: var(--size);
     height: var(--size);
     border-radius: 5px;

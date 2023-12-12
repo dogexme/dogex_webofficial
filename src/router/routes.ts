@@ -42,6 +42,10 @@ export default [
             path: 'item/:tick',
             component: () => import('@/views/Drc20/DrcItem.vue'),
           },
+          {
+            path: 'wallet/:address',
+            component: () => import('@/views/Drc20/DrcWallet.vue'),
+          },
         ],
       },
       // {
