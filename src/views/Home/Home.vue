@@ -223,7 +223,7 @@ onBeforeRouteUpdate((route) => {
     width: 95%;
     max-width: 740px;
     height: 12vmin;
-    max-height: 66px;
+    max-height: 55px;
     background: #fff;
     padding: 0 24px;
     border-radius: 40px;
