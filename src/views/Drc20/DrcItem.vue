@@ -50,6 +50,7 @@ function updateTick() {
     tickInfo.value = res.data.data
     loading.value = false
     isNotFount.value = !tickInfo.value.tick
+    curTabValue.value = 'overview'
   })
 }
 

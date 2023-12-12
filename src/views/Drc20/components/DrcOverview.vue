@@ -13,16 +13,22 @@ const props = withDefaults(
 
 <template>
   <div class="coll-info">
-    <!-- <div class="coll-info_item" v-if="props.collInfo.logo">
+    <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Logo</div>
       <div class="coll-info_item_value">
         <div class="coll-logo-wrap">
-          <DogCollValid :show="collInfo.valid == 0">
-            <el-image class="coll-logo-img" :src="props.tickInfo.logo" fit="cover" />
-          </DogCollValid>
+          <el-image
+            class="coll-logo-img"
+            :src="`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${props.tickInfo.tick == 'dogi' ? 'dogim' : props.tickInfo.tick}.png`"
+            fit="cover"
+          >
+            <template #error>
+              {{ props.tickInfo.tick }}
+            </template>
+          </el-image>
         </div>
       </div>
-    </div> -->
+    </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Tick</div>
       <div class="coll-info_item_value">{{ props.tickInfo.tick }}</div>
@@ -78,7 +84,7 @@ const props = withDefaults(
   position: relative;
   display: inline-flex;
   .coll-logo-img {
-    --size: 48px;
+    --size: 32px;
     width: var(--size);
     height: var(--size);
     border-radius: 5px;

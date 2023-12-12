@@ -109,6 +109,7 @@ function triggerDrawer(direction: DrawerDirection) {
 
 <style lang="scss" scoped>
 .nav-menu {
+  --activeColor: rgb(238, 181, 15);
   :deep(.el-menu-item) {
     font-weight: 500;
     &:hover {
@@ -120,8 +121,8 @@ function triggerDrawer(direction: DrawerDirection) {
   }
   :deep(.is-active) {
     font-weight: 800;
-    color: #ddc2f9 !important;
-    border-color: #ddc2f9 !important;
+    color: var(--activeColor) !important;
+    border-color: var(--activeColor) !important;
     transition: none;
   }
 }

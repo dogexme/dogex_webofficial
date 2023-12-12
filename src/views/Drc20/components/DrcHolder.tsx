@@ -12,11 +12,16 @@ export default defineComponent({
   },
   setup(props, { expose }) {
     const pageSize = 20
-    const { loading, dataSource, total, page, query } = useTable({
+    const { loading, dataSource, total, page, query, disabledSlide } = useTable({
       api: getData,
       pageSize,
       first: false,
     })
+
+    watch(
+      () => props.tickInfo.tick,
+      (tick) => tick && query(1, true)
+    )
 
     const columns = [
       {
@@ -68,7 +73,7 @@ export default defineComponent({
         if (isLoaded) {
           return
         }
-        await query(1)
+        await query(1, true)
         isLoaded = true
       },
     })
@@ -76,6 +81,7 @@ export default defineComponent({
     return () => (
       <DogTable
         defaultPageSize={pageSize}
+        disabledSlide={disabledSlide.value}
         loading={loading.value}
         dataSource={dataSource.value}
         columns={columns}
