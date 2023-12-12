@@ -1,9 +1,57 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { collMap } from '@/services/nft'
+
+type ViewNames = 'home'
+
+const isShow = ref(false)
+const route = useRoute()
+
+function loadCollMap() {
+  return new Promise((resolve) => {
+    let timer = 0
+    async function req() {
+      try {
+        const res = await collMap()
+        localStorage.setItem('nfts', JSON.stringify(res.data))
+        clearTimeout(timer)
+        resolve(undefined)
+      } catch {
+        timer = window.setTimeout(req, 1000)
+      }
+    }
+    req()
+  })
+}
+
+const viewReqStateList = {
+  home: loadCollMap,
+}
+
+const viewLoadedSet = new Set<ViewNames>()
+
+async function requestState() {
+  const viewName = route.name as ViewNames
+
+  if (!viewReqStateList[viewName] || viewLoadedSet.has(viewName)) {
+    isShow.value = true
+    return
+  }
+
+  isShow.value = false
+  await viewReqStateList[viewName]()
+  isShow.value = true
+  viewLoadedSet.add(viewName)
+}
+
+watch(() => route.name, requestState, {
+  immediate: true,
+})
+</script>
 <template>
   <div id="container">
     <DogNav></DogNav>
-    <main class="content">
-      <router-view v-slot="{ Component }">
+    <main class="content" v-loading="!isShow">
+      <router-view v-slot="{ Component }" v-if="isShow">
         <keep-alive :include="['home', 'swap', 'drc20']">
           <component :is="Component" />
         </keep-alive>
