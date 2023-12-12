@@ -1,48 +1,50 @@
 import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
-import DogCollValid from '@/components/DogCollValid.vue'
-import { ElImage } from 'element-plus'
-import { queryCastLightList } from '@/services/nft'
-import { setCollectionLogo, numberFormat } from '@/utils'
+import { numberFormat } from '@/utils'
+import { queryDrcList } from '@/services/drc'
 
 export default defineComponent({
   emits: ['search'],
-  setup(_props, { emit }) {
+  setup() {
     const pageSize = 20
     const { dataSource, total, page, loading, query } = useTable({
       api: getData,
       pageSize,
     })
-
-    function handleClickTxid(e: string) {
-      emit('search', e)
-    }
+    const router = useRouter()
 
     const columns = [
-      {
-        title: 'Logo',
-        dataIndex: 'logo',
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        render: (logo: string, r: any) => {
-          return (
-            <DogCollValid show={r.valid == 0}>
-              {logo ? <ElImage v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={logo} fit="cover"></ElImage> : r.tick}
-            </DogCollValid>
-          )
-        },
-      },
-      {
-        title: 'Txid',
-        dataIndex: 'txid',
-        render(text: string) {
-          return <>{text && <DogLink onClick={handleClickTxid} is-copy style="cursor: pointer;" label={omitCenterString(text, 24)} value={text}></DogLink>}</>
-        },
-      },
+      // {
+      //   title: 'Logo',
+      //   dataIndex: 'logo',
+      //   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      //   render: (logo: string, r: any) => {
+      //     return (
+      //       <DogCollValid show={r.valid == 0}>
+      //         {logo ? <ElImage v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }} style="width: 40px; height: 40px; border-radius: 5px" src={logo} fit="cover"></ElImage> : r.tick}
+      //       </DogCollValid>
+      //     )
+      //   },
+      // },
+      // {
+      //   title: 'Txid',
+      //   dataIndex: 'txid',
+      //   render(text: string) {
+      //     return <>{text && <DogLink onClick={handleClickTxid} is-copy style="cursor: pointer;" label={omitCenterString(text, 24)} value={text}></DogLink>}</>
+      //   },
+      // },
       {
         title: 'Tick',
         dataIndex: 'tick',
         render(text: string) {
           return text
+        },
+      },
+      {
+        title: 'Mint',
+        dataIndex: 'mintVal',
+        render(text: number) {
+          return numberFormat(text)
         },
       },
       {
@@ -53,8 +55,15 @@ export default defineComponent({
         },
       },
       {
-        title: 'Mintval',
-        dataIndex: 'mintval',
+        title: 'Lim',
+        dataIndex: 'lim',
+        render(text: number) {
+          return numberFormat(text)
+        },
+      },
+      {
+        title: 'Holders',
+        dataIndex: 'holders',
         render(text: number) {
           return numberFormat(text)
         },
@@ -68,19 +77,19 @@ export default defineComponent({
       },
     ]
 
+    function rowClick(drc: any) {
+      router.push(`/drc20/item/${drc.tick}`)
+    }
+
     async function getData(page: number, pageSize: number) {
-      const res = await queryCastLightList({
+      const res = await queryDrcList({
         pageSize,
         page,
       })
 
       return {
-        total: res.data.total,
-        // eslint-disablenext-line @typescript-eslint/no-explicit-any
-        data: res.data.data.map((item: any) => {
-          const { logo, valid } = setCollectionLogo({ txid: item.txid })
-          return Object.assign(item, { logo, valid })
-        }),
+        total: res.data.total || 1,
+        data: res.data.data,
       }
     }
 
@@ -95,6 +104,8 @@ export default defineComponent({
         total={total.value}
         onCurrent-change={query}
         onRefresh={() => query(page.value)}
+        onRow-click={rowClick}
+        rowClick
       />
     )
   },

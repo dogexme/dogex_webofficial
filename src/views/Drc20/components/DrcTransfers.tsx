@@ -6,28 +6,15 @@ import { setCollectionLogo } from '@/utils'
 
 export default defineComponent({
   props: {
-    txid: {
-      type: String,
-      required: true,
-    },
-    tabVal: {
-      type: String,
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
+    tickInfo: {
+      type: Object,
     },
   },
-  emits: ['update:isLoading'],
-  setup(props, { emit, expose }) {
+  setup(props, { expose }) {
     const { dataSource, loading, total, page, query } = useTable({
       api: getData,
       pageSize: 15,
       first: false,
-    })
-
-    watch(loading, (isLoading) => {
-      emit('update:isLoading', isLoading)
     })
 
     const originColumns = [

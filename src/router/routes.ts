@@ -39,7 +39,7 @@ export default [
         component: () => import('@/views/Drc20/Drc20.vue'),
         children: [
           {
-            path: 'item/:hash',
+            path: 'item/:tick',
             component: () => import('@/views/Drc20/DrcItem.vue'),
           },
         ],

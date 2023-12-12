@@ -1,54 +1,53 @@
 <script setup lang="ts">
-import { CollInfo } from '@/types'
-import { dateFormat, omitCenterString, numberFormat } from '@/utils'
+import { omitCenterString, numberFormat } from '@/utils'
 
 const props = withDefaults(
   defineProps<{
-    collInfo?: Partial<CollInfo>
+    tickInfo?: any
   }>(),
   {
-    collInfo: () => ({}),
+    tickInfo: () => ({}),
   }
 )
 </script>
 
 <template>
   <div class="coll-info">
-    <div class="coll-info_item" v-if="props.collInfo.logo">
+    <!-- <div class="coll-info_item" v-if="props.collInfo.logo">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Logo</div>
       <div class="coll-info_item_value">
         <div class="coll-logo-wrap">
           <DogCollValid :show="collInfo.valid == 0">
-            <el-image class="coll-logo-img" :src="props.collInfo.logo" fit="cover" />
+            <el-image class="coll-logo-img" :src="props.tickInfo.logo" fit="cover" />
           </DogCollValid>
         </div>
       </div>
-    </div>
+    </div> -->
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Tick</div>
-      <div class="coll-info_item_value">{{ props.collInfo.tick }}</div>
+      <div class="coll-info_item_value">{{ props.tickInfo.tick }}</div>
+    </div>
+    <div class="coll-info_item">
+      <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Lim</div>
+      <div class="coll-info_item_value">{{ props.tickInfo.max && numberFormat(props.tickInfo.lim) }}</div>
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Max</div>
-      <div class="coll-info_item_value">{{ props.collInfo.max && numberFormat(props.collInfo.max) }}</div>
+      <div class="coll-info_item_value">{{ props.tickInfo.max && numberFormat(props.tickInfo.max) }}</div>
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Mintval</div>
-      <div class="coll-info_item_value">{{ props.collInfo.mintval && numberFormat(props.collInfo.mintval) }}</div>
+      <div class="coll-info_item_value">{{ props.tickInfo.mintVal && numberFormat(props.tickInfo.mintVal) }}</div>
+    </div>
+    <div class="coll-info_item">
+      <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Holders</div>
+      <div class="coll-info_item_value">{{ props.tickInfo.holders && numberFormat(props.tickInfo.holders) }}</div>
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Deployer</div>
       <div class="coll-info_item_value">
-        <DogLink route :to="`/address/${props.collInfo.deployer}`" is-copy :label="omitCenterString(props.collInfo.deployer)" :value="props.collInfo.deployer"></DogLink>
+        <DogLink route :to="`/address/${props.tickInfo.deployer}`" is-copy :label="omitCenterString(props.tickInfo.deployer)" :value="props.tickInfo.deployer"></DogLink>
       </div>
-    </div>
-    <div class="coll-info_item">
-      <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Holders</div>
-      <div class="coll-info_item_value">{{ props.collInfo.holders && numberFormat(props.collInfo.holders) }}</div>
-    </div>
-    <div class="coll-info_item">
-      <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Date</div>
-      <div class="coll-info_item_value">{{ props.collInfo.date && dateFormat(new Date(props.collInfo.date)) }}</div>
     </div>
   </div>
 </template>

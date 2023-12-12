@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { collMap } from '@/services/nft'
+import { useAppStore } from './store'
 
+const store = useAppStore()
 const loading = ref(true)
 let timer = 0
 
@@ -20,6 +22,7 @@ async function loadCollMap() {
 onMounted(async () => {
   document.body.classList.add('loading-body')
   loadCollMap()
+  store.getBlocksCountHandler()
 })
 </script>
 <template>

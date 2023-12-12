@@ -1,28 +1,16 @@
 import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import { ElProgress } from 'element-plus'
-import { queryHoldersByTxid } from '@/services/nft'
-import { CollInfo } from '@/types'
+import { queryDrcHolders } from '@/services/drc'
 
 export default defineComponent({
   props: {
-    txid: {
-      type: String,
-      required: true,
-    },
-    collInfo: {
-      type: Object as PropType<Partial<CollInfo>>,
+    tickInfo: {
+      type: Object,
       default: () => ({}),
     },
-
-    isLoading: {
-      type: Boolean,
-      default: false,
-    },
-    error: Function as PropType<(e: Error) => void>,
   },
-  emits: ['update:isLoading'],
-  setup(props, { emit, expose }) {
+  setup(props, { expose }) {
     const { loading, dataSource, total, page, query } = useTable({
       api: getData,
       pageSize: 15,
@@ -31,13 +19,8 @@ export default defineComponent({
 
     const columns = [
       {
-        title: 'Rank',
-        render: (_text: unknown, _record: unknown, i: number) => <span class="table-index">{(page.value - 1) * 15 + i + 1}</span>,
-        width: '100px',
-      },
-      {
-        title: 'Holder',
-        dataIndex: 'nft_owner',
+        title: 'Address',
+        dataIndex: 'address',
         width: '350px',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render(text: string) {
@@ -45,8 +28,8 @@ export default defineComponent({
         },
       },
       {
-        title: 'Count',
-        dataIndex: 'nft_count',
+        title: 'Balance',
+        dataIndex: 'balance',
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         render(text: number, record: any) {
           return (
@@ -64,40 +47,28 @@ export default defineComponent({
       },
     ]
 
-    watch(loading, (isLoading) => {
-      emit('update:isLoading', isLoading)
-    })
-
     async function getData(page: number, pageSize: number) {
-      try {
-        const res = await queryHoldersByTxid({
-          txid: props.txid,
-          pageSize,
-          page,
-        })
-        return {
-          total: res.data.total,
-          data: res.data.data.map((d: { nft_count: number }) => ({ ...d, ratio: d.nft_count / props.collInfo.max! })),
-        }
-      } catch (e: unknown) {
-        props.error?.(e as Error)
-        throw e
+      const res = await queryDrcHolders({
+        tick: props.tickInfo.tick,
+        pageSize,
+        page,
+      })
+
+      return {
+        total: res.data.data.total,
+        data: res.data.data.holders.map((d: { balance: number }) => ({ ...d, ratio: d.balance / props.tickInfo.mintVal })),
       }
     }
 
-    const isLoaded = ref(false)
+    let isLoaded = false
 
     expose({
-      reload: () => {
-        if (page.value == 1 && !isLoaded.value) {
-          query(1)
-          isLoaded.value = true
-        } else {
-          page.value = 1
+      reload: async () => {
+        if (isLoaded) {
+          return
         }
-      },
-      setLoad(isLoad: boolean) {
-        isLoaded.value = isLoad
+        await query(1)
+        isLoaded = true
       },
     })
 

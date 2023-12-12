@@ -2,6 +2,7 @@ import { createPinia, defineStore } from 'pinia'
 import { RouteLocationNormalized } from 'vue-router'
 import { DogeErrorCode } from '@/hooks/doge'
 import { ElMessageBox } from 'element-plus'
+import { getBlocksCount } from '@/services/nft'
 
 const store = createPinia()
 const { connectDpal } = useDoge()
@@ -12,6 +13,7 @@ export const useAppStore = defineStore('app', {
   state: () => ({
     activeRoute: {} as RouteLocationNormalized,
     address: '',
+    blockCount: 0,
     transferList: JSON.parse(localStorage.getItem('transfer_list') || '[]'),
   }),
   actions: {
@@ -41,6 +43,17 @@ export const useAppStore = defineStore('app', {
         this.transferList.unshift(transfer)
       }
       localStorage.setItem('transfer_list', JSON.stringify(this.transferList))
+    },
+    getBlocksCountHandler() {
+      getBlocksCount().then((r) => {
+        this.blockCount = r.data?.data?.[0]?.block || 0
+        setTimeout(
+          () => {
+            this.getBlocksCountHandler()
+          },
+          1000 * 60 * 5
+        )
+      })
     },
   },
   getters: {

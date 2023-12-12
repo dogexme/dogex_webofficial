@@ -1,21 +1,30 @@
 <script setup lang="ts">
+import { useAppStore } from '@/store'
 import { Loading, CircleCloseFilled } from '@element-plus/icons-vue'
+
+defineOptions({
+  name: 'drc20',
+})
 
 const route = useRoute()
 const router = useRouter()
-const txid = ref('')
+const tick = ref('')
 const loadingSearch = ref(false)
+const appStore = useAppStore()
+const blockCount = computed(() => appStore.blockCount)
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const blockCount = ref(0)
+console.log(route.name)
 
-async function search(txidValue: string) {
-  if (txidValue) {
-    txid.value = txidValue
+async function search() {
+  tick.value = tick.value.trim()
+
+  if (!tick.value || loadingSearch.value) return
+
+  if (route.fullPath.startsWith('/drc20/item')) {
+    router.replace(`/drc20/item/${tick.value}`)
+  } else {
+    router.push(`/drc20/item/${tick.value}`)
   }
-  const hash = txid.value.trim()
-  if (!hash || loadingSearch.value) return
-  router.push(`/drc20/item/${hash}`)
 }
 </script>
 <template>
@@ -23,19 +32,19 @@ async function search(txidValue: string) {
     <div class="nav-search">
       <form @submit.prevent class="nav-search_inputwrap">
         <i class="dog-icon dog-icon_search"></i>
-        <input class="nav-search-input" type="text" maxlength="128" placeholder="Deploy Hash" v-model="txid" @keydown.enter="search('')" />
+        <input class="nav-search-input" type="text" maxlength="128" placeholder="Search for tokens" v-model="tick" @keydown.enter="search" />
         <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
-        <el-icon v-if="!loadingSearch && txid.length" style="cursor: pointer" @click="txid = ''"><CircleCloseFilled /></el-icon>
+        <el-icon v-if="!loadingSearch && tick.length" style="cursor: pointer" @click="tick = ''"><CircleCloseFilled /></el-icon>
       </form>
       <div class="blocks-number">
         <i class="dog-icon dog-icon_block"></i>
         Processed Blocks: <span v-if="blockCount">{{ blockCount }}</span>
       </div>
     </div>
-    <DogCard v-if="route.name == 'drc20'" style="margin-top: 12px">
-      <CastTable @search="search"></CastTable>
+    <DogCard v-show="route.name == 'drc20'" style="margin-top: 12px">
+      <DrcCast @search="search"></DrcCast>
     </DogCard>
-    <router-view v-else></router-view>
+    <router-view v-if="route.name != 'drc20'"></router-view>
   </div>
 </template>
 

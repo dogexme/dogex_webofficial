@@ -4,7 +4,7 @@
     <DogNav></DogNav>
     <main class="content">
       <router-view v-slot="{ Component }">
-        <keep-alive :include="['home', 'swap']">
+        <keep-alive :include="['home', 'swap', 'drc20']">
           <component :is="Component" />
         </keep-alive>
       </router-view>

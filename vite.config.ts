@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import path from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
@@ -12,47 +12,58 @@ import { viteMockServe } from 'vite-plugin-mock'
 import requireTransform from 'vite-plugin-require-transform'
 
 // https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [
-    vue(),
-    vueJsx(),
-    AutoImport({
-      imports: ['vue', 'vue-router', 'vuex'],
-      dirs: ['./src/hooks/**/*.ts', './src/components/**/*.vue', './src/components/**/*.tsx', './src/utils/**/*.ts'],
-      dts: './src/auto-imports.d.ts',
-      eslintrc: {
-        enabled: true,
-      },
-      resolvers: [ElementPlusResolver()],
-    }),
-    Components({
-      dirs: ['src/components', 'src/**/components'],
-      extensions: ['vue', 'jsx', 'tsx', 'ts', 'js'],
-      dts: './src/components.d.ts',
-      resolvers: [ElementPlusResolver()],
-    }),
-    removeConsole(),
-    ElementPlus({}),
-    viteCompression(),
-    viteMockServe({
-      mockPath: 'mock',
-      enable: process.env.NODE_ENV === 'development',
-      watchFiles: false,
-    }),
-    requireTransform({
-      fileRegex: /.[tj]sx?$|.vue$/,
-    }),
-  ],
-  css: {
-    preprocessorOptions: {
-      scss: {
-        additionalData: `@import "@/assets/styles/global.scss";`,
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  return {
+    plugins: [
+      vue(),
+      vueJsx(),
+      AutoImport({
+        imports: ['vue', 'vue-router', 'vuex'],
+        dirs: ['./src/hooks/**/*.ts', './src/components/**/*.vue', './src/components/**/*.tsx', './src/utils/**/*.ts'],
+        dts: './src/auto-imports.d.ts',
+        eslintrc: {
+          enabled: true,
+        },
+        resolvers: [ElementPlusResolver()],
+      }),
+      Components({
+        dirs: ['src/components', 'src/**/components'],
+        extensions: ['vue', 'jsx', 'tsx', 'ts', 'js'],
+        dts: './src/components.d.ts',
+        resolvers: [ElementPlusResolver()],
+      }),
+      removeConsole(),
+      ElementPlus({}),
+      viteCompression(),
+      viteMockServe({
+        mockPath: 'mock',
+        enable: process.env.NODE_ENV === 'development',
+        watchFiles: false,
+      }),
+      requireTransform({
+        fileRegex: /.[tj]sx?$|.vue$/,
+      }),
+    ],
+    css: {
+      preprocessorOptions: {
+        scss: {
+          additionalData: `@import "@/assets/styles/global.scss";`,
+        },
       },
     },
-  },
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, 'src'),
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, 'src'),
+      },
     },
-  },
+    server: {
+      proxy: {
+        '^/api': {
+          target: env.proxy,
+          changeOrigin: true,
+        },
+      },
+    },
+  }
 })

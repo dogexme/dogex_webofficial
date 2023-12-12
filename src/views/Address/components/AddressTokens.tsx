@@ -1,7 +1,5 @@
-import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
-import { getBalanceByPoolAddress } from '@/services/sword'
-import icon from '@/config/payIcons'
+import { queryDrcHolderTickAmount } from '@/services/drc'
 
 export default defineComponent({
   props: {
@@ -9,32 +7,17 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    tabVal: {
-      type: String,
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
-    },
-    error: Function as PropType<(e: Error) => void>,
   },
-  emits: ['update:isLoading'],
-  setup(props, { expose, emit }) {
+  setup(props, { expose }) {
     const { dataSource, page, total, loading, query } = useTable({
       api: getData,
-    })
-
-    watch(loading, (isLoading) => {
-      emit('update:isLoading', isLoading)
+      first: false,
     })
 
     const columns = [
       {
-        title: 'Address',
-        dataIndex: 'address',
-        render(text: string) {
-          return <>{text && <DogLink route is-copy label={text} value={text}></DogLink>}</>
-        },
+        title: 'Tick',
+        dataIndex: 'tick',
       },
       {
         title: 'Balance',
@@ -43,7 +26,7 @@ export default defineComponent({
           return (
             <div class="flex items-center">
               {numberFormat(amt)}
-              <img class="ml-2" style={{ borderRadius: '50%', width: '24px' }} src={icon.dogim} alt="" />
+              {/* <img class="ml-2" style={{ borderRadius: '50%', width: '24px' }} src={icon.dogim} alt="" /> */}
             </div>
           )
         },
@@ -51,26 +34,26 @@ export default defineComponent({
     ]
 
     async function getData() {
-      try {
-        const res = await getBalanceByPoolAddress(props.address)
-        const data = res.data
+      const res = await queryDrcHolderTickAmount({
+        address: props.address,
+      })
 
-        if (data.length && !+data[0].balance) {
-          data.shift()
-        }
+      const data = res.data.data.ticks
 
-        return {
-          total: 1,
-          data,
-        }
-      } catch (e: unknown) {
-        props.error?.(e as Error)
-        throw e
+      return {
+        total: 1,
+        data,
       }
     }
 
+    let isLoaded = false
+
     expose({
-      reload: (page.value = 1),
+      load: async () => {
+        if (isLoaded) return
+        await query(1)
+        isLoaded = true
+      },
     })
 
     return () => (
