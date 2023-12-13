@@ -80,35 +80,38 @@ export default defineComponent({
     })
 
     return () => (
-      <div class="relative mt-12">
-        <div class="flex absolute w-full box-border pr-10">
-          <DogSearch
-            class="flex-1"
-            style="max-width: 300px"
-            v-model={params.address}
-            loading={loading.value}
-            onSearch={() => {
-              query(1, true)
-            }}
-            onClear={() => {
-              params.address = ''
-              query(1, true)
-            }}
-          ></DogSearch>
-        </div>
-        <DogTable
-          defaultPageSize={20}
-          rowkey="id"
-          loading={loading.value}
-          dataSource={dataSource.value}
-          columns={columns.value}
-          total={total.value}
-          currentPage={page.value}
-          onCurrent-change={query}
-          onRefresh={() => query(page.value)}
-          disabledSlide={disabledSlide.value}
-        />
-      </div>
+      <DogTable
+        defaultPageSize={20}
+        rowkey="id"
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns.value}
+        total={total.value}
+        currentPage={page.value}
+        onCurrent-change={query}
+        onRefresh={() => query(page.value)}
+        disabledSlide={disabledSlide.value}
+        v-slots={{
+          tooltipLeft() {
+            return (
+              <div class="flex ">
+                <DogSearch
+                  style="max-width: 300px"
+                  v-model={params.address}
+                  loading={loading.value}
+                  onSearch={() => {
+                    query(1, true)
+                  }}
+                  onClear={() => {
+                    params.address = ''
+                    query(1, true)
+                  }}
+                ></DogSearch>
+              </div>
+            )
+          },
+        }}
+      />
     )
   },
 })

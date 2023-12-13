@@ -199,44 +199,47 @@ export default defineComponent({
     }
 
     return () => (
-      <div class="relative mt-12">
-        <div class="flex absolute w-full box-border pr-10">
-          <DogSearch
-            class="flex-1"
-            style="max-width: 300px"
-            v-model={params.address}
-            loading={loading.value}
-            onSearch={() => {
-              query(1, true)
-              getBanlance()
-            }}
-            onClear={() => {
-              params.address = ''
-              balance.value = 0
-              controller.value?.abort()
-              query(1, true)
-            }}
-          ></DogSearch>
-          {balance.value > 0 && (
-            <div class="flex items-center ml-3 text-xs">
-              <img class="mr-2" style={{ borderRadius: '50%', width: '16px' }} src={icon.dogim} alt="" />
-              {numberFormat(balance.value)}
-            </div>
-          )}
-        </div>
-        <DogTable
-          defaultPageSize={20}
-          rowkey="id"
-          loading={loading.value}
-          dataSource={dataSource.value}
-          columns={columns.value}
-          total={total.value}
-          currentPage={page.value}
-          onCurrent-change={query}
-          onRefresh={() => query(page.value)}
-          disabledSlide={disabledSlide.value}
-        />
-      </div>
+      <DogTable
+        defaultPageSize={20}
+        rowkey="id"
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns.value}
+        total={total.value}
+        currentPage={page.value}
+        onCurrent-change={query}
+        onRefresh={() => query(page.value)}
+        disabledSlide={disabledSlide.value}
+        v-slots={{
+          tooltipLeft() {
+            return (
+              <div class="flex">
+                <DogSearch
+                  style="max-width: 300px"
+                  v-model={params.address}
+                  loading={loading.value}
+                  onSearch={() => {
+                    query(1, true)
+                    getBanlance()
+                  }}
+                  onClear={() => {
+                    params.address = ''
+                    balance.value = 0
+                    controller.value?.abort()
+                    query(1, true)
+                  }}
+                ></DogSearch>
+                {balance.value > 0 && (
+                  <div class="flex flex-1 items-center ml-3 text-xs">
+                    <img class="mr-2" style={{ borderRadius: '50%', width: '16px' }} src={icon.dogim} alt="" />
+                    {numberFormat(balance.value)}
+                  </div>
+                )}
+              </div>
+            )
+          },
+        }}
+      />
     )
   },
 })

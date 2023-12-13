@@ -398,7 +398,7 @@ function getAddressTransList() {
     </el-col>
     <el-col :span="24">
       <dog-card v-loading="listLoading">
-        <div style="position: absolute; z-index: 2000">
+        <div class="mb-3">
           <DogTableMenuItem label="Pool Transactions" :value="0" @click="transferSelect.value = 0" :selected="transferSelect.value == 0" />
           <DogTableMenuItem label="Transactions" :value="3" @click="getAddressTransList" :selected="transferSelect.value == 3" />
         </div>

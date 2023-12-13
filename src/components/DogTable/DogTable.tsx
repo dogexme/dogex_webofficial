@@ -66,7 +66,7 @@ export default defineComponent({
     },
   },
   emits: ['current-change', 'row-click', 'refresh'],
-  setup(props, { emit }) {
+  setup(props, { emit, slots }) {
     const containerRef = ref<HTMLElement>()
     const currentPage = ref(1)
     const pages = computed(() => Math.ceil(props.total / props.defaultPageSize))
@@ -138,11 +138,14 @@ export default defineComponent({
     return () => {
       return (
         <div ref={(tw) => (tableWrap.value = tw)} class={s['table-wrapper']} v-loading={props.loading}>
-          {props.refresh && (
-            <div style="width: 100%;display: flex;justify-content: flex-end;margin-bottom:12px">
-              <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
-            </div>
-          )}
+          <div class="flex justify-between mb-2">
+            {slots.tooltipLeft?.()}
+            {props.refresh && (
+              <div style="width: 100%;display: flex;justify-content: flex-end;">
+                <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
+              </div>
+            )}
+          </div>
           {props.showPagination && pages.value > 1 && (
             <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
           )}
