@@ -5,11 +5,19 @@ const router = useRouter()
 const props = defineProps<{
   title?: string
   isBack?: boolean
+  customBack?: boolean
+}>()
+const emit = defineEmits<{
+  (event: 'back'): void
 }>()
 
 function goBack() {
   if (!props.isBack) return
-  router.back()
+  if (props.customBack) {
+    emit('back')
+  } else {
+    router.back()
+  }
 }
 </script>
 

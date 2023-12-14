@@ -51,8 +51,7 @@ function triggerDrawer(direction: DrawerDirection) {
         <div class="logo-wrap">
           <a class="nav-more" href="javascript:void(0)" @click="triggerDrawer('ltr')">&#xe66c;</a>
           <span class="nav-logo"></span>
-          <a href="/" class="nav-title">dogex.me</a>
-          <div class="nav-active-item nav-protocol-tag">DRC721</div>
+          <!-- <a href="/" class="nav-title">dogex.me</a> -->
         </div>
         <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
           <component v-for="n in navlist" :is="n.children ? ElSubMenu : ElMenuItem" :index="n.path" :key="n.title">
@@ -110,25 +109,21 @@ function triggerDrawer(direction: DrawerDirection) {
 
 <style lang="scss" scoped>
 .nav-menu {
+  --activeColor: rgb(238, 181, 15);
   :deep(.el-menu-item) {
-    border-radius: 8px;
-    border-bottom: none;
-    background-color: #fafafa;
-    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
-    margin-right: 4px;
-    border: 1px solid #333;
+    font-size: 13px;
+    font-family: SistemnyjC;
     &:hover {
-      background-color: #ddc2f9;
+      background-color: transparent;
     }
     &:focus {
-      background-color: #ddc2f9;
+      background-color: transparent;
     }
   }
   :deep(.is-active) {
-    border-bottom: none;
-    border: 1px solid #333;
-    background-color: #ddc2f9;
-    box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
+    color: var(--activeColor) !important;
+    border-color: var(--activeColor) !important;
+    transition: none;
   }
 }
 
@@ -138,12 +133,6 @@ function triggerDrawer(direction: DrawerDirection) {
   border: none;
   flex: 1;
   height: auto;
-}
-
-.nav-protocol-tag {
-  padding: 2px 8px;
-  font-weight: bold;
-  font-size: 16px;
 }
 
 .nav {
@@ -157,12 +146,11 @@ function triggerDrawer(direction: DrawerDirection) {
   box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
 }
 .nav-logo {
-  --size: 29px;
   display: inline-block;
-  background: url('@/assets/img/logo32.png');
+  background: url('@/assets/img/navfont.png') no-repeat;
   background-size: 100%;
-  width: var(--size);
-  height: var(--size);
+  width: 105px;
+  height: 18px;
 }
 #show-search-bar {
   display: none;
@@ -244,8 +232,7 @@ function triggerDrawer(direction: DrawerDirection) {
   font-family: SistemnyjC;
   margin-left: 12px;
   font-weight: bold;
-  font-size: 24px;
-  line-height: 1;
+  font-size: 18px;
 }
 
 @media screen and (max-width: 876px) {

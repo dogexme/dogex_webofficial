@@ -10,6 +10,10 @@ export default [
     title: 'Home',
   },
   {
+    path: '/drc20',
+    title: 'DRC-20',
+  },
+  {
     path: '/swordpool',
     title: 'Swordpool',
   },

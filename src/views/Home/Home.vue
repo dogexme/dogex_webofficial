@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { queryColl, getBlocksCount } from '@/services/nft'
+import { queryColl } from '@/services/nft'
 import { Loading, CircleCloseFilled } from '@element-plus/icons-vue'
 import { CollInfoType, CollInfo, RequestPageParams } from '@/types'
 import AssetsTable from './components/AssetsTable'
 import { RouteRecordName, onBeforeRouteUpdate } from 'vue-router'
+import { useAppStore } from '@/store'
 
 defineOptions({
   name: 'home',
@@ -19,9 +20,10 @@ const showContent = ref(route.name == 'nft' ? true : false)
 const isNotFount = ref(route.name == 'nft' ? true : false)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const collInfo = ref<CollInfo>()
-const blockCount = ref(0)
 const tables = reactive<any>({})
 const routeName = ref<RouteRecordName | null | undefined>(route.name)
+const appStore = useAppStore()
+const blockCount = computed(() => appStore.blockCount)
 
 const tabs = [
   {
@@ -104,18 +106,6 @@ async function search(txidValue: string) {
   }
 }
 
-function getBlocksCountHandler() {
-  getBlocksCount().then((r) => {
-    blockCount.value = r.data?.data?.[0]?.block || 0
-    setTimeout(
-      () => {
-        getBlocksCountHandler()
-      },
-      1000 * 60 * 5
-    )
-  })
-}
-
 onBeforeRouteUpdate((route) => {
   routeName.value = route.name
   if (route.name == 'home') {
@@ -123,10 +113,6 @@ onBeforeRouteUpdate((route) => {
     loadingSearch.value = false
     curTabValue.value = 'overview'
   }
-})
-
-onMounted(() => {
-  getBlocksCountHandler()
 })
 </script>
 <template>
@@ -237,7 +223,7 @@ onMounted(() => {
     width: 95%;
     max-width: 740px;
     height: 12vmin;
-    max-height: 66px;
+    max-height: 55px;
     background: #fff;
     padding: 0 24px;
     border-radius: 40px;

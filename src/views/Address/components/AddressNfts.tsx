@@ -10,23 +10,11 @@ export default defineComponent({
       type: String,
       required: true,
     },
-    tabVal: {
-      type: String,
-    },
-    isLoading: {
-      type: Boolean,
-      default: false,
-    },
-    error: Function as PropType<(e: Error) => void>,
   },
-  emits: ['update:isLoading'],
-  setup(props, { expose, emit }) {
+  setup(props, { expose }) {
     const { dataSource, page, total, loading, query } = useTable({
       api: getData,
-    })
-
-    watch(loading, (isLoading) => {
-      emit('update:isLoading', isLoading)
+      first: false,
     })
 
     const columns = [
@@ -71,25 +59,26 @@ export default defineComponent({
     ]
 
     async function getData(page: number, pageSize: number) {
-      try {
-        const res = await queryAdrCollections({
-          address: props.address,
-          pageSize,
-          page,
-        })
+      const res = await queryAdrCollections({
+        address: props.address,
+        pageSize,
+        page,
+      })
 
-        return {
-          total: res.data.total,
-          data: setCollectionLogo(res.data.data),
-        }
-      } catch (e: unknown) {
-        props.error?.(e as Error)
-        throw e
+      return {
+        total: res.data.total,
+        data: setCollectionLogo(res.data.data),
       }
     }
 
+    let isLoaded = false
+
     expose({
-      reload: (page.value = 1),
+      load: async () => {
+        if (isLoaded) return
+        await query(1)
+        isLoaded = true
+      },
     })
 
     return () => (

@@ -1,29 +1,12 @@
 <script setup lang="ts">
-import { collMap } from '@/services/nft'
-
-const loading = ref(true)
-let timer = 0
-
-async function loadCollMap() {
-  try {
-    const res = await collMap()
-    localStorage.setItem('nfts', JSON.stringify(res.data))
-    loading.value = false
-    document.body.removeChild(document.getElementById('loading-container')!)
-    document.body.classList.remove('loading-body')
-    clearTimeout(timer)
-  } catch {
-    timer = window.setTimeout(loadCollMap, 1000)
-  }
-}
+import { useAppStore } from './store'
 
 onMounted(async () => {
-  document.body.classList.add('loading-body')
-  loadCollMap()
+  useAppStore().getBlocksCountHandler()
 })
 </script>
 <template>
-  <router-view v-if="!loading"></router-view>
+  <router-view></router-view>
 </template>
 <style lang="scss">
 @import url('./reset.css');
