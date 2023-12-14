@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import { useAppStore } from './store'
 
+const appStore = useAppStore()
+
 onMounted(async () => {
-  useAppStore().getBlocksCountHandler()
+  appStore.getBlocksCountHandler()
+  appStore.getMenus()
 })
 </script>
 <template>

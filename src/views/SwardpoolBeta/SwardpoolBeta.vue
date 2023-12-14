@@ -8,7 +8,6 @@ import { ArrowDown, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
-import TransferTop500 from './components/TransferTop500'
 import { SwordPool, TokenState } from '@/services/types'
 import VChart from 'vue-echarts'
 import ECharts from 'vue-echarts'
@@ -335,8 +334,9 @@ function getAddressTransList() {
                 <div class="selectToken">
                   <el-dropdown class="inline-block mr-4" trigger="click" @command="changePool">
                     <el-button>
-                      <img class="token-icon" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA
-                      }}<span class="split-word">/</span> <img class="token-icon" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span v-if="address"
+                      <img class="token-icon rounded-full" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA
+                      }}<span class="split-word">/</span> <img class="token-icon rounded-full" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span
+                        v-if="address"
                         >{{ balance }}&nbsp;</span
                       >{{ currentPool?.tokenB }}
                       <el-icon class="ml-2"><ArrowDown /></el-icon>
@@ -344,8 +344,8 @@ function getAddressTransList() {
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="!!noticeMessage || item.status != 0">
-                          <img class="token-icon" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
-                          <img class="token-icon" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
+                          <img class="token-icon rounded-full" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
+                          <img class="token-icon rounded-full" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
                         </el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
@@ -426,7 +426,7 @@ function getAddressTransList() {
 }
 
 :deep(.doglink .doglink_link) {
-  color: rgb(238, 181, 15);
+  color: rgb(255, 194, 0);
 }
 
 .chart {
@@ -458,7 +458,6 @@ function getAddressTransList() {
 .token-icon {
   width: 20px;
   height: 20px;
-  border-radius: 50%;
   margin-right: 6px;
 }
 .split-word {
@@ -485,7 +484,7 @@ section {
   line-height: 1.5;
   margin-left: 6px;
   &--connect {
-    background-color: rgb(238, 181, 15);
+    background-color: rgb(255, 194, 0);
     color: #333;
     border: 1px solid #333;
   }

@@ -40,3 +40,10 @@ export const queryTickInfo = (params: { tick: string }) => {
     params,
   })
 }
+
+/**
+ * 获取菜单权限
+ */
+export const getMenuAuth = () => {
+  return axios.get('/api/config')
+}

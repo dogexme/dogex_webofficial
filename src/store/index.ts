@@ -3,6 +3,8 @@ import { RouteLocationNormalized } from 'vue-router'
 import { DogeErrorCode } from '@/hooks/doge'
 import { ElMessageBox } from 'element-plus'
 import { getBlocksCount } from '@/services/nft'
+import { getMenuAuth } from '@/services/drc'
+import menuList from '@/config/navlist'
 
 const store = createPinia()
 const { connectDpal } = useDoge()
@@ -15,6 +17,7 @@ export const useAppStore = defineStore('app', {
     address: '',
     blockCount: 0,
     transferList: JSON.parse(localStorage.getItem('transfer_list') || '[]'),
+    menus: JSON.parse(localStorage.getItem('menus') || '[]') as typeof menuList,
   }),
   actions: {
     connectDpal() {
@@ -54,6 +57,18 @@ export const useAppStore = defineStore('app', {
           1000 * 60 * 5
         )
       })
+    },
+    async getMenus() {
+      const res = await getMenuAuth()
+      const auth = res.data
+      const menus: typeof menuList = []
+      menuList.forEach((mItem) => {
+        if (auth[mItem.value] !== false) {
+          menus.push(mItem)
+        }
+      })
+      this.menus = menus
+      localStorage.setItem('menus', JSON.stringify(menus))
     },
   },
   getters: {

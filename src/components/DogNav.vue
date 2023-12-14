@@ -2,7 +2,6 @@
 import { omitCenterString } from '@/utils'
 import { EpPropMergeType } from 'element-plus/lib/utils/index.js'
 import { useAppStore } from '@/store'
-import navlist from '@/config/navlist'
 import { ElMenuItem, ElMessageBox, ElSubMenu } from 'element-plus'
 
 type DrawerDirection = EpPropMergeType<StringConstructor, 'ltr' | 'rtl' | 'ttb' | 'btt', unknown>
@@ -11,6 +10,7 @@ const appStore = useAppStore()
 const router = useRouter()
 const isShowDrawer = ref(false)
 const activePath = computed(() => appStore.activeRoutePath)
+const navlist = computed(() => appStore.menus)
 const drawerDirection = ref<DrawerDirection>('ltr')
 const { connectDpal } = appStore
 const address = computed(() => appStore.address)
@@ -50,7 +50,7 @@ function triggerDrawer(direction: DrawerDirection) {
       <div class="nav-wrap">
         <div class="logo-wrap">
           <a class="nav-more" href="javascript:void(0)" @click="triggerDrawer('ltr')">&#xe66c;</a>
-          <span class="nav-logo"></span>
+          <span class="nav-logo" @click="router.replace('/')"></span>
           <!-- <a href="/" class="nav-title">dogex.me</a> -->
         </div>
         <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
@@ -109,7 +109,7 @@ function triggerDrawer(direction: DrawerDirection) {
 
 <style lang="scss" scoped>
 .nav-menu {
-  --activeColor: rgb(238, 181, 15);
+  --activeColor: rgb(255, 194, 0);
   :deep(.el-menu-item) {
     font-size: 13px;
     font-family: SistemnyjC;
@@ -151,6 +151,7 @@ function triggerDrawer(direction: DrawerDirection) {
   background-size: 100%;
   width: 105px;
   height: 18px;
+  cursor: pointer;
 }
 #show-search-bar {
   display: none;
@@ -210,7 +211,7 @@ function triggerDrawer(direction: DrawerDirection) {
   }
   &--weblink {
     background-color: currentColor;
-    color: rgb(238, 181, 15);
+    color: rgb(255, 194, 0);
     :hover {
       background-color: rgba(0, 0, 0, 0.05);
     }
