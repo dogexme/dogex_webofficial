@@ -149,8 +149,8 @@ function triggerDrawer(direction: DrawerDirection) {
   display: inline-block;
   background: url('@/assets/img/navfont.png') no-repeat;
   background-size: 100%;
-  width: 105px;
-  height: 18px;
+  width: 120px;
+  height: 24px;
   cursor: pointer;
 }
 #show-search-bar {
