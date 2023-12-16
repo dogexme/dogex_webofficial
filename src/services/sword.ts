@@ -2,6 +2,7 @@ import { PageResult } from './../types.d'
 // import { CollInfo, RequestPageParams } from '@/types'
 import axios from 'axios'
 import { ResultToken, TokenState } from './types'
+import req from './request'
 
 /**
  * 获取代币池
@@ -14,7 +15,7 @@ export const queryPools = () => {
  * 获取代币最新金额
  */
 export const queryPoolState = (poolid: string) => {
-  return axios.get<ResultToken<TokenState>>('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_state', {
+  return req.get<ResultToken<TokenState>>('/api/v1/pool/state', {
     params: { poolid },
   })
 }
@@ -41,7 +42,7 @@ export const queryPoolTransactionList = (params: { pair: string } & PageResult) 
  * 查询池子交易记录
  */
 export const queryPoolTransfers = (params: { address?: string } & PageResult) => {
-  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_txs', {
+  return req.get('/api/v1/pool/transaction/list', {
     params,
   })
 }
@@ -63,7 +64,7 @@ export const getTransferList = (address: string) => {
  * @returns
  */
 export const queryTransferStatus = (hash: string) => {
-  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=pool_transaction', {
+  return req.get('/api/v1/pool/transaction', {
     params: { hash },
   })
 }
@@ -100,7 +101,7 @@ export const getTokenInfo = () => {
  * @returns
  */
 export const getTokenTransferData = () => {
-  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=tvl')
+  return req.get('/api/v1/pool/tvl')
 }
 
 /**

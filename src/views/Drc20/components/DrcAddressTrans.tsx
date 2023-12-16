@@ -27,13 +27,18 @@ export default defineComponent({
         title: 'Logo',
         dataIndex: 'logo',
         render: (_: string, r: any) => {
+          const tick = r.tick == 'dogi' ? 'dogim' : r.tick
           return (
-            <ElImage
-              v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }}
-              style="width: 40px; height: 40px; border-radius: 5px"
-              src={`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${r.tick == 'dogi' ? 'dogim' : r.tick}.png`}
-              fit="cover"
-            ></ElImage>
+            <>
+              {tick && (
+                <ElImage
+                  v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }}
+                  style="width: 40px; height: 40px; border-radius: 5px"
+                  src={`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${tick}.png`}
+                  fit="cover"
+                ></ElImage>
+              )}
+            </>
           )
         },
       },

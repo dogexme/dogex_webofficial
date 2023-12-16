@@ -1,9 +1,5 @@
+import axios from './request'
 import { PageResult } from '@/types'
-import _axios from 'axios'
-
-const axios = _axios.create({
-  baseURL: import.meta.env.PROD ? import.meta.env.VITE_BASE_URL : '',
-})
 
 /**
  * 获取drc列表

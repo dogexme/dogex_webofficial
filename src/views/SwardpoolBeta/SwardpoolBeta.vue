@@ -198,9 +198,8 @@ onMounted(() => {
   getTokenTransferData().then((res) => {
     const result = res.data
     if (result.status == 'success') {
-      const data = result.data
-      const marketData = data.market_data
-      loadTransferData(marketData)
+      const data = result.market_data
+      loadTransferData(data)
     }
   })
 })
@@ -383,10 +382,10 @@ function getAddressTransList() {
                 <el-statistic title="Processed Blocks" :value="currentPoolState?.blockno" />
               </el-col>
               <el-col :span="12">
-                <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="currentPoolState?.balanceA" />
+                <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="+currentPoolState?.balanceA" />
               </el-col>
               <el-col :span="12">
-                <el-statistic :title="`Current ${currentPool?.tokenB} Balance`" :precision="5" :value="currentPoolState?.balanceB" />
+                <el-statistic :title="`Current ${currentPool?.tokenB} Balance`" :precision="5" :value="+currentPoolState?.balanceB" />
               </el-col>
             </el-row>
           </el-col>

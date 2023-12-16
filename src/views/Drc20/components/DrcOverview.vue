@@ -13,7 +13,7 @@ const props = withDefaults(
 
 <template>
   <div class="coll-info">
-    <div class="coll-info_item">
+    <div class="coll-info_item" v-if="props.tickInfo.tick">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Logo</div>
       <div class="coll-info_item_value">
         <div class="coll-logo-wrap">
