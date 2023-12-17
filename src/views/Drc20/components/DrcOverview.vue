@@ -23,7 +23,7 @@ const props = withDefaults(
             fit="cover"
           >
             <template #error>
-              {{ props.tickInfo.tick }}
+              <div class="el-image__error">{{ props.tickInfo.tick }}</div>
             </template>
           </el-image>
         </div>
@@ -39,21 +39,29 @@ const props = withDefaults(
     </div>
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Max</div>
-      <div class="coll-info_item_value">{{ props.tickInfo.max && numberFormat(props.tickInfo.max) }}</div>
+      <div class="coll-info_item_value">{{ numberFormat(props.tickInfo.max) }}</div>
     </div>
-    <div class="coll-info_item">
+    <div class="coll-info_item" v-if="props.tickInfo.mintVal !== undefined">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Mintval</div>
-      <div class="coll-info_item_value">{{ props.tickInfo.mintVal && numberFormat(props.tickInfo.mintVal) }}</div>
+      <div class="coll-info_item_value">{{ numberFormat(props.tickInfo.mintVal) }}</div>
     </div>
-    <div class="coll-info_item">
+    <div class="coll-info_item" v-if="props.tickInfo.holders !== undefined">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Holders</div>
-      <div class="coll-info_item_value">{{ props.tickInfo.holders && numberFormat(props.tickInfo.holders) }}</div>
+      <div class="coll-info_item_value">{{ numberFormat(props.tickInfo.holders) }}</div>
     </div>
-    <div class="coll-info_item">
+    <div class="coll-info_item" v-if="props.tickInfo.deployer">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Deployer</div>
       <div class="coll-info_item_value">
         <DogLink route :to="`/address/${props.tickInfo.deployer}`" is-copy :label="omitCenterString(props.tickInfo.deployer)" :value="props.tickInfo.deployer"></DogLink>
       </div>
+    </div>
+    <div class="coll-info_item" v-if="props.tickInfo.block">
+      <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Block</div>
+      <div class="coll-info_item_value">{{ numberFormat(props.tickInfo.block) }}</div>
+    </div>
+    <div class="coll-info_item" v-if="props.tickInfo.txid">
+      <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Txid</div>
+      <div class="coll-info_item_value"><DogLink is-copy style="cursor: pointer" :label="omitCenterString(props.tickInfo.txid, 24)" :value="props.tickInfo.txid"></DogLink></div>
     </div>
   </div>
 </template>

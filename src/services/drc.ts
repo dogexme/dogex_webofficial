@@ -43,3 +43,21 @@ export const queryTickInfo = (params: { tick: string }) => {
 export const getMenuAuth = () => {
   return axios.get('/api/config')
 }
+
+/**
+ * 查询unlist drc
+ */
+export const queryUnlist = (params: { len: number } & Partial<PageResult>) => {
+  return axios.get('/api/v1/tick/unlist', {
+    params,
+  })
+}
+
+/**
+ *  获取unlist drc项
+ */
+export const getUnlistItem = (params: { tick: string }) => {
+  return axios.get('/api/v1/tick/unlist/tickname', {
+    params,
+  })
+}

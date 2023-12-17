@@ -39,14 +39,8 @@ async function search() {
         <el-icon v-if="loadingSearch" class="loading-icon"><Loading /></el-icon>
         <el-icon v-if="!loadingSearch && tick.length" style="cursor: pointer" @click="tick = ''"><CircleCloseFilled /></el-icon>
       </form>
-      <!-- <div class="blocks-number">
-        <i class="dog-icon dog-icon_block"></i>
-        Processed Blocks: <span v-if="blockCount">{{ blockCount }}</span>
-      </div> -->
     </div>
-    <DogCard v-show="route.name == 'drc20'" style="margin-top: 12px">
-      <DrcCast @search="search"></DrcCast>
-    </DogCard>
+    <DrcCast v-show="route.name == 'drc20'" @search="search"></DrcCast>
     <router-view v-if="route.name != 'drc20'"></router-view>
   </div>
 </template>

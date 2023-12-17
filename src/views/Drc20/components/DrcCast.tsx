@@ -1,113 +1,53 @@
-import DogLink from '@/components/DogLink.vue'
-import DogTable from '@/components/DogTable/DogTable'
-import { numberFormat } from '@/utils'
-import { queryDrcList } from '@/services/drc'
-import { ElImage } from 'element-plus'
+import DogTabs from '@/components/DogTabs/DogTabs'
+import DogTabsItem from '@/components/DogTabs/DogTabsItem'
+import DrcListed from './DrcListed'
+import DrcUnlist from './DrcUnlist'
+
+export type ListType = 'listed' | 'unlist'
 
 export default defineComponent({
   emits: ['search'],
   setup() {
-    const pageSize = 20
-    const { dataSource, total, page, loading, query } = useTable({
-      api: getData,
-      pageSize,
-    })
-    const router = useRouter()
-
-    const columns = [
+    const route = useRoute()
+    const type = route.query.type as ListType | undefined
+    const queryTypeVal = ref(type || 'listed')
+    const tables = reactive<any>({})
+    const tabs = [
       {
-        title: 'Logo',
-        dataIndex: 'logo',
-        render: (_: string, r: any) => {
-          const tick = r.tick == 'dogi' ? 'dogim' : r.tick
-          return (
-            <>
-              {tick && (
-                <ElImage
-                  v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }}
-                  style="width: 40px; height: 40px; border-radius: 5px"
-                  src={`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${tick}.png`}
-                  fit="cover"
-                ></ElImage>
-              )}
-            </>
-          )
-        },
+        label: 'Listed',
+        value: 'listed',
       },
       {
-        title: 'Tick',
-        dataIndex: 'tick',
-        render(text: string) {
-          return text
-        },
-      },
-      {
-        title: 'Mint',
-        dataIndex: 'mintVal',
-        render(text: number) {
-          return numberFormat(text)
-        },
-      },
-      {
-        title: 'Max',
-        dataIndex: 'max',
-        render(text: number) {
-          return numberFormat(text)
-        },
-      },
-      {
-        title: 'Lim',
-        dataIndex: 'lim',
-        render(text: number) {
-          return numberFormat(text)
-        },
-      },
-      {
-        title: 'Holders',
-        dataIndex: 'holders',
-        render(text: number) {
-          return numberFormat(text)
-        },
-      },
-      {
-        title: 'Deployer',
-        dataIndex: 'deployer',
-        render(text: string) {
-          return <DogLink route to={`/address/${text}`} is-copy label={text} value={text}></DogLink>
-        },
+        label: 'Unlist',
+        value: 'unlist',
       },
     ]
 
-    function rowClick(drc: any) {
-      router.push(`/drc20/item/${drc.tick}`)
+    const loading = ref(false)
+
+    async function changeTab(tabVal: ListType) {
+      if (loading.value) return
+      queryTypeVal.value = tabVal
+      nextTick(reload)
     }
 
-    async function getData(page: number, pageSize: number) {
-      const res = await queryDrcList({
-        pageSize,
-        page,
-      })
-
-      return {
-        total: res.data.total || 1,
-        data: res.data.data,
-      }
+    function reload() {
+      tables[queryTypeVal.value]?.reload?.()
     }
+
+    onMounted(reload)
 
     return () => (
-      <DogTable
-        rowkey="txid"
-        defaultPageSize={pageSize}
-        loading={loading.value}
-        dataSource={dataSource.value}
-        columns={columns}
-        currentPage={page.value}
-        total={total.value}
-        onCurrent-change={query}
-        onRefresh={() => query(page.value)}
-        onRow-click={rowClick}
-        rowClick
-      />
+      <div class="mt-4">
+        <DogTabs keep-dom modelValue={queryTypeVal.value} tabs={tabs} onChange={changeTab}>
+          <DogTabsItem value="listed">
+            <DrcListed ref={(ref) => (tables['listed'] = ref)} v-model:loading={loading.value} type="listed"></DrcListed>
+          </DogTabsItem>
+          <DogTabsItem value="unlist">
+            <DrcUnlist ref={(ref) => (tables['unlist'] = ref)} v-model:loading={loading.value} type="unlist"></DrcUnlist>
+          </DogTabsItem>
+        </DogTabs>
+      </div>
     )
   },
 })
