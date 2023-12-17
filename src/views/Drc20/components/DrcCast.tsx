@@ -9,6 +9,7 @@ export default defineComponent({
   emits: ['search'],
   setup() {
     const route = useRoute()
+    const router = useRouter()
     const type = route.query.type as ListType | undefined
     const queryTypeVal = ref(type || 'listed')
     const tables = reactive<any>({})
@@ -28,6 +29,7 @@ export default defineComponent({
     async function changeTab(tabVal: ListType) {
       if (loading.value) return
       queryTypeVal.value = tabVal
+      router.replace(`/drc20?type=${queryTypeVal.value}`)
       nextTick(reload)
     }
 
