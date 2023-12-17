@@ -46,7 +46,7 @@ const tickInfo = ref()
 function updateTick() {
   loading.value = true
 
-  let api = paramType.value == 'unlist' ? getUnlistItem : queryTickInfo
+  let api = getUnlistItem
 
   if (paramType.value == 'unlist') {
     tabs.value = [

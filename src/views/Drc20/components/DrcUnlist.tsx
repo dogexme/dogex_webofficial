@@ -134,7 +134,7 @@ export default defineComponent({
             <div class="flex items-center">
               <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
               <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">
-                {Array.from({ length: 3 }).map((_, i) => {
+                {Array.from({ length: 2 }).map((_, i) => {
                   return <ElOption key={i} label={i + 4} value={i + 4}></ElOption>
                 })}
               </ElSelect>
