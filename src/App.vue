@@ -96,4 +96,8 @@ onMounted(async () => {
     }
   }
 }
+
+.el-alert--info.is-dark {
+  background-color: var(--el-color-primary) !important;
+}
 </style>

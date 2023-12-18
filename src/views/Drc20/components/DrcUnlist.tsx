@@ -2,7 +2,7 @@ import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import { numberFormat } from '@/utils'
 import { queryUnlist } from '@/services/drc'
-import { ElImage, ElOption, ElSelect } from 'element-plus'
+import { ElAlert, ElImage, ElOption, ElSelect } from 'element-plus'
 import { PropType } from 'vue'
 import { ListType } from './DrcCast'
 
@@ -118,8 +118,6 @@ export default defineComponent({
 
     return () => (
       <DogTable
-        rowkey="tick"
-        defaultPageSize={pageSize}
         loading={loading.value}
         dataSource={dataSource.value}
         columns={columns}
@@ -131,13 +129,16 @@ export default defineComponent({
         rowClick
         v-slots={{
           tooltipLeft: () => (
-            <div class="flex items-center">
-              <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
-              <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">
-                {Array.from({ length: 2 }).map((_, i) => {
-                  return <ElOption key={i} label={i + 4} value={i + 4}></ElOption>
-                })}
-              </ElSelect>
+            <div class="flex flex-col mr-2">
+              <ElAlert description="Not all ticks are valuable; Don't waste your funds on minting." type="info" effect="dark" show-icon closable={false} />
+              <div class="flex items-center mt-2">
+                <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
+                <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">
+                  {Array.from({ length: 2 }).map((_, i) => {
+                    return <ElOption key={i} label={i + 4} value={i + 4}></ElOption>
+                  })}
+                </ElSelect>
+              </div>
             </div>
           ),
         }}

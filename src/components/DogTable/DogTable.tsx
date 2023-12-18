@@ -141,7 +141,7 @@ export default defineComponent({
           <div class="flex justify-between mb-2">
             {slots.tooltipLeft?.()}
             {props.refresh && (
-              <div style="width: 100%;display: flex;justify-content: flex-end;">
+              <div class={s['table-refresh-wrapper']}>
                 <ElButton icon={Refresh} circle onClick={refresh}></ElButton>
               </div>
             )}

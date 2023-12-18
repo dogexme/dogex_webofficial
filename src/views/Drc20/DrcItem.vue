@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getUnlistItem } from '@/services/drc'
+import { getUnlistItem, queryTickInfo } from '@/services/drc'
 import { CollInfoType } from '@/types'
 const tables = reactive<any>({})
 const isNotFount = ref(false)
@@ -40,19 +40,27 @@ function reload() {
 
 const tickInfo = ref()
 
-function updateTick() {
+async function updateTick() {
   loading.value = true
+  const tick = route.params.tick as string
+  let res: any
 
-  let api = getUnlistItem
+  curTabValue.value = 'overview'
 
-  api({
-    tick: route.params.tick as string,
-  }).then((res) => {
-    tickInfo.value = res.data.data
-    loading.value = false
-    isNotFount.value = !tickInfo.value.tick
-    curTabValue.value = 'overview'
+  res = await queryTickInfo({
+    tick,
   })
+
+  if (!res.data.data.tick) {
+    res = await getUnlistItem({
+      tick,
+    })
+  }
+
+  tickInfo.value = res.data.data
+  loading.value = false
+  isNotFount.value = !tickInfo.value.tick
+  curTabValue.value = 'overview'
 }
 
 onMounted(updateTick)
