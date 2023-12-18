@@ -62,7 +62,7 @@ export default defineComponent({
 
       return {
         total: res.data.data.total,
-        data: res.data.data.holders.map((d: { balance: number }) => ({ ...d, ratio: d.balance / props.tickInfo.mintVal })),
+        data: res.data.data.holders.map((d: { balance: number }) => ({ ...d, ratio: d.balance / props.tickInfo.max })),
       }
     }
 

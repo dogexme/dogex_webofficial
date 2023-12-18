@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { getUnlistItem, queryTickInfo } from '@/services/drc'
+import { getUnlistItem } from '@/services/drc'
 import { CollInfoType } from '@/types'
-import { ListType } from './components/DrcCast'
-
 const tables = reactive<any>({})
 const isNotFount = ref(false)
 const curTabValue = ref<CollInfoType>('overview')
 const route = useRoute()
 const loading = ref(false)
-const paramType = computed(() => route.query.type as ListType)
 const tabs = ref([
   {
     label: 'Overview',
@@ -47,26 +44,6 @@ function updateTick() {
   loading.value = true
 
   let api = getUnlistItem
-
-  if (paramType.value == 'unlist') {
-    tabs.value = [
-      {
-        label: 'Overview',
-        value: 'overview',
-      },
-    ]
-  } else {
-    tabs.value = [
-      {
-        label: 'Overview',
-        value: 'overview',
-      },
-      {
-        label: 'Holders',
-        value: 'holders',
-      },
-    ]
-  }
 
   api({
     tick: route.params.tick as string,

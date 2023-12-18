@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Loading, CircleCloseFilled } from '@element-plus/icons-vue'
-import { ListType } from './components/DrcCast'
 
 defineOptions({
   name: 'drc20',
@@ -10,7 +9,6 @@ const route = useRoute()
 const router = useRouter()
 const tick = ref('')
 const loadingSearch = ref(false)
-const paramType = computed(() => route.query.type as ListType)
 
 function pushRoute(path: string, startsWiths: string[]) {
   if (startsWiths.some((path) => route.fullPath.startsWith(path))) {
@@ -28,7 +26,7 @@ async function search() {
   if (tick.value.length > 6) {
     pushRoute(`/drc20/wallet/${tick.value}`, ['/drc20/wallet', '/drc20/item'])
   } else {
-    pushRoute(`/drc20/item/${tick.value}?type=${paramType.value}`, ['/drc20/item'])
+    pushRoute(`/drc20/item/${tick.value}`, ['/drc20/item'])
   }
 }
 </script>
