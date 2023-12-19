@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getBalanceByPoolAddress, getTokenInfo, queryPools, queryPoolState, getTokenTransferData } from '@/services/sword'
+import { getBalanceByPoolAddress, getTokenInfo, queryPoolState, getTokenTransferData } from '@/services/sword'
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
@@ -22,12 +22,12 @@ const { connectDpal } = appStore
 const address = computed(() => appStore.address)
 const transferLoadingCount = computed(() => appStore.transferLoadingCount)
 const showSwapDialog = ref(false)
-const pools = ref<any[]>([])
 const poolid = ref('')
 const currentPool = ref<Partial<SwordPool>>({})
 const currentPoolState = ref<TokenState>()
 const tokenInfo = ref({})
-const noticeMessage = ref('')
+const noticeMessage = computed(() => appStore.noticeMessages.notice_message)
+const pools = computed(() => appStore.swordPools)
 const loading = ref(false)
 const listLoading = ref(false)
 const balance = ref(0)
@@ -122,14 +122,10 @@ const newData = new Map()
 const tdCountMap = new Map()
 
 function init() {
-  queryPools().then((res) => {
-    pools.value = res.data.pools
-    poolid.value = pools.value[0].poolid
-    currentPool.value = pools.value[0]
-    noticeMessage.value = res.data.notice_message
-    // 第二个参数开启实时金额
-    queryPoolStatus(poolid.value, false)
-  })
+  poolid.value = pools.value[0].poolid
+  currentPool.value = pools.value[0]
+  // 第二个参数开启实时金额
+  queryPoolStatus(poolid.value, false)
   if (address.value) {
     getBalance(address.value)
   }
@@ -325,7 +321,7 @@ function getAddressTransList() {
             </el-link>
           </div>
         </div>
-        <el-alert v-if="noticeMessage" title="Notice" :description="noticeMessage" type="warning" effect="dark" show-icon class="mb-3" />
+        <el-alert class="mb-3" v-if="noticeMessage" title="Notice" :description="noticeMessage" type="info" effect="dark" show-icon :closable="false" />
         <el-row style="margin-top: 12px">
           <el-col :span="24" :md="12">
             <el-row>
@@ -350,7 +346,7 @@ function getAddressTransList() {
                     </template>
                   </el-dropdown>
                   <template v-if="address && currentPool.pooladdress">
-                    <el-button class="mr-3" :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
+                    <el-button :disabled="!currentPool.status || +currentPool.status == 0" class="mr-3" :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
                     <div class="selectToken_bar">
                       <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                       <el-button class="mr-3" type="primary" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>

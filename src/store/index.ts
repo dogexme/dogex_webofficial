@@ -5,6 +5,7 @@ import { ElMessageBox } from 'element-plus'
 import { getBlocksCount } from '@/services/nft'
 import { getMenuAuth } from '@/services/drc'
 import menuList from '@/config/navlist'
+import { queryPools } from '@/services/sword'
 
 const store = createPinia()
 const { connectDpal } = useDoge()
@@ -18,6 +19,7 @@ export const useAppStore = defineStore('app', {
     blockCount: 0,
     transferList: JSON.parse(localStorage.getItem('transfer_list') || '[]'),
     menus: JSON.parse(localStorage.getItem('menus') || '[]') as typeof menuList,
+    swordPoolInfo: {} as any,
   }),
   actions: {
     connectDpal() {
@@ -70,8 +72,20 @@ export const useAppStore = defineStore('app', {
       this.menus = menus
       localStorage.setItem('menus', JSON.stringify(menus))
     },
+    async getSwordPools() {
+      return queryPools().then((res) => {
+        this.swordPoolInfo = res.data
+      })
+    },
   },
   getters: {
+    swordPools(state) {
+      return state.swordPoolInfo?.pools || []
+    },
+    noticeMessages(state) {
+      const { notice_message, notice_message_2 } = state.swordPoolInfo || {}
+      return { notice_message, notice_message_2 }
+    },
     activeRoutePath(state) {
       return state.activeRoute.path
     },

@@ -2,9 +2,10 @@ import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import { numberFormat } from '@/utils'
 import { queryUnlist } from '@/services/drc'
-import { ElAlert, ElImage, ElOption, ElSelect } from 'element-plus'
+import { ElAlert, ElOption, ElSelect } from 'element-plus'
 import { PropType } from 'vue'
 import { ListType } from './DrcCast'
+import { useAppStore } from '@/store'
 
 export default defineComponent({
   props: {
@@ -24,28 +25,30 @@ export default defineComponent({
       api: getData,
       pageSize,
     })
+    const store = useAppStore()
     const router = useRouter()
+    const unlistMessage = computed(() => store.noticeMessages.notice_message_2)
     const len = ref(4)
     const columns = [
-      {
-        title: 'Logo',
-        dataIndex: 'logo',
-        render: (_: string, r: any) => {
-          const tick = r.tick == 'dogi' ? 'dogim' : r.tick
-          return (
-            <>
-              {tick && (
-                <ElImage
-                  v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }}
-                  style="width: 40px; height: 40px; border-radius: 5px"
-                  src={`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${tick}.png`}
-                  fit="cover"
-                ></ElImage>
-              )}
-            </>
-          )
-        },
-      },
+      // {
+      //   title: 'Logo',
+      //   dataIndex: 'logo',
+      //   render: (_: string, r: any) => {
+      //     const tick = r.tick == 'dogi' ? 'dogim' : r.tick
+      //     return (
+      //       <>
+      //         {tick && (
+      //           <ElImage
+      //             v-slots={{ error: () => <div class="el-image__error">{r.tick}</div> }}
+      //             style="width: 40px; height: 40px; border-radius: 5px"
+      //             src={`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${tick}.png`}
+      //             fit="cover"
+      //           ></ElImage>
+      //         )}
+      //       </>
+      //     )
+      //   },
+      // },
       {
         title: 'Tick',
         dataIndex: 'tick',
@@ -126,11 +129,12 @@ export default defineComponent({
         onCurrent-change={query}
         onRefresh={() => query(page.value)}
         onRow-click={rowClick}
+        defaultPageSize={pageSize}
         rowClick
         v-slots={{
           tooltipLeft: () => (
             <div class="flex flex-col mr-2">
-              <ElAlert description="Not all ticks are valuable; Don't waste your funds on minting." type="info" effect="dark" show-icon closable={false} />
+              {unlistMessage.value && <ElAlert description={unlistMessage.value} type="info" effect="dark" show-icon closable={false} />}
               <div class="flex items-center mt-2">
                 <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
                 <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">

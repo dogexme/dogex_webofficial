@@ -1,10 +1,12 @@
 <script setup lang="ts">
 import { collMap } from '@/services/nft'
+import { useAppStore } from '@/store'
 
-type ViewNames = 'home'
+type ViewNames = 'home' | 'drc20' | 'swordpool'
 
 const isShow = ref(false)
 const route = useRoute()
+const { getSwordPools } = useAppStore()
 
 function loadCollMap() {
   return new Promise((resolve) => {
@@ -25,6 +27,8 @@ function loadCollMap() {
 
 const viewReqStateList = {
   home: loadCollMap,
+  drc20: getSwordPools,
+  swordpool: getSwordPools,
 }
 
 const viewLoadedSet = new Set<ViewNames>()
