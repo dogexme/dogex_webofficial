@@ -46,6 +46,16 @@ async function updateTick() {
   let res: any
 
   curTabValue.value = 'overview'
+  tabs.value = [
+    {
+      label: 'Overview',
+      value: 'overview',
+    },
+    {
+      label: 'Holders',
+      value: 'holders',
+    },
+  ]
 
   res = await queryTickInfo({
     tick,
@@ -55,6 +65,12 @@ async function updateTick() {
     res = await getUnlistItem({
       tick,
     })
+    tabs.value = [
+      {
+        label: 'Overview',
+        value: 'overview',
+      },
+    ]
   }
 
   tickInfo.value = res.data.data
