@@ -131,6 +131,9 @@ watch(
   () => props.pools,
   (pools) => {
     revToken.value.pools = pools
+  },
+  {
+    immediate: true,
   }
 )
 

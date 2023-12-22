@@ -346,10 +346,10 @@ function getAddressTransList() {
                     </template>
                   </el-dropdown>
                   <template v-if="address && currentPool.pooladdress">
-                    <el-button :disabled="!currentPool.status || +currentPool.status == 0" class="mr-3" :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
+                    <el-button :disabled="currentPool.status != '0'" class="mr-3" :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
                     <div class="selectToken_bar">
                       <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
-                      <el-button class="mr-3" type="primary" :disabled="!!noticeMessage" @click="showSwapDialog = true">Swap</el-button>
+                      <el-button class="mr-3" type="primary" :disabled="!!noticeMessage || currentPool.status != '0'" @click="showSwapDialog = true">Swap</el-button>
                       <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
                         <DogTableMenuItem style="margin-right: 0; line-height: 30px; padding: 0 10px" label="History" value="1" @click="showTransferDialog = true" />
                       </el-badge>
