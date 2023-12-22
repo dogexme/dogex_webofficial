@@ -53,7 +53,7 @@ export const queryPoolTransfers = (params: { address?: string } & PageResult) =>
  * @returns
  */
 export const getTransferList = (address: string) => {
-  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=get_transfer_list', {
+  return axios.get('https://vckist48l2.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=get_transfer_list', {
     params: { address },
   })
 }
@@ -85,7 +85,7 @@ export const getBalanceByPoolAddress = (address: string, options = {}) => {
  * @returns
  */
 export const queryTop500 = () => {
-  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=top500')
+  return axios.get('https://vckist48l2.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=top500')
 }
 
 /**
@@ -108,7 +108,7 @@ export const getTokenTransferData = () => {
  * 查询地址交易记录
  */
 export const queryTransAddress = (params: { address?: string } & PageResult) => {
-  return axios.get('https://t26o6gfqyj.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=transactions', {
+  return axios.get('https://vckist48l2.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=transactions', {
     params,
   })
 }
