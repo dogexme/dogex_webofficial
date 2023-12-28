@@ -2,10 +2,9 @@ import DogLink from '@/components/DogLink.vue'
 import DogTable from '@/components/DogTable/DogTable'
 import { numberFormat } from '@/utils'
 import { queryUnlist } from '@/services/drc'
-import { ElAlert, ElOption, ElSelect } from 'element-plus'
+import { ElOption, ElSelect } from 'element-plus'
 import { PropType } from 'vue'
 import { ListType } from './DrcCast'
-import { useAppStore } from '@/store'
 
 export default defineComponent({
   props: {
@@ -25,9 +24,7 @@ export default defineComponent({
       api: getData,
       pageSize,
     })
-    const store = useAppStore()
     const router = useRouter()
-    const unlistMessage = computed(() => store.noticeMessages.notice_message_2)
     const len = ref(4)
     const columns = [
       // {
@@ -120,33 +117,34 @@ export default defineComponent({
     })
 
     return () => (
-      <DogTable
-        loading={loading.value}
-        dataSource={dataSource.value}
-        columns={columns}
-        currentPage={page.value}
-        total={total.value}
-        onCurrent-change={query}
-        onRefresh={() => query(page.value)}
-        onRow-click={rowClick}
-        defaultPageSize={pageSize}
-        rowClick
-        v-slots={{
-          tooltipLeft: () => (
-            <div class="flex flex-col mr-2">
-              {unlistMessage.value && <ElAlert description={unlistMessage.value} type="info" effect="dark" show-icon closable={false} />}
-              <div class="flex items-center mt-2">
-                <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
-                <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">
-                  {Array.from({ length: 2 }).map((_, i) => {
-                    return <ElOption key={i} label={i + 4} value={i + 4}></ElOption>
-                  })}
-                </ElSelect>
+      <>
+        <DogTable
+          loading={loading.value}
+          dataSource={dataSource.value}
+          columns={columns}
+          currentPage={page.value}
+          total={total.value}
+          onCurrent-change={query}
+          onRefresh={() => query(page.value)}
+          onRow-click={rowClick}
+          defaultPageSize={pageSize}
+          rowClick
+          v-slots={{
+            tooltipLeft: () => (
+              <div class="flex flex-col mr-2">
+                <div class="flex items-center mt-2">
+                  <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
+                  <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">
+                    {Array.from({ length: 2 }).map((_, i) => {
+                      return <ElOption key={i} label={i + 4} value={i + 4}></ElOption>
+                    })}
+                  </ElSelect>
+                </div>
               </div>
-            </div>
-          ),
-        }}
-      ></DogTable>
+            ),
+          }}
+        ></DogTable>
+      </>
     )
   },
 })

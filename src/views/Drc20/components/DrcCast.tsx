@@ -2,6 +2,8 @@ import DogTabs from '@/components/DogTabs/DogTabs'
 import DogTabsItem from '@/components/DogTabs/DogTabsItem'
 import DrcListed from './DrcListed'
 import DrcUnlist from './DrcUnlist'
+import { useAppStore } from '@/store'
+import { ElAlert } from 'element-plus'
 
 export type ListType = 'listed' | 'unlist'
 
@@ -10,6 +12,8 @@ export default defineComponent({
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const store = useAppStore()
+    const unlistMessage = computed(() => store.noticeMessages.notice_message_2)
     const type = route.query.type as ListType | undefined
     const queryTypeVal = ref(type || 'listed')
     const tables = reactive<any>({})
@@ -41,6 +45,7 @@ export default defineComponent({
 
     return () => (
       <div class="mt-4">
+        {unlistMessage.value && queryTypeVal.value === 'unlist' && <ElAlert style="margin-bottom: 12px" description={unlistMessage.value} type="info" effect="dark" show-icon closable={false} />}
         <DogTabs keep-dom modelValue={queryTypeVal.value} tabs={tabs} onChange={changeTab}>
           <DogTabsItem value="listed">
             <DrcListed ref={(ref) => (tables['listed'] = ref)} v-model:loading={loading.value} type="listed"></DrcListed>

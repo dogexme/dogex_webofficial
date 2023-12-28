@@ -71,6 +71,7 @@ const klineOpts = [
 ]
 
 const currentKline = ref(klineOpts[0])
+const curKlinePoint = ref()
 
 const currentPrice = computed(() => {
   const { balanceA = 0, balanceB = 0 } = currentPoolState.value || {}
@@ -92,7 +93,6 @@ async function queryPoolStatus(poolid: string, timer = false) {
       currentPoolState.value = data
       if (!isShowTip.value) {
         showPriceVal.value = currentPrice.value.price
-        // showUpdownVal.value = chartsData[chartsData.length - 1]?.custom.upordown
       }
     }
   } finally {
@@ -203,6 +203,8 @@ onActivated(() => {
   init()
 })
 
+const klineData = ref([])
+
 async function loadKline() {
   const { label, limit } = currentKline.value
   try {
@@ -216,6 +218,8 @@ async function loadKline() {
     let currentData = [] as any[]
     let timeType = 'hours'
     let timeNum = 1
+
+    data = klineData.value = data
 
     if (label === KlineType._1h) {
       currentTime = moment().minute(0).second(0)
@@ -237,15 +241,29 @@ async function loadKline() {
     }
 
     const xLabels = Array.from({ length: limit }).map((_, i) => {
-      const formatTime = currentTime.format('YYYY-MM-DD HH:mm')
+      let formatTime = currentTime.format('YYYY-MM-DD HH:mm')
+      if (label == KlineType._1d) {
+        formatTime = currentTime.format('YYYY-MM-DD')
+      }
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       //@ts-ignore
       currentTime = currentTime.subtract(timeNum, timeType)
-      currentData[i] = [formatTime, data[i]?.c || 0]
-      data[i] = [formatTime, data[i]]
+
+      const prev = data[i + 1]
+      const cur = data[i]
+      const curPrice = cur?.c || 0
+      const prevPrice = prev?.c || 0
+
+      data[i] = cur ? Object.assign(cur, { r: (curPrice - prevPrice) / prevPrice }) : cur
+
+      currentData[i] = {
+        custom: cur,
+        value: [formatTime, curPrice],
+      }
+
       return formatTime
     })
-
+    showUpdownVal.value = klineData.value[0]?.r || 0
     loadTransferData(xLabels.reverse(), currentData.reverse())
   } finally {
     echatLoading.value = false
@@ -300,7 +318,10 @@ function loadTransferData(xLabels: any[], data: any[]) {
         formatter: function (params: any) {
           const opts = params[0]
           const [date, value] = opts.value
-
+          const { custom } = opts.data
+          curKlinePoint.value = custom
+          showPriceVal.value = value
+          showUpdownVal.value = custom?.r || 0
           return `${date} Ð ${np.round(value, 6)}`
         },
       },
@@ -315,8 +336,22 @@ function loadTransferData(xLabels: any[], data: any[]) {
         axisLabel: {
           showMinLabel: false,
           showMaxLabel: false,
+          color: '#aeaeae',
+          fontSize: 10,
           formatter(value: string) {
-            return value.slice(0, -6)
+            const { label } = currentKline.value
+            return label == KlineType._1d ? value : value.slice(0, -6)
+          },
+        },
+        axisTick: {
+          length: 2,
+          lineStyle: {
+            color: 'rgb(255, 194, 0)',
+          },
+        },
+        axisLine: {
+          lineStyle: {
+            color: 'rgb(255, 194, 0)',
           },
         },
       },
@@ -325,7 +360,8 @@ function loadTransferData(xLabels: any[], data: any[]) {
         type: 'value',
         axisLabel: {
           showMinLabel: false,
-          showMaxLabel: false,
+          color: '#aeaeae',
+          fontSize: 10,
         },
         scale: true,
         splitLine: {
@@ -355,11 +391,11 @@ async function changeKline(k: any) {
 }
 
 function hideTipHandle() {
-  // isShowTip.value = false
-  // showPriceVal.value = currentPrice.value.price
-  // if (chartsData.length > 0) {
-  //   showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
-  // }
+  isShowTip.value = false
+  showPriceVal.value = currentPrice.value.price
+  if (klineData.value.length > 0) {
+    showUpdownVal.value = klineData.value[0]?.r || 0
+  }
 }
 
 function getAddressTransList() {
@@ -446,10 +482,10 @@ function getAddressTransList() {
             </el-row>
           </el-col>
           <el-col :span="24" :md="12" v-loading="echatLoading">
-            <ul class="flex justify-end">
+            <ul class="flex mb-4 text-xs font-bold">
               <li
-                class="inline-block w-8 text-xs text-center rounded-md cursor-pointer py-2 ml-2 hover:bg-yellow-300"
-                :style="[currentKline.label == k.label ? { 'background-color': 'rgb(255, 194, 0)' } : {}]"
+                class="inline-block w-8 text-center rounded-md cursor-pointer py-2 mp ml-2 hover:bg-yellow-300"
+                :style="[currentKline.label == k.label ? { 'background-color': 'rgb(255, 194, 0)', color: '#fff' } : {}]"
                 v-for="k in klineOpts"
                 @click="changeKline(k)"
                 :key="k.label"
@@ -457,6 +493,31 @@ function getAddressTransList() {
                 {{ k.label }}
               </li>
             </ul>
+            <el-row
+              class="text-xs font-bold text-center"
+              flex
+              justify="center"
+              :gutter="12"
+              style="min-height: 20px"
+              :style="[{ color: curKlinePoint?.r || 0 < 0 ? 'rgb(255, 90, 80)' : 'rgb(64, 180, 105)', visibility: curKlinePoint ? 'visible' : 'hidden' }]"
+            >
+              <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">
+                <span>O</span>:<span>{{ np.round(curKlinePoint?.o || 0, 4) }}</span>
+              </el-col>
+              <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">
+                <span>H</span>:<span>{{ np.round(curKlinePoint?.h || 0, 4) }}</span>
+              </el-col>
+              <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">
+                <span>L</span>:<span>{{ np.round(curKlinePoint?.l || 0, 4) }}</span>
+              </el-col>
+              <el-col class="mb-2" :span="6" :xs="{ span: 12 }">
+                <span>C</span>:<span>{{ np.round(curKlinePoint?.c || 0, 4) }}</span>
+                <span class="ml-2">{{ np.round((curKlinePoint?.r || 0) * 100, 2) }}%</span>
+              </el-col>
+              <el-col class="mb-2" :span="3" :xs="12">
+                <span>Vol</span>:<span>{{ np.round(curKlinePoint?.tav || 0, 4) }}</span>
+              </el-col>
+            </el-row>
             <v-chart ref="vchart" class="chart" autoresize @hideTip="hideTipHandle" />
           </el-col>
         </el-row>
@@ -488,7 +549,7 @@ function getAddressTransList() {
 </template>
 <style lang="scss" scoped>
 :deep(.el-statistic__number) {
-  font-size: 18px;
+  font-size: 16px;
 }
 
 :deep(.doglink .doglink_link) {
