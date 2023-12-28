@@ -13,6 +13,13 @@ import VChart from 'vue-echarts'
 import ECharts from 'vue-echarts'
 import moment from 'moment'
 
+enum KlineType {
+  _10m = '10m',
+  _1h = '1h',
+  _12h = '12h',
+  _1d = '1d',
+}
+
 defineOptions({
   name: 'swap',
 })
@@ -34,6 +41,7 @@ const balance = ref(0)
 const tabValue = ref('0')
 const showTransferDialog = ref(false)
 const isBalanceLoading = ref(false)
+const echatLoading = ref(false)
 const transferSelectList = [
   { label: 'Pool Transactions', value: 0 },
   { label: 'Holder', value: 1 },
@@ -195,25 +203,53 @@ onActivated(() => {
   init()
 })
 
-function loadKline() {
-  getKline({
-    interval: '1h',
-    limit: 400,
-  }).then((res) => {
+async function loadKline() {
+  const { label, limit } = currentKline.value
+  try {
+    echatLoading.value = true
+    const res = await getKline({
+      interval: label,
+      limit: limit,
+    })
     let data = res.data.data
-    let currentTime = moment().minute(0).second(0)
+    let currentTime = moment()
     let currentData = [] as any[]
+    let timeType = 'hours'
+    let timeNum = 1
 
-    const xLabels = Array.from({ length: 400 }).map((_, i) => {
+    if (label === KlineType._1h) {
+      currentTime = moment().minute(0).second(0)
+      timeType = 'hours'
+      timeNum = 1
+    } else if (label === KlineType._12h) {
+      currentTime = moment().minute(0).second(0)
+      timeType = 'hours'
+      timeNum = 12
+    } else if (label === KlineType._10m) {
+      currentTime = moment()
+        .minute(parseInt(String(moment().minute() / 10)) * 10)
+        .second(0)
+      timeNum = 10
+      timeType = 'minutes'
+    } else {
+      timeNum = 1
+      timeType = 'days'
+    }
+
+    const xLabels = Array.from({ length: limit }).map((_, i) => {
       const formatTime = currentTime.format('YYYY-MM-DD HH:mm')
-      currentTime = currentTime.subtract(1, 'hours')
-      currentData[i] = [formatTime, data[i].c]
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      //@ts-ignore
+      currentTime = currentTime.subtract(timeNum, timeType)
+      currentData[i] = [formatTime, data[i]?.c || 0]
       data[i] = [formatTime, data[i]]
       return formatTime
     })
 
     loadTransferData(xLabels.reverse(), currentData.reverse())
-  })
+  } finally {
+    echatLoading.value = false
+  }
 }
 
 function hideHideTipOrPointerEvent(e: Event) {
@@ -243,29 +279,29 @@ function loadTransferData(xLabels: any[], data: any[]) {
       title: {
         show: false,
       },
-      // grid: {
-      //   left: 0,
-      //   right: 0,
-      //   top: 0,
-      //   bottom: 0,
-      // },
-      // dataZoom: [
-      //   {
-      //     id: 'dataZoomX',
-      //     type: 'inside',
-      //     xAxisIndex: [0],
-      //     minSpan: 5,
-      //     start: 90,
-      //     end: 100,
-      //   },
-      // ],
+      grid: {
+        left: 40,
+        right: 10,
+        top: 20,
+        bottom: 20,
+      },
+      dataZoom: [
+        {
+          id: 'dataZoomX',
+          type: 'inside',
+          xAxisIndex: [0],
+          minSpan: 50,
+          start: 0,
+          end: 100,
+        },
+      ],
       tooltip: {
         trigger: 'axis',
         formatter: function (params: any) {
           const opts = params[0]
-          const [, value] = opts.value
+          const [date, value] = opts.value
 
-          return `Ð ${np.round(value, 6)}`
+          return `${date} Ð ${np.round(value, 6)}`
         },
       },
       xAxis: {
@@ -275,15 +311,23 @@ function loadTransferData(xLabels: any[], data: any[]) {
         splitLine: {
           show: false,
         },
+        scale: true,
         axisLabel: {
+          showMinLabel: false,
+          showMaxLabel: false,
           formatter(value: string) {
-            return value.slice(-5)
+            return value.slice(0, -6)
           },
         },
       },
       yAxis: {
         show: true,
         type: 'value',
+        axisLabel: {
+          showMinLabel: false,
+          showMaxLabel: false,
+        },
+        scale: true,
         splitLine: {
           show: false,
         },
@@ -293,6 +337,7 @@ function loadTransferData(xLabels: any[], data: any[]) {
           name: 'price',
           type: 'line',
           showSymbol: false,
+          animation: false,
           lineStyle: {
             color: 'rgb(238,181,15)',
           },
@@ -302,6 +347,11 @@ function loadTransferData(xLabels: any[], data: any[]) {
     },
     true
   )
+}
+
+async function changeKline(k: any) {
+  currentKline.value = k
+  loadKline()
 }
 
 function hideTipHandle() {
@@ -395,9 +445,17 @@ function getAddressTransList() {
               </el-col>
             </el-row>
           </el-col>
-          <el-col :span="24" :md="12">
-            <ul>
-              <li v-for="k in klineOpts" @click="currentKline = k.label" :key="k.label">{{ k.label }}</li>
+          <el-col :span="24" :md="12" v-loading="echatLoading">
+            <ul class="flex justify-end">
+              <li
+                class="inline-block w-8 text-xs text-center rounded-md cursor-pointer py-2 ml-2 hover:bg-yellow-300"
+                :style="[currentKline.label == k.label ? { 'background-color': 'rgb(255, 194, 0)' } : {}]"
+                v-for="k in klineOpts"
+                @click="changeKline(k)"
+                :key="k.label"
+              >
+                {{ k.label }}
+              </li>
             </ul>
             <v-chart ref="vchart" class="chart" autoresize @hideTip="hideTipHandle" />
           </el-col>
