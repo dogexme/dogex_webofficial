@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getBalanceByPoolAddress, getTokenInfo, queryPoolState, getTokenTransferData } from '@/services/sword'
+import { getBalanceByPoolAddress, getTokenInfo, queryPoolState, getKline } from '@/services/sword'
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
@@ -11,7 +11,7 @@ import SwapTransferList from './components/SwapTransferList.vue'
 import { SwordPool, TokenState } from '@/services/types'
 import VChart from 'vue-echarts'
 import ECharts from 'vue-echarts'
-import { TokenMarketInfo } from '@/types'
+import moment from 'moment'
 
 defineOptions({
   name: 'swap',
@@ -43,6 +43,27 @@ const transferSelect = reactive({
   label: transferSelectList[0].label,
 })
 
+const klineOpts = [
+  {
+    label: '10m',
+    limit: 400,
+  },
+  {
+    label: '1h',
+    limit: 400,
+  },
+  {
+    label: '12h',
+    limit: 400,
+  },
+  {
+    label: '1d',
+    limit: 400,
+  },
+]
+
+const currentKline = ref(klineOpts[0])
+
 const currentPrice = computed(() => {
   const { balanceA = 0, balanceB = 0 } = currentPoolState.value || {}
   const price = np.divide(balanceA, balanceB) || 0
@@ -63,7 +84,7 @@ async function queryPoolStatus(poolid: string, timer = false) {
       currentPoolState.value = data
       if (!isShowTip.value) {
         showPriceVal.value = currentPrice.value.price
-        showUpdownVal.value = chartsData[chartsData.length - 1]?.custom.upordown
+        // showUpdownVal.value = chartsData[chartsData.length - 1]?.custom.upordown
       }
     }
   } finally {
@@ -118,8 +139,6 @@ const vchart = ref(ECharts)
 const showUpdownVal = ref(0)
 const showPriceVal = ref(0)
 const isShowTip = ref(false)
-const newData = new Map()
-const tdCountMap = new Map()
 
 function init() {
   poolid.value = pools.value[0].poolid
@@ -176,6 +195,27 @@ onActivated(() => {
   init()
 })
 
+function loadKline() {
+  getKline({
+    interval: '1h',
+    limit: 400,
+  }).then((res) => {
+    let data = res.data.data
+    let currentTime = moment().minute(0).second(0)
+    let currentData = [] as any[]
+
+    const xLabels = Array.from({ length: 400 }).map((_, i) => {
+      const formatTime = currentTime.format('YYYY-MM-DD HH:mm')
+      currentTime = currentTime.subtract(1, 'hours')
+      currentData[i] = [formatTime, data[i].c]
+      data[i] = [formatTime, data[i]]
+      return formatTime
+    })
+
+    loadTransferData(xLabels.reverse(), currentData.reverse())
+  })
+}
+
 function hideHideTipOrPointerEvent(e: Event) {
   if ((e.target as HTMLElement).tagName != 'CANVAS') {
     vchart.value.dispatchAction({
@@ -190,58 +230,25 @@ function hideHideTipOrPointerEvent(e: Event) {
 
 onMounted(() => {
   document.documentElement.addEventListener('touchstart', hideHideTipOrPointerEvent)
-
-  getTokenTransferData().then((res) => {
-    const result = res.data
-    if (result.status == 'success') {
-      const data = result.market_data
-      loadTransferData(data)
-    }
-  })
+  loadKline()
 })
 
 onUnmounted(() => {
   document.documentElement.removeEventListener('touchstart', hideHideTipOrPointerEvent)
 })
 
-let xLabel = []
-let chartsData: any = []
-
-function loadTransferData(marketData: TokenMarketInfo[]) {
-  marketData.forEach((td) => {
-    const data = tdCountMap.get(td.block_no)
-    if (!tdCountMap.has(td.block_no)) {
-      tdCountMap.set(td.block_no, 1)
-      newData.set(`${td.block_no}_1`, td)
-    } else {
-      tdCountMap.set(td.block_no, data + 1)
-      newData.set(`${td.block_no}_${data + 1}`, td)
-    }
-  })
-
-  xLabel = Array.from(newData.keys()).reverse()
-  chartsData = Array.from(newData.entries())
-    .map(([block_no, d]) => {
-      return {
-        custom: d,
-        value: [block_no, d.price],
-      }
-    })
-    .reverse()
-
-  showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
-
+function loadTransferData(xLabels: any[], data: any[]) {
   vchart.value.setOption(
     {
       title: {
         show: false,
       },
-      grid: {
-        left: 0,
-        right: 0,
-        top: 0,
-        bottom: 0,
-      },
+      // grid: {
+      //   left: 0,
+      //   right: 0,
+      //   top: 0,
+      //   bottom: 0,
+      // },
       // dataZoom: [
       //   {
       //     id: 'dataZoomX',
@@ -256,23 +263,26 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
         trigger: 'axis',
         formatter: function (params: any) {
           const opts = params[0]
-          const data = opts.data.custom
-          const [, price] = opts.value
-          isShowTip.value = true
-          showPriceVal.value = price
-          showUpdownVal.value = data.upordown
-          return `Ð ${price}`
+          const [, value] = opts.value
+
+          return `Ð ${np.round(value, 6)}`
         },
       },
       xAxis: {
-        show: false,
-        data: xLabel,
+        type: 'category',
+        show: true,
+        data: xLabels,
         splitLine: {
           show: false,
         },
+        axisLabel: {
+          formatter(value: string) {
+            return value.slice(-5)
+          },
+        },
       },
       yAxis: {
-        show: false,
+        show: true,
         type: 'value',
         splitLine: {
           show: false,
@@ -286,7 +296,7 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
           lineStyle: {
             color: 'rgb(238,181,15)',
           },
-          data: chartsData,
+          data,
         },
       ],
     },
@@ -295,11 +305,11 @@ function loadTransferData(marketData: TokenMarketInfo[]) {
 }
 
 function hideTipHandle() {
-  isShowTip.value = false
-  showPriceVal.value = currentPrice.value.price
-  if (chartsData.length > 0) {
-    showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
-  }
+  // isShowTip.value = false
+  // showPriceVal.value = currentPrice.value.price
+  // if (chartsData.length > 0) {
+  //   showUpdownVal.value = chartsData[chartsData.length - 1].custom.upordown
+  // }
 }
 
 function getAddressTransList() {
@@ -386,6 +396,9 @@ function getAddressTransList() {
             </el-row>
           </el-col>
           <el-col :span="24" :md="12">
+            <ul>
+              <li v-for="k in klineOpts" @click="currentKline = k.label" :key="k.label">{{ k.label }}</li>
+            </ul>
             <v-chart ref="vchart" class="chart" autoresize @hideTip="hideTipHandle" />
           </el-col>
         </el-row>

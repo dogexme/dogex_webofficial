@@ -112,3 +112,9 @@ export const queryTransAddress = (params: { address?: string } & PageResult) => 
     params,
   })
 }
+
+export const getKline = (params: any) => {
+  return axios.get('https://dogim.defieyes.io/api/dogim/klines', {
+    params,
+  })
+}
