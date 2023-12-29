@@ -203,7 +203,7 @@ onActivated(() => {
   init()
 })
 
-const klineData = ref([])
+const klineData = ref<any[]>([])
 
 async function loadKline() {
   const { label, limit } = currentKline.value
@@ -336,7 +336,7 @@ function loadTransferData(xLabels: any[], data: any[]) {
         axisLabel: {
           showMinLabel: false,
           showMaxLabel: false,
-          color: '#aeaeae',
+          color: '#e8e8e8',
           fontSize: 10,
           formatter(value: string) {
             const { label } = currentKline.value
@@ -346,12 +346,12 @@ function loadTransferData(xLabels: any[], data: any[]) {
         axisTick: {
           length: 2,
           lineStyle: {
-            color: 'rgb(255, 194, 0)',
+            color: '#e8e8e8',
           },
         },
         axisLine: {
           lineStyle: {
-            color: 'rgb(255, 194, 0)',
+            color: '#e8e8e8',
           },
         },
       },
@@ -360,7 +360,7 @@ function loadTransferData(xLabels: any[], data: any[]) {
         type: 'value',
         axisLabel: {
           showMinLabel: false,
-          color: '#aeaeae',
+          color: '#e8e8e8',
           fontSize: 10,
         },
         scale: true,
@@ -375,7 +375,7 @@ function loadTransferData(xLabels: any[], data: any[]) {
           showSymbol: false,
           animation: false,
           lineStyle: {
-            color: 'rgb(238,181,15)',
+            color: '#ba77ff',
           },
           data,
         },
@@ -482,17 +482,25 @@ function getAddressTransList() {
             </el-row>
           </el-col>
           <el-col :span="24" :md="12" v-loading="echatLoading">
-            <ul class="flex mb-4 text-xs font-bold">
-              <li
-                class="inline-block w-8 text-center rounded-md cursor-pointer py-2 mp ml-2 hover:bg-yellow-300"
-                :style="[currentKline.label == k.label ? { 'background-color': 'rgb(255, 194, 0)', color: '#fff' } : {}]"
-                v-for="k in klineOpts"
-                @click="changeKline(k)"
-                :key="k.label"
-              >
-                {{ k.label }}
-              </li>
-            </ul>
+            <div class="flex justify-between items-center mb-4">
+              <ul class="flex text-xs font-bold">
+                <li
+                  class="inline-block w-8 text-center rounded-md cursor-pointer py-2 mp ml-2 hover:bg-yellow-300"
+                  :style="[currentKline.label == k.label ? { 'background-color': 'rgb(255, 194, 0)', color: '#fff' } : {}]"
+                  v-for="k in klineOpts"
+                  @click="changeKline(k)"
+                  :key="k.label"
+                >
+                  {{ k.label }}
+                </li>
+              </ul>
+              <div class="text-center">
+                <el-link href="https://dogim.defieyes.io/" style="font-size: 12px; color: #a8a8a8" target="_blank">
+                  <!-- <img class="token-icon" src="@/assets/img/logo32.png" alt="" /> -->
+                  dogim.defieyes.io
+                </el-link>
+              </div>
+            </div>
             <el-row
               class="text-xs font-bold text-center"
               flex

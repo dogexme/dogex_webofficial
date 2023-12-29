@@ -45,7 +45,7 @@ export default defineComponent({
 
     return () => (
       <div class="mt-4">
-        {unlistMessage.value && queryTypeVal.value === 'unlist' && <ElAlert style="margin-bottom: 12px" description={unlistMessage.value} type="info" effect="dark" show-icon closable={false} />}
+        {unlistMessage.value && <ElAlert style="margin-bottom: 12px" description={unlistMessage.value} type="info" effect="dark" show-icon closable={false} />}
         <DogTabs keep-dom modelValue={queryTypeVal.value} tabs={tabs} onChange={changeTab}>
           <DogTabsItem value="listed">
             <DrcListed ref={(ref) => (tables['listed'] = ref)} v-model:loading={loading.value} type="listed"></DrcListed>
