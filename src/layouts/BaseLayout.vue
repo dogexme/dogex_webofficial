@@ -71,9 +71,9 @@ watch(() => route.name, requestState, {
       <!-- <li class="link-list_item">
           <a href="https://discord.com/dpalwallet" target="_blank" class="nft link-list_item_a">&#xebf8;</a>
         </li> -->
-      <li class="link-list_item">
+      <!-- <li class="link-list_item">
         <a href="https://t.me/dpalwallet" target="_blank" class="nft link-list_item_a">&#xec25;</a>
-      </li>
+      </li> -->
     </ul>
     <span class="text-xs mt-2">Copyright©2023 dogex.me</span>
   </footer>
