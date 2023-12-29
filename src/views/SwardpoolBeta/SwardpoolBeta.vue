@@ -507,7 +507,7 @@ function getAddressTransList() {
               justify="center"
               :gutter="12"
               style="min-height: 20px"
-              :style="[{ color: curKlinePoint?.r || 0 < 0 ? 'rgb(255, 90, 80)' : 'rgb(64, 180, 105)', visibility: curKlinePoint ? 'visible' : 'hidden' }]"
+              :style="[{ color: (curKlinePoint?.r || 0) < 0 ? 'rgb(255, 90, 80)' : 'rgb(64, 180, 105)', visibility: curKlinePoint ? 'visible' : 'hidden' }]"
             >
               <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">
                 <span>O</span>:<span>{{ np.round(curKlinePoint?.o || 0, 4) }}</span>
@@ -520,7 +520,7 @@ function getAddressTransList() {
               </el-col>
               <el-col class="mb-2" :span="6" :xs="{ span: 12 }">
                 <span>C</span>:<span>{{ np.round(curKlinePoint?.c || 0, 4) }}</span>
-                <span class="ml-2">{{ np.round((curKlinePoint?.r || 0) * 100, 2) }}%</span>
+                <span class="ml-2">{{ (curKlinePoint?.r || 0) < 0 ? '-' : '+' }}{{ Math.abs(np.round((curKlinePoint?.r || 0) * 100, 2)) }}%</span>
               </el-col>
               <el-col class="mb-2" :span="3" :xs="12">
                 <span>Vol</span>:<span>{{ np.round(curKlinePoint?.tav || 0, 4) }}</span>
