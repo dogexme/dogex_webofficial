@@ -117,34 +117,32 @@ export default defineComponent({
     })
 
     return () => (
-      <>
-        <DogTable
-          loading={loading.value}
-          dataSource={dataSource.value}
-          columns={columns}
-          currentPage={page.value}
-          total={total.value}
-          onCurrent-change={query}
-          onRefresh={() => query(page.value)}
-          onRow-click={rowClick}
-          defaultPageSize={pageSize}
-          rowClick
-          v-slots={{
-            tooltipLeft: () => (
-              <div class="flex flex-col mr-2">
-                <div class="flex items-center mt-2">
-                  <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
-                  <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">
-                    {Array.from({ length: 2 }).map((_, i) => {
-                      return <ElOption key={i} label={i + 4} value={i + 4}></ElOption>
-                    })}
-                  </ElSelect>
-                </div>
+      <DogTable
+        loading={loading.value}
+        dataSource={dataSource.value}
+        columns={columns}
+        currentPage={page.value}
+        total={total.value}
+        onCurrent-change={query}
+        onRefresh={() => query(page.value)}
+        onRow-click={rowClick}
+        defaultPageSize={pageSize}
+        rowClick
+        v-slots={{
+          tooltipLeft: () => (
+            <div class="flex flex-col mr-2">
+              <div class="flex items-center mt-2">
+                <span class="text-xs whitespace-nowrap mr-2">Tick Length: </span>
+                <ElSelect v-model={len.value} collapse-tags placeholder="Tick length" style="width: 80px">
+                  {Array.from({ length: 2 }).map((_, i) => {
+                    return <ElOption key={i} label={i + 4} value={i + 4}></ElOption>
+                  })}
+                </ElSelect>
               </div>
-            ),
-          }}
-        ></DogTable>
-      </>
+            </div>
+          ),
+        }}
+      ></DogTable>
     )
   },
 })

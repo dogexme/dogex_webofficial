@@ -336,7 +336,7 @@ function loadTransferData(xLabels: any[], data: any[]) {
         axisLabel: {
           showMinLabel: false,
           showMaxLabel: false,
-          color: '#e8e8e8',
+          color: '#aeaeae',
           fontSize: 10,
           formatter(value: string) {
             const { label } = currentKline.value
@@ -346,12 +346,12 @@ function loadTransferData(xLabels: any[], data: any[]) {
         axisTick: {
           length: 2,
           lineStyle: {
-            color: '#e8e8e8',
+            color: '#aeaeae',
           },
         },
         axisLine: {
           lineStyle: {
-            color: '#e8e8e8',
+            color: '#aeaeae',
           },
         },
       },
@@ -360,7 +360,7 @@ function loadTransferData(xLabels: any[], data: any[]) {
         type: 'value',
         axisLabel: {
           showMinLabel: false,
-          color: '#e8e8e8',
+          color: '#aeaeae',
           fontSize: 10,
         },
         scale: true,
