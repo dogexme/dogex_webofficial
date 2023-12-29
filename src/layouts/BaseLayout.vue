@@ -63,7 +63,7 @@ watch(() => route.name, requestState, {
   <footer id="footer">
     <ul class="link-list">
       <li class="link-list_item">
-        <a href="https://twitter.com/dogexprotocal" target="_blank" class="nft link-list_item_a">&#xe652;</a>
+        <a href="https://twitter.com/dogexpro_20xx" target="_blank" class="nft link-list_item_a">&#xe652;</a>
       </li>
       <li class="link-list_item">
         <a href="https://github.com/dogexme" target="_blank" class="nft link-list_item_a">&#xe691;</a>
