@@ -24,9 +24,9 @@ async function search() {
   if (!tick.value || loadingSearch.value) return
 
   if (tick.value.length > 6) {
-    pushRoute(`/drc20/wallet/${decodeURIComponent(tick.value)}`, ['/drc20/wallet', '/drc20/item'])
+    pushRoute(`/drc20/wallet/${encodeURIComponent(tick.value)}`, ['/drc20/wallet', '/drc20/item'])
   } else {
-    pushRoute(`/drc20/item/${decodeURIComponent(tick.value)}`, ['/drc20/item'])
+    pushRoute(`/drc20/item/${encodeURIComponent(tick.value)}`, ['/drc20/item'])
   }
 }
 </script>
