@@ -4,7 +4,7 @@ import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
-import { ArrowDown, Refresh } from '@element-plus/icons-vue'
+import { ArrowDown, Clock, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
@@ -40,6 +40,7 @@ const listLoading = ref(false)
 const balance = ref(0)
 const tabValue = ref('0')
 const showTransferDialog = ref(false)
+const showCtrlPoolDialog = ref(false)
 const isBalanceLoading = ref(false)
 const echatLoading = ref(false)
 const transferSelectList = [
@@ -420,10 +421,10 @@ function getAddressTransList() {
         <el-alert class="mb-3" v-if="noticeMessage" title="Notice" :description="noticeMessage" type="info" effect="dark" show-icon :closable="false" />
         <el-row style="margin-top: 12px">
           <el-col :span="24" :md="12">
-            <el-row>
+            <el-row :span="24">
               <el-col>
-                <div class="selectToken">
-                  <el-dropdown class="inline-block mr-4" trigger="click" @command="changePool">
+                <div class="inline-block mb-2">
+                  <el-dropdown class="inline-block mr-2" style="vertical-align: middle" trigger="click" @command="changePool">
                     <el-button>
                       <img class="token-icon rounded-full" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA
                       }}<span class="split-word">/</span> <img class="token-icon rounded-full" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span
@@ -441,26 +442,27 @@ function getAddressTransList() {
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
-                  <template v-if="address && currentPool.pooladdress">
-                    <el-button :disabled="currentPool.status != '0'" class="mr-3" :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
-                    <div class="selectToken_bar">
-                      <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
-                      <el-button class="mr-3" type="primary" :disabled="!!noticeMessage || currentPool.status != '0'" @click="showSwapDialog = true">Swap</el-button>
-                      <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
-                        <DogTableMenuItem style="margin-right: 0; line-height: 30px; padding: 0 10px" label="History" value="1" @click="showTransferDialog = true" />
-                      </el-badge>
-                    </div>
-                  </template>
-                  <div class="inline-block" style="font-size: 14px" v-else-if="currentPool.pooladdress && !address">
-                    <div class="swap-pair_buy swap-pair_buy--connect size" @click="connect">Connect DpalWallet</div>
+                  <el-badge style="font-size: 0" class="inline-block mr-2" :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
+                    <el-icon style="color: #666; font-size: 24px; cursor: pointer" @click="showTransferDialog = true"><Clock /></el-icon>
+                  </el-badge>
+                </div>
+                <template v-if="address && currentPool.pooladdress">
+                  <div class="selectToken_bar inline-block">
+                    <el-button :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
+                    <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
+                    <el-button class="mr-3" type="primary" :disabled="!!noticeMessage || currentPool.status != '0'" @click="showSwapDialog = true">Swap</el-button>
+                    <el-button style="margin: 0" type="warning" :disabled="!!noticeMessage" @click="showCtrlPoolDialog = true">+ Add Liquidity</el-button>
                   </div>
+                </template>
+                <div class="inline-block" style="font-size: 14px" v-else-if="currentPool.pooladdress && !address">
+                  <div class="swap-pair_buy swap-pair_buy--connect size" @click="connect">Connect DpalWallet</div>
                 </div>
               </el-col>
             </el-row>
-            <el-row style="margin: 24px 0" v-if="currentPoolState">
-              <el-col :span="12">
+            <el-row class="my-5" v-if="currentPoolState">
+              <el-col :span="12" class="mb-2">
                 <h4 style="font-size: 26px; margin: 0"><span style="margin-right: 6px; font-size: 30px">Ð</span>{{ np.round(showPriceVal, 6) }}</h4>
-                <p style="font-size: 16px; color: #777; vertical-align: middle">
+                <p class="m-0 mt-2" style="font-size: 16px; color: #777; vertical-align: middle">
                   <span style="margin-right: 4px">{{ Math.abs(np.round(showUpdownVal * 100, 2)) }}%</span>
                   <svg v-show="showUpdownVal >= 0" style="vertical-align: middle" width="18" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
                     <path d="M573.056 272l308.8 404.608A76.8 76.8 0 0 1 820.736 800H203.232a76.8 76.8 0 0 1-61.056-123.392L450.976 272a76.8 76.8 0 0 1 122.08 0z" fill="rgb(64, 180, 105)" />
@@ -470,7 +472,7 @@ function getAddressTransList() {
                   </svg>
                 </p>
               </el-col>
-              <el-col :span="12">
+              <el-col :span="12" class="flex items-end mb-2">
                 <el-statistic title="Processed Blocks" :value="currentPoolState?.blockno" />
               </el-col>
               <el-col :span="12">
@@ -554,6 +556,7 @@ function getAddressTransList() {
     @pay-success="paySuccess"
   />
   <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool" @close="tabValue = '0'"></SwapTransferList>
+  <SwapCtrlPoolDialog v-model:visible="showCtrlPoolDialog" :current-pool="currentPool"></SwapCtrlPoolDialog>
 </template>
 <style lang="scss" scoped>
 :deep(.el-statistic__number) {
@@ -566,17 +569,6 @@ function getAddressTransList() {
 
 .chart {
   height: 200px;
-}
-.selectToken {
-  display: flex;
-  align-items: center;
-  @media screen and (max-width: 490px) {
-    flex-wrap: wrap;
-    & .swap-pair_buy--connect,
-    & &_bar {
-      margin-top: 12px;
-    }
-  }
 }
 .swordpool-info {
   margin-top: 12px;
@@ -598,6 +590,7 @@ function getAddressTransList() {
 .split-word {
   padding: 0 5px;
 }
+
 section {
   line-height: 2;
   color: orange;
