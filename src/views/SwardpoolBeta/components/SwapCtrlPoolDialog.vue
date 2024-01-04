@@ -4,6 +4,7 @@ import icons from '@/config/payIcons'
 import { Back, CaretRight } from '@element-plus/icons-vue'
 import { omitCenterString } from '@/utils'
 import { consumeToken } from './TransferTable'
+import { useAppStore } from '@/store'
 
 enum CtrlType {
   Nothing,
@@ -33,6 +34,8 @@ const visible = computed({
   },
 })
 
+const store = useAppStore()
+const swordInfo = computed(() => store.swordPoolInfo)
 const currentPool = computed(() => props.currentPool)
 const maxInputDialogWidth = 1000
 const inputDialogWidth = ref(maxInputDialogWidth)
@@ -81,6 +84,15 @@ function changeUndo(isAdd: boolean) {
     doType.value = CtrlType.Add
   } else {
     doType.value = CtrlType.Remove
+  }
+}
+
+function add() {
+  const { amountA, amountB } = token
+  if (isAToken.value) {
+    console.log(amountA)
+  } else {
+    console.log(amountB)
   }
 }
 </script>
@@ -163,21 +175,28 @@ function changeUndo(isAdd: boolean) {
                 dogim
               </div>
             </div>
-            <SwapInput v-model="token.amountA" title="Add doge" name="pay" :price="0" swap-type="SWAP_A_B" v-if="isAToken">
+            <SwapInput v-model="token.amountA" title="Add doge" name="pay" :price="0" :min="swordInfo.minLiqTokenA" swap-type="SWAP_A_B" v-if="isAToken">
               <template #right>
-                <div></div>
+                <div>
+                  <div class="limit-btn">Min: {{ swordInfo.minLiqTokenA }}</div>
+                </div>
               </template>
             </SwapInput>
-            <SwapInput class="mt-4" disabled v-model="token.amountB" title="Add dogim" name="pay" :price="0" swap-type="SWAP_A_B" v-else>
+            <SwapInput class="mt-4" disabled v-model="token.amountB" :min="swordInfo.minLiqTokenB" title="Add dogim" name="pay" :price="0" swap-type="SWAP_A_B" v-else>
               <template #right>
-                <DogeButton type="warn" border-color="#fff" @click="showSelectTokenDialog = true">
-                  <div class="flex items-center text-sm">
-                    Select<el-icon><CaretRight /></el-icon>
+                <div class="flex flex-col items-end">
+                  <DogeButton type="warn" border-color="#fff" @click="showSelectTokenDialog = true">
+                    <div class="flex items-center text-sm">
+                      Select<el-icon><CaretRight /></el-icon>
+                    </div>
+                  </DogeButton>
+                  <div class="flex">
+                    <div class="limit-btn">Min: {{ swordInfo.minLiqTokenB }}</div>
                   </div>
-                </DogeButton>
+                </div>
               </template>
             </SwapInput>
-            <div class="swap-sub-btn swap-sub-btn--disabled mt-10">Add</div>
+            <div class="swap-sub-btn mt-10" @click="add">Add</div>
           </div>
         </div>
       </template>
@@ -206,5 +225,14 @@ function changeUndo(isAdd: boolean) {
   padding: 1% 0;
   // border: 1px solid red;
   border-radius: 30px;
+}
+
+.limit-btn {
+  padding: 6px 12px;
+  margin: 5px 0;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 12px;
+  background-color: #ffa21e;
 }
 </style>

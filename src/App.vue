@@ -100,4 +100,15 @@ onMounted(async () => {
 .el-alert--info.is-dark {
   background-color: var(--el-color-primary-light-3) !important;
 }
+
+.beta {
+  color: rgb(255, 194, 0);
+  padding: 5px;
+  font-size: 12px;
+  font-weight: bold;
+  font-style: normal;
+  border-radius: 5px;
+  background-color: #fff;
+  margin-left: 6px;
+}
 </style>

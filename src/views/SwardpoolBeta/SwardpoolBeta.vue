@@ -451,7 +451,7 @@ function getAddressTransList() {
                     <el-button :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
                     <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                     <el-button class="mr-3" type="primary" :disabled="!!noticeMessage || currentPool.status != '0'" @click="showSwapDialog = true">Swap</el-button>
-                    <el-button style="margin: 0" type="warning" :disabled="!!noticeMessage" @click="showCtrlPoolDialog = true">+ Add Liquidity</el-button>
+                    <el-button style="margin: 0" type="warning" :disabled="!!noticeMessage" @click="showCtrlPoolDialog = true">Add Liquidity<em class="beta">BETA</em></el-button>
                   </div>
                 </template>
                 <div class="inline-block" style="font-size: 14px" v-else-if="currentPool.pooladdress && !address">

@@ -21,10 +21,26 @@ export function useDoge() {
     }
   }
 
-  async function payPool(cast: number, poolAddress: string) {
+  async function useDoge(cost: string | number, address: string, costFor: string) {
     const doge = window?.DogeApi
     if (await doge.isEnabled()) {
-      const rs = await doge.useDoge(cast, poolAddress, 'swap')
+      return doge.useDoge(cost, address, costFor)
+    }
+    throw 1
+  }
+
+  async function payPool(cast: number, poolAddress: string) {
+    const rs = await useDoge(cast, poolAddress, 'swap')
+    if (rs?.txid) {
+      return rs?.txid
+    }
+    throw 1
+  }
+
+  async function transferD20(inscriptionid: string, address: string, amt = 0, tick = 'dogim', indexerType = '1', addliq = false) {
+    const doge = window?.DogeApi
+    if (await doge.isEnabled()) {
+      const rs = await doge.transferd20(inscriptionid, address, amt, tick, indexerType, addliq)
       if (rs?.txid) {
         return rs?.txid
       }
@@ -32,10 +48,17 @@ export function useDoge() {
     throw 1
   }
 
-  async function transferD20(inscriptionid: string, address: string, amt = 0, tick = 'dogim', indexerType = '1') {
+  /**
+   * 添加doge流动性
+   * @param addresslist
+   * @param costlist
+   * @param costFor
+   * @returns
+   */
+  async function useMultiDoge(addresslist: string[], costlist: string[], costFor: string) {
     const doge = window?.DogeApi
     if (await doge.isEnabled()) {
-      const rs = await doge.transferd20(inscriptionid, address, amt, tick, indexerType)
+      const rs = await doge.useMultiDoge(addresslist, costlist, costFor)
       if (rs?.txid) {
         return rs?.txid
       }
@@ -47,5 +70,6 @@ export function useDoge() {
     connectDpal,
     payPool,
     transferD20,
+    useMultiDoge,
   }
 }
