@@ -97,19 +97,11 @@ const currentBalance = computed(() => {
 const isLimitAmount = computed(() => payToken.value.swapType == SwapTypeEnum.AB && +payToken.value.amount < 10)
 const isSelectLimit = computed(() => !payToken.value.txid && payToken.value.swapType == SwapTypeEnum.BA)
 const isDisabledPay = computed(() => isLimitAmount.value || payToken.value.amount == 0 || isSelectLimit.value)
-// const transNotifier = ref<NotificationHandle>()
 
 watch(visible, (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
     revToken.value.pools = props.pools
-    // transNotifier.value = ElNotification({
-    //   title: 'Transaction Reminder',
-    //   message: `There may be differences in the current transaction amount.`,
-    //   type: 'warning',
-    //   duration: 0,
-    //   customClass: 'trans-notifier',
-    // })
   } else {
     payToken.value = resetPayToken()
     revToken.value = resetRevToken()
@@ -117,7 +109,6 @@ watch(visible, (isVisible) => {
       revToken.value.pools = props.pools
     }
     resetPoolState()
-    // transNotifier.value?.close()
   }
 })
 

@@ -309,7 +309,7 @@ function setSelectToken(transToken: any) {
         <el-divider />
         <div class="flex justify-center">
           <div class="swappool-wrapper mt-5">
-            <div class="flex mb-10">
+            <div class="flex mb-4">
               <div
                 class="flex items-center py-2 px-4 rounded-3xl overflow-hidden bg-white border border-gray-400 border-solid cursor-pointer"
                 :style="[isAToken ? { border: '1px solid #ffa21e', backgroundColor: '#ffa21e40' } : {}]"
@@ -327,28 +327,30 @@ function setSelectToken(transToken: any) {
                 dogim
               </div>
             </div>
-            <SwapInput v-model="token.amountA" title="Add doge" name="pay" :price="4" :min="currentPool.minLiqTokenA" swap-type="SWAP_A_B" v-if="isAToken">
-              <template #right>
-                <div>
-                  <div class="limit-btn">Min: {{ currentPool.minLiqTokenA }}</div>
-                </div>
-              </template>
-            </SwapInput>
-            <SwapInput class="mt-4" disabled v-model="token.amountB" :price="0" :min="currentPool.minLiqTokenB" title="Add dogim" name="pay" swap-type="SWAP_A_B" @selectToken="selectToken" v-else>
-              <template #right>
-                <div class="flex flex-col items-end">
-                  <DogeButton type="warn" border-color="#fff" @click="selectToken">
-                    <div class="flex items-center text-sm">
-                      Select<el-icon><CaretRight /></el-icon>
-                    </div>
-                  </DogeButton>
-                  <div class="flex">
-                    <div class="limit-btn">Min: {{ currentPool.minLiqTokenB }}</div>
+            <div style="min-height: 200px">
+              <SwapInput v-model="token.amountA" title="Add doge" name="pay" :price="4" :min="currentPool.minLiqTokenA" swap-type="SWAP_A_B" v-if="isAToken">
+                <template #right>
+                  <div>
+                    <div class="limit-btn">Min: {{ currentPool.minLiqTokenA }}</div>
                   </div>
-                </div>
-              </template>
-            </SwapInput>
-            <div class="swap-sub-btn mt-10" :class="[isDisabledAddBtn && 'swap-sub-btn--disabled']" @click="add">Add</div>
+                </template>
+              </SwapInput>
+              <SwapInput disabled v-model="token.amountB" :price="0" :min="currentPool.minLiqTokenB" title="Add dogim" name="pay" swap-type="SWAP_A_B" @selectToken="selectToken" v-else>
+                <template #right>
+                  <div class="flex flex-col items-end">
+                    <DogeButton type="warn" border-color="#fff" @click="selectToken">
+                      <div class="flex items-center text-sm">
+                        Select<el-icon><CaretRight /></el-icon>
+                      </div>
+                    </DogeButton>
+                    <div class="flex">
+                      <div class="limit-btn">Min: {{ currentPool.minLiqTokenB }}</div>
+                    </div>
+                  </div>
+                </template>
+              </SwapInput>
+            </div>
+            <div class="swap-sub-btn" :class="[isDisabledAddBtn && 'swap-sub-btn--disabled']" @click="add">Add</div>
           </div>
         </div>
       </template>

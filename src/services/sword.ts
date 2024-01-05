@@ -140,3 +140,7 @@ export const getLiqPools = (params: any) => {
     params,
   })
 }
+
+export const getSwordProtocol = () => {
+  return axios.get('https://raw.githubusercontent.com/dpalwallet/swordpool/main/README.md')
+}
