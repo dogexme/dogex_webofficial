@@ -7,6 +7,7 @@ import { consumeToken } from './TransferTable'
 import { getLiqPools, getTransferList, isCheckAddLiq } from '@/services/sword'
 import { useAppStore } from '@/store'
 import { ElMessage } from 'element-plus'
+import { calculateOutA, calculateOutB } from '../computePrice'
 
 enum CtrlType {
   Nothing,
@@ -18,6 +19,7 @@ const props = withDefaults(
   defineProps<{
     visible: boolean
     currentPool: any
+    poolState: any
   }>(),
   {}
 )
@@ -39,6 +41,7 @@ const appStore = useAppStore()
 const transferLoadingCount = computed(() => appStore.transferLoadingCount)
 const { transferD20, multiDoge, doge } = useDoge()
 const currentPool = computed(() => props.currentPool)
+const poolState = computed(() => props.poolState)
 const maxInputDialogWidth = 1000
 const inputDialogWidth = ref(maxInputDialogWidth)
 const doType = ref<CtrlType>(CtrlType.Nothing)
@@ -171,6 +174,7 @@ async function add() {
   const { amountA, amountB } = token
   const { txid } = currentPackPool.value
   const { poolid, addTokenALiqAdr, pooladdress, addfees, tokenB } = currentPool.value
+  const { balanceA, balanceB } = poolState.value
   let id = ''
 
   try {
@@ -189,23 +193,23 @@ async function add() {
       id = await multiDoge([pooladdress, addTokenALiqAdr].join(), [amountA, addfees].join(), 'add doge LP')
       appStore.updateTransferList({
         txid,
-        status: 1,
+        status: 0,
         swapType: T_TYPE_ADDLIQ_LP,
         inTokenA: amountA,
         inTokenB: 0,
         outTokenA: 0,
-        outTokenB: 0,
+        outTokenB: calculateOutB(amountA, balanceA, balanceB, 0),
         date: dateFormat(new Date()),
       })
     } else {
       id = await transferD20(txid, address.value, amountB, tokenB, '1', true, poolid)
       appStore.updateTransferList({
         txid,
-        status: 1,
+        status: 0,
         swapType: T_TYPE_ADDLIQ_LP,
         inTokenA: 0,
         inTokenB: amountB,
-        outTokenA: 0,
+        outTokenA: calculateOutA(amountB, balanceA, balanceB, 4),
         outTokenB: 0,
         date: dateFormat(new Date()),
       })
@@ -282,10 +286,12 @@ function setSelectToken(transToken: any) {
                 >
               </div>
               <div class="pools-line">
-                <div class="pools-line_label">In/Out</div>
-                <span class="pools-line_item mr-4"
-                  >{{ consumeToken(pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }} / {{ consumeToken(pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span
-                >
+                <div class="pools-line_label">In</div>
+                <span class="pools-line_item mr-4">{{ consumeToken(pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
+              </div>
+              <div class="pools-line">
+                <div class="pools-line_label">Out</div>
+                <span class="pools-line_item mr-4">{{ consumeToken(pi.outTokenA, pi.outTokenA, currentPool.tokenA, currentPool.tokenB) }}</span>
               </div>
               <div class="pools-line flex justify-end">
                 <DogeButton type="warn" @click="removePool(pi)" style="margin-right: 12px; line-height: 1" v-if="pi.status == 1">Remove</DogeButton>

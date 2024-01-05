@@ -102,7 +102,7 @@ onMounted(async () => {
 }
 
 .beta {
-  color: rgb(255, 194, 0);
+  color: transparant;
   padding: 5px;
   font-size: 12px;
   font-weight: bold;

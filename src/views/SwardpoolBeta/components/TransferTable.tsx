@@ -121,7 +121,7 @@ export default defineComponent({
       {
         title: 'Price',
         render(_text: any, r: any) {
-          return 'Ð ' + NP.round(NP.divide(r.balanceA, r.balanceB), 4)
+          return 'Ð ' + NP.round(r.balanceB == 0 ? 0 : NP.divide(r.balanceA, r.balanceB), 4)
         },
       },
       {

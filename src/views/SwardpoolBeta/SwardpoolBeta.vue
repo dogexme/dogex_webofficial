@@ -77,7 +77,7 @@ const curKlinePoint = ref()
 
 const currentPrice = computed(() => {
   const { balanceA = 0, balanceB = 0 } = currentPoolState.value || {}
-  const price = np.divide(balanceA, balanceB) || 0
+  const price = balanceB == 0 ? 0 : np.divide(balanceA, balanceB) || 0
   return {
     oldPrice: price,
     price: np.round(price, 6),
@@ -487,7 +487,9 @@ function showAddPools() {
                     <el-button :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
                     <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                     <el-button class="mr-3" type="primary" :disabled="!!noticeMessage || currentPool.status != '0'" @click="showSwapDialog = true">Swap</el-button>
-                    <el-button style="margin: 0" type="warning" :disabled="!!noticeMessage" @click="showAddPools">Add Liquidity<em class="beta">BETA</em></el-button>
+                    <el-button style="margin: 0; background-color: #ba77ff; border: 1px solid #ba77ff" type="warning" :disabled="!!noticeMessage" @click="showAddPools"
+                      >Add Liquidity<em class="beta" style="color: #ba77ff">BETA</em></el-button
+                    >
                   </div>
                 </template>
                 <div class="inline-block" style="font-size: 14px" v-else-if="currentPool.pooladdress && !address">
@@ -589,7 +591,7 @@ function showAddPools() {
     @pay-success="paySuccess"
   />
   <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool" @close="tabValue = '0'"></SwapTransferList>
-  <SwapCtrlPoolDialog v-model:visible="showCtrlPoolDialog" :current-pool="currentPool"></SwapCtrlPoolDialog>
+  <SwapCtrlPoolDialog v-model:visible="showCtrlPoolDialog" :current-pool="currentPool" :poolState="currentPoolState"></SwapCtrlPoolDialog>
 </template>
 <style lang="scss" scoped>
 :deep(.el-statistic__number) {
