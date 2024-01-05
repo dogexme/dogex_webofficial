@@ -71,7 +71,9 @@ watch(visible, async (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
     loading.value = true
-    const res = await getLiqPools({})
+    const res = await getLiqPools({
+      address: address.value,
+    })
     loading.value = false
     poolsList.value = res.data?.data || []
   } else {
