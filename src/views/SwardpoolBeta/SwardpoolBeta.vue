@@ -4,7 +4,7 @@ import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
-import { ArrowDown, Clock, Refresh } from '@element-plus/icons-vue'
+import { ArrowDown, Tickets, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
@@ -196,7 +196,7 @@ onActivated(() => {
                     </template>
                   </el-dropdown>
                   <el-badge style="font-size: 0" class="inline-block mr-2" :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
-                    <el-icon style="color: #666; font-size: 24px; cursor: pointer" @click="showTransferDialog = true"><Clock /></el-icon>
+                    <el-icon style="color: #666; font-size: 24px; cursor: pointer" @click="showTransferDialog = true"><Tickets /></el-icon>
                   </el-badge>
                 </div>
                 <template v-if="address && currentPool.pooladdress">
