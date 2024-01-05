@@ -203,7 +203,7 @@ async function add() {
     if (isAToken.value) {
       id = await multiDoge([pooladdress, addTokenALiqAdr].join(), [amountA, addfees].join(), 'add doge LP')
       appStore.updateTransferList({
-        txid,
+        txid: id,
         status: 0,
         swapType: T_TYPE_ADDLIQ_LP,
         inTokenA: amountA,
@@ -215,7 +215,7 @@ async function add() {
     } else {
       id = await transferD20(txid, currentPool.value.pooladdress, amountB, tokenB, '1', true, poolid)
       appStore.updateTransferList({
-        txid,
+        txid: id,
         status: 0,
         swapType: T_TYPE_ADDLIQ_LP,
         inTokenA: 0,
@@ -279,7 +279,7 @@ function setSelectToken(transToken: any) {
         <div class="pools">
           <div class="pools-item mt-4" v-for="pi in poolsList" :key="pi.addBlockno">
             <div class="pools-item_avator">
-              <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons['dogim']"></el-image>
+              <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
             </div>
             <div class="pools-item_info">
               <div class="pools-line">
