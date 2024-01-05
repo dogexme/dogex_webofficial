@@ -21,7 +21,7 @@ export function useDoge() {
     }
   }
 
-  async function useDoge(cost: string | number, address: string, costFor: string) {
+  async function doge(cost: string | number, address: string, costFor: string) {
     const doge = window?.DogeApi
     if (await doge.isEnabled()) {
       return doge.useDoge(cost, address, costFor)
@@ -30,17 +30,17 @@ export function useDoge() {
   }
 
   async function payPool(cast: number, poolAddress: string) {
-    const rs = await useDoge(cast, poolAddress, 'swap')
+    const rs = await doge(cast, poolAddress, 'swap')
     if (rs?.txid) {
       return rs?.txid
     }
     throw 1
   }
 
-  async function transferD20(inscriptionid: string, address: string, amt = 0, tick = 'dogim', indexerType = '1', addliq = false) {
+  async function transferD20(inscriptionid: string, address: string, amt = 0, tick = 'dogim', indexerType = '1', addliq?: boolean, poolid?: string) {
     const doge = window?.DogeApi
     if (await doge.isEnabled()) {
-      const rs = await doge.transferd20(inscriptionid, address, amt, tick, indexerType, addliq)
+      const rs = await doge.transferd20(inscriptionid, address, amt, tick, indexerType, addliq, poolid)
       if (rs?.txid) {
         return rs?.txid
       }
@@ -55,7 +55,7 @@ export function useDoge() {
    * @param costFor
    * @returns
    */
-  async function useMultiDoge(addresslist: string[], costlist: string[], costFor: string) {
+  async function multiDoge(addresslist: string, costlist: string, costFor: string) {
     const doge = window?.DogeApi
     if (await doge.isEnabled()) {
       const rs = await doge.useMultiDoge(addresslist, costlist, costFor)
@@ -70,6 +70,7 @@ export function useDoge() {
     connectDpal,
     payPool,
     transferD20,
-    useMultiDoge,
+    multiDoge,
+    doge,
   }
 }

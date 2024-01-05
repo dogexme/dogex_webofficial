@@ -3,7 +3,7 @@ import { getBalanceByPoolAddress, getTokenInfo, queryPoolState, getKline } from 
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
-import { ElMessageBox } from 'element-plus'
+import { ElMessageBox, ElCheckbox } from 'element-plus'
 import { ArrowDown, Clock, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
@@ -12,6 +12,7 @@ import { SwordPool, TokenState } from '@/services/types'
 import VChart from 'vue-echarts'
 import ECharts from 'vue-echarts'
 import moment from 'moment'
+import { h } from 'vue'
 
 enum KlineType {
   _10m = '10m',
@@ -403,6 +404,41 @@ function getAddressTransList() {
   transferSelect.value = 3
   TransactionsListRef.value?.load()
 }
+
+const isAgree = ref(true)
+
+function showAddPools() {
+  if (!+localStorage.getItem('isAgree')) {
+    ElMessageBox.confirm(
+      () => {
+        return h('div', null, [
+          'We are in the testing stage, please bear any risk.',
+          h(ElCheckbox, {
+            modelValue: isAgree.value,
+            'onUpdate:modelValue': (val: boolean) => {
+              isAgree.value = val
+            },
+            label: 'Agree not to show it in the future.',
+          }),
+        ])
+      },
+      'Warning',
+      {
+        confirmButtonText: 'I agree',
+        cancelButtonText: 'Cancel',
+        customClass: 'messageBox-dialog',
+        type: 'warning',
+      }
+    ).then(() => {
+      showCtrlPoolDialog.value = true
+      if (isAgree.value) {
+        localStorage.setItem('isAgree', 1)
+      }
+    })
+  } else {
+    showCtrlPoolDialog.value = true
+  }
+}
 </script>
 
 <template>
@@ -451,7 +487,7 @@ function getAddressTransList() {
                     <el-button :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
                     <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                     <el-button class="mr-3" type="primary" :disabled="!!noticeMessage || currentPool.status != '0'" @click="showSwapDialog = true">Swap</el-button>
-                    <el-button style="margin: 0" type="warning" :disabled="!!noticeMessage" @click="showCtrlPoolDialog = true">Add Liquidity<em class="beta">BETA</em></el-button>
+                    <el-button style="margin: 0" type="warning" :disabled="!!noticeMessage" @click="showAddPools">Add Liquidity<em class="beta">BETA</em></el-button>
                   </div>
                 </template>
                 <div class="inline-block" style="font-size: 14px" v-else-if="currentPool.pooladdress && !address">
@@ -497,10 +533,7 @@ function getAddressTransList() {
                 </li>
               </ul>
               <div class="text-center">
-                <el-link href="https://dogim.defieyes.io/" style="font-size: 12px; color: #a8a8a8" target="_blank">
-                  <!-- <img class="token-icon" src="@/assets/img/logo32.png" alt="" /> -->
-                  dogim.defieyes.io
-                </el-link>
+                <el-link href="https://dogim.defieyes.io/" style="font-size: 12px; color: #a8a8a8" target="_blank"> dogim.defieyes.io </el-link>
               </div>
             </div>
             <el-row

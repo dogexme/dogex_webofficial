@@ -4,7 +4,9 @@ import icons from '@/config/payIcons'
 import { Back, CaretRight } from '@element-plus/icons-vue'
 import { omitCenterString } from '@/utils'
 import { consumeToken } from './TransferTable'
+import { getLiqPools, getTransferList, isCheckAddLiq } from '@/services/sword'
 import { useAppStore } from '@/store'
+import { ElMessage } from 'element-plus'
 
 enum CtrlType {
   Nothing,
@@ -33,9 +35,8 @@ const visible = computed({
     emit('update:visible', isVisible)
   },
 })
-
-const store = useAppStore()
-const swordInfo = computed(() => store.swordPoolInfo)
+const appStore = useAppStore()
+const { transferD20, multiDoge, doge } = useDoge()
 const currentPool = computed(() => props.currentPool)
 const maxInputDialogWidth = 1000
 const inputDialogWidth = ref(maxInputDialogWidth)
@@ -45,23 +46,32 @@ const token = reactive({
   amountA: 0,
   amountB: 0,
 })
-const transferList = ref([
-  {
-    swapType: 'SWAP_A_B',
-    txid: 'asdsadsadasdsads',
-    status: '1',
-  },
-])
-const pageSize = 10
-const page = ref(1)
-const curTransferList = computed(() => transferList.value.slice((page.value - 1) * pageSize, pageSize + pageSize * (page.value - 1)))
+const transferList = ref<any>([])
+const poolsList = ref<any>([])
 const isAToken = ref(true)
+const currentPackPool = ref<any>({})
+const loading = ref(false)
+const transferListLoading = ref(false)
+
+const address = computed(() => appStore.address)
+const isDisabledAddBtn = computed(() => {
+  if (isAToken.value) {
+    return token.amountA < currentPool.value.minLiqTokenA
+  } else {
+    return token.amountB < currentPool.value.minLiqTokenB
+  }
+})
 
 watch(visible, async (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+    loading.value = true
+    const res = await getLiqPools({})
+    loading.value = false
+    poolsList.value = res.data?.data || []
   } else {
     doType.value = CtrlType.Nothing
+    currentPackPool.value = {}
   }
 })
 
@@ -75,77 +85,172 @@ watch(doType, (doType) => {
   }
 })
 
-async function next(num: number) {
-  page.value = num
+watch(isAToken, () => {
+  Object.assign(token, {
+    amountA: 0,
+    amountB: 0,
+  })
+  currentPackPool.value = {}
+})
+
+async function addPool() {
+  doType.value = CtrlType.Add
 }
 
-function changeUndo(isAdd: boolean) {
-  if (isAdd) {
-    doType.value = CtrlType.Add
-  } else {
-    doType.value = CtrlType.Remove
+async function isAddLiq(type = 1) {
+  const res = await isCheckAddLiq({
+    address: address.value,
+    type,
+  })
+  return res.data.data ? Promise.resolve(true) : Promise.reject(false)
+}
+
+async function removePool(p: any) {
+  const { removeAmount, removeTokenALiqAdr, removeTokenBLiqAdr } = currentPool.value
+  const { liqtype } = p
+  let rs: any = {}
+
+  loading.value = true
+
+  try {
+    await isAddLiq(2)
+  } catch {
+    return ElMessage({
+      message: 'Failed!',
+      type: 'error',
+    })
+  }
+
+  try {
+    if (liqtype == currentPool.value.tokenA) {
+      rs = await doge(removeAmount, removeTokenALiqAdr, 'swap')
+    } else {
+      rs = await doge(removeAmount, removeTokenBLiqAdr, 'swap')
+    }
+
+    if (rs?.txid) {
+      ElMessage({
+        message: 'Successful!',
+        type: 'success',
+      })
+      console.log('删除流动性：txid: ' + rs.txid)
+    } else {
+      ElMessage({
+        message: 'Failed!',
+        type: 'error',
+      })
+    }
+
+    loading.value = false
+  } catch {
+    loading.value = false
   }
 }
 
-function add() {
+async function add() {
+  if (isDisabledAddBtn.value) {
+    return
+  }
+
   const { amountA, amountB } = token
-  if (isAToken.value) {
-    console.log(amountA)
-  } else {
-    console.log(amountB)
+  const { txid } = currentPackPool.value
+  const { poolid, addTokenALiqAdr, pooladdress, addfees, tokenB } = currentPool.value
+  let id = ''
+  // try {
+  //   await isAddLiq(1)
+  // } catch {
+  //   return ElMessage({
+  //     message: 'Failed!',
+  //     type: 'error',
+  //   })
+  // }
+
+  loading.value = true
+
+  try {
+    if (isAToken.value) {
+      id = await multiDoge([pooladdress, addTokenALiqAdr].join(), [amountA, addfees].join(), 'add doge LP')
+    } else {
+      id = await transferD20(txid, address.value, amountB, tokenB, '1', true, poolid)
+    }
+    ElMessage({
+      message: 'Successful!',
+      type: 'success',
+    })
+    loading.value = false
+  } catch {
+    ElMessage({
+      message: 'Failed!',
+      type: 'error',
+    })
+    loading.value = false
   }
+
+  console.log('添加流动性：txid: ' + id)
+}
+
+async function selectToken() {
+  showSelectTokenDialog.value = true
+  try {
+    transferListLoading.value = true
+    const res = await getTransferList(address.value)
+    const resData = res.data
+    if (resData.status == 'success') {
+      transferList.value = resData.data.transfer_list
+    }
+  } finally {
+    transferListLoading.value = false
+  }
+}
+
+function setSelectToken(transToken: any) {
+  currentPackPool.value = transToken
+  token.amountB = transToken.amt
+  showSelectTokenDialog.value = false
 }
 </script>
 
 <template>
   <el-dialog class="custom-dialog" v-model="visible" :width="inputDialogWidth" @close="emit('close')">
-    <div class="swap-pool-dialog p-5">
+    <div class="swap-pool-dialog p-5" style="min-height: 500px" v-loading="loading">
       <template v-if="doType == CtrlType.Nothing">
         <h2 class="swap-header m-0 pt-3 ml-3">Pools</h2>
         <el-divider />
         <div class="flex justify-end mt-4">
-          <DogeButton @click="changeUndo(true)">+ Add</DogeButton>
-          <DogeButton type="warn" @click="changeUndo(false)">- Reduce</DogeButton>
+          <DogeButton @click="addPool">+ Add</DogeButton>
         </div>
-        <div class="border border-solid border-gray-400 rounded-xl p-5 mt-5" style="min-height: 300px">
-          <el-table :data="curTransferList">
-            <el-table-column label="Swap" width="100px">
-              <template #default="s">
-                <SwapIconExchange :icon-a="currentPool.tokenA" :icon-b="currentPool.tokenB" v-if="s.row.swapType == 'SWAP_A_B'"></SwapIconExchange>
-                <SwapIconExchange :icon-a="currentPool.tokenB" :icon-b="currentPool.tokenA" v-else-if="s.row.swapType == 'SWAP_B_A'"></SwapIconExchange>
-                <span v-else-if="s.row.swapType == 'ROLLBACK_A' || s.row.swapType == 'ROLLBACK_B'">ROLLBACK</span>
-                <span v-else>{{ s.row.swapType }}</span>
-              </template>
-            </el-table-column>
-            <el-table-column prop="status" align="center" label="Status">
-              <template #default="s">
-                <SwapStatusIcon :status="s.row.status"></SwapStatusIcon>
-              </template>
-            </el-table-column>
-            <el-table-column prop="txid" label="Txid" width="200px">
-              <template #default="s">
-                <DogLink v-if="s.row.txid" is-copy :to="`https://chain.so/tx/DOGE/${s.row.txid}`" :label="omitCenterString(s.row.txid, 12)" :value="s.row.txid"></DogLink>
-              </template>
-            </el-table-column>
-            <el-table-column label="In" width="150px">
-              <template #default="s">
-                {{ consumeToken(s.row.inTokenA, s.row.inTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="out" width="200px">
-              <template #default="s">
-                {{ consumeToken(s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="Date" prop="date" width="190px"></el-table-column>
-            <!-- <el-table-column label="handle" width="100px" fixed="right">
-            <template #default>
-              <DogTableMenuItem style="line-height: 30px; padding: 0 10px" label="undo" selected value="1" />
-            </template>
-          </el-table-column> -->
-          </el-table>
-          <div style="margin-top: 12px; display: flex; justify-content: center">
-            <el-pagination :page-size="pageSize" layout="prev, pager, next" :total="transferList.length" @current-change="next" />
+        <div class="pools">
+          <div class="pools-item" v-for="pi in poolsList" :key="pi.addBlockno">
+            <div class="pools-item_avator">
+              <el-image style="width: 86px; height: 86px; border-radius: 12px" :src="icons['dogim']"></el-image>
+            </div>
+            <div class="pools-item_info">
+              <div class="pools-line">
+                <div class="pools-line_label">blockNo</div>
+                <span class="pools-line_item">{{ pi.status == 1 ? pi.addBlockno : pi.removeBlockno }}</span>
+              </div>
+              <div class="pools-line">
+                <div class="pools-line_label">Address</div>
+                <span class="pools-line_item">
+                  <DogLink is-copy :label="omitCenterString(pi.address, 12)" :value="pi.address"></DogLink>
+                </span>
+              </div>
+              <div class="pools-line">
+                <div class="pools-line_label">Status</div>
+                <span class="pools-line_item"
+                  ><el-tag :type="pi.status == 1 ? 'success' : 'danger'">{{ pi.status == 1 ? 'Add' : 'Reduce' }}</el-tag></span
+                >
+              </div>
+              <div class="pools-line">
+                <div class="pools-line_label">In/Out</div>
+                <span class="pools-line_item mr-4"
+                  >{{ consumeToken(pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }} / {{ consumeToken(pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span
+                >
+              </div>
+              <div class="pools-line flex justify-end">
+                <DogeButton type="warn" @click="removePool(pi)" style="margin-right: 12px; line-height: 1" v-if="pi.status == 1">Remove</DogeButton>
+              </div>
+            </div>
           </div>
         </div>
       </template>
@@ -175,41 +280,34 @@ function add() {
                 dogim
               </div>
             </div>
-            <SwapInput v-model="token.amountA" title="Add doge" name="pay" :price="0" :min="swordInfo.minLiqTokenA" swap-type="SWAP_A_B" v-if="isAToken">
+            <SwapInput v-model="token.amountA" title="Add doge" name="pay" :price="4" :min="currentPool.minLiqTokenA" swap-type="SWAP_A_B" v-if="isAToken">
               <template #right>
                 <div>
-                  <div class="limit-btn">Min: {{ swordInfo.minLiqTokenA }}</div>
+                  <div class="limit-btn">Min: {{ currentPool.minLiqTokenA }}</div>
                 </div>
               </template>
             </SwapInput>
-            <SwapInput class="mt-4" disabled v-model="token.amountB" :min="swordInfo.minLiqTokenB" title="Add dogim" name="pay" :price="0" swap-type="SWAP_A_B" v-else>
+            <SwapInput class="mt-4" disabled v-model="token.amountB" :price="0" :min="currentPool.minLiqTokenB" title="Add dogim" name="pay" swap-type="SWAP_A_B" @selectToken="selectToken" v-else>
               <template #right>
                 <div class="flex flex-col items-end">
-                  <DogeButton type="warn" border-color="#fff" @click="showSelectTokenDialog = true">
+                  <DogeButton type="warn" border-color="#fff" @click="selectToken">
                     <div class="flex items-center text-sm">
                       Select<el-icon><CaretRight /></el-icon>
                     </div>
                   </DogeButton>
                   <div class="flex">
-                    <div class="limit-btn">Min: {{ swordInfo.minLiqTokenB }}</div>
+                    <div class="limit-btn">Min: {{ currentPool.minLiqTokenB }}</div>
                   </div>
                 </div>
               </template>
             </SwapInput>
-            <div class="swap-sub-btn mt-10" @click="add">Add</div>
+            <div class="swap-sub-btn mt-10" :class="[isDisabledAddBtn && 'swap-sub-btn--disabled']" @click="add">Add</div>
           </div>
         </div>
       </template>
-      <template v-else>
-        <div class="flex items-center pt-2">
-          <el-icon class="cursor-pointer p-2" @click="doType = CtrlType.Nothing"><Back /></el-icon>
-          <h2 class="swap-header m-0 ml-2">Reduce liquidity</h2>
-        </div>
-        <el-divider />
-      </template>
     </div>
   </el-dialog>
-  <SwapSelectTokenDialog v-model:visible="showSelectTokenDialog" :list="[]" :icon="icons.dogim"></SwapSelectTokenDialog>
+  <SwapSelectTokenDialog v-model:visible="showSelectTokenDialog" :list="transferList" @select="setSelectToken" :loading="transferListLoading" :icon="icons.dogim"></SwapSelectTokenDialog>
 </template>
 
 <style lang="scss" scoped>
@@ -223,7 +321,6 @@ function add() {
   width: 100%;
   max-width: 650px;
   padding: 1% 0;
-  // border: 1px solid red;
   border-radius: 30px;
 }
 
@@ -233,6 +330,36 @@ function add() {
   border-radius: 6px;
   color: #fff;
   font-size: 12px;
-  background-color: #ffa21e;
+  background-color: #d6d6d6;
+}
+
+.pools {
+  font-size: 12px;
+  .pools-item {
+    position: relative;
+    display: inline-flex;
+    width: 50%;
+    box-sizing: border-box;
+
+    @media screen and (max-width: 580px) {
+      width: 100%;
+    }
+
+    &_avator {
+      margin-right: 12px;
+    }
+    &_info {
+      flex: 1;
+    }
+  }
+  .pools-line {
+    display: flex;
+    align-items: center;
+    margin-bottom: 6px;
+    &_label {
+      width: 5em;
+      margin-right: 12px;
+    }
+  }
 }
 </style>

@@ -8,14 +8,14 @@ import req from './request'
  * 获取代币池
  */
 export const queryPools = () => {
-  return axios.get('https://raw.githubusercontent.com/dpalwallet/conf/main/swardpool.json')
+  return axios.get('https://raw.githubusercontent.com/dpalwallet/conf/main/testpool.json')
 }
 
 /**
  * 获取代币最新金额
  */
 export const queryPoolState = (poolid: string) => {
-  return req.get<ResultToken<TokenState>>('/api/v1/pool/state', {
+  return req.get<ResultToken<TokenState>>('/api/v1/pooltest/state', {
     params: { poolid },
   })
 }
@@ -42,7 +42,7 @@ export const queryPoolTransactionList = (params: { pair: string } & PageResult) 
  * 查询池子交易记录
  */
 export const queryPoolTransfers = (params: { address?: string } & PageResult) => {
-  return req.get('/api/v1/pool/transaction/list', {
+  return req.get('/api/v1/pooltest/transaction/list', {
     params,
   })
 }
@@ -64,7 +64,7 @@ export const getTransferList = (address: string) => {
  * @returns
  */
 export const queryTransferStatus = (hash: string) => {
-  return req.get('/api/v1/pool/transaction', {
+  return req.get('/api/v1/pooltest/transaction', {
     params: { hash },
   })
 }
@@ -101,7 +101,7 @@ export const getTokenInfo = () => {
  * @returns
  */
 export const getTokenTransferData = () => {
-  return req.get('/api/v1/pool/tvl')
+  return req.get('/api/v1/pooltest/tvl')
 }
 
 /**
@@ -115,6 +115,28 @@ export const queryTransAddress = (params: { address?: string } & PageResult) => 
 
 export const getKline = (params: any) => {
   return axios.get('https://dogim.defieyes.io/api/dogim/klines', {
+    params,
+  })
+}
+
+/**
+ * 检查是否能添加流动性
+ * @param params
+ * @returns
+ */
+export const isCheckAddLiq = (params: any) => {
+  return axios.get('https://drc20.dogex.me/api/v1/pooltest/checkliq', {
+    params,
+  })
+}
+
+/**
+ * 获取流动性列表
+ * @param params
+ * @returns
+ */
+export const getLiqPools = (params: any) => {
+  return axios.get('https://drc20.dogex.me/api/v1/pooltest/liqs?address=DDwwSNzKCdw9ZCLWtouLWor6YEmBFxzSGf', {
     params,
   })
 }
