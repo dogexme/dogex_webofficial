@@ -273,7 +273,7 @@ function setSelectToken(transToken: any) {
         <div class="flex justify-end mt-4">
           <DogeButton type="warn" @click="addPool">+ Add</DogeButton>
           <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount">
-            <DogeButton @click="showTransferDialog = true">history</DogeButton>
+            <DogeButton @click="showTransferDialog = true">History</DogeButton>
           </el-badge>
         </div>
         <div class="pools">
