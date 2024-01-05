@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SwapInput from '@/views/Swap/components/SwapInput.vue'
 import icons from '@/config/payIcons'
-import { Back, CaretRight } from '@element-plus/icons-vue'
+import { Back, CaretRight, Right } from '@element-plus/icons-vue'
 import { omitCenterString } from '@/utils'
 import { consumeToken } from './TransferTable'
 import { getLiqPools, getTransferList, isCheckAddLiq } from '@/services/sword'
@@ -206,7 +206,7 @@ async function add() {
         date: dateFormat(new Date()),
       })
     } else {
-      id = await transferD20(txid, address.value, amountB, tokenB, '1', true, poolid)
+      id = await transferD20(txid, currentPool.value.pooladdress, amountB, tokenB, '1', true, poolid)
       appStore.updateTransferList({
         txid,
         status: 0,
@@ -270,37 +270,47 @@ function setSelectToken(transToken: any) {
         <div class="pools">
           <div class="pools-item mt-4" v-for="pi in poolsList" :key="pi.addBlockno">
             <div class="pools-item_avator">
-              <el-image style="width: 86px; height: 86px; border-radius: 12px" :src="icons['dogim']"></el-image>
+              <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons['dogim']"></el-image>
             </div>
             <div class="pools-item_info">
               <div class="pools-line">
-                <div class="pools-line_label">blockNo</div>
+                <div class="pools-line_label">Type:</div>
+                <span class="pools-line_item">{{ pi.liqtype }}</span>
+              </div>
+              <div class="pools-line">
+                <div class="pools-line_label">blockNo:</div>
                 <span class="pools-line_item">{{ pi.status == 1 ? pi.addBlockno : pi.removeBlockno }}</span>
               </div>
               <div class="pools-line">
-                <div class="pools-line_label">Address</div>
+                <div class="pools-line_label">Address:</div>
                 <span class="pools-line_item">
                   <DogLink is-copy :label="omitCenterString(pi.address, 12)" :value="pi.address"></DogLink>
                 </span>
               </div>
-              <div class="pools-line">
-                <div class="pools-line_label">Status</div>
-                <span class="pools-line_item"
-                  ><el-tag :type="pi.status == 1 ? 'success' : 'danger'">{{ pi.status == 1 ? 'Add' : 'Reduce' }}</el-tag></span
-                >
+            </div>
+            <div class="flex flex-col flex-1 items-center justify-center mx-5">
+              <div>
+                <div class="pools-line">
+                  <div class="pools-line_label">Status:</div>
+                  <span class="pools-line_item"
+                    ><el-tag :type="pi.status == 1 ? 'success' : 'danger'">{{ pi.status == 1 ? 'Add' : 'Reduce' }}</el-tag></span
+                  >
+                </div>
+                <div class="flex flex-1 justify-center items-center whitespace-nowrap">
+                  <p>
+                    <span>In: </span>
+                    <span class="text-sm text-black">{{ consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
+                  </p>
+                  <el-icon style="font-size: 14px; margin: 0 12px"><Right /></el-icon>
+                  <p>
+                    <span>Out: </span>
+                    <span class="text-sm text-black">{{ consumeToken('', pi.outTokenA, pi.outTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
+                  </p>
+                </div>
               </div>
-              <div class="pools-line">
-                <div class="pools-line_label">In</div>
-                <span class="pools-line_item mr-4">{{ consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
-              </div>
-              <div class="pools-line">
-                <div class="pools-line_label">Out</div>
-                <span class="pools-line_item mr-4">{{ consumeToken('', pi.outTokenA, pi.outTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
-              </div>
-              <div class="pools-line">
-                <div class="pools-line_label">Handle</div>
-                <DogeButton type="warn" @click="removePool(pi)" style="margin: 0; line-height: 1" v-if="pi.status == 1">Remove</DogeButton>
-              </div>
+            </div>
+            <div class="pools-line">
+              <DogeButton type="warn" @click="removePool(pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.status == 1">Remove</DogeButton>
             </div>
           </div>
           <el-empty v-if="poolsList.length < 1" description="To add liquidity." />
@@ -389,28 +399,27 @@ function setSelectToken(transToken: any) {
 }
 
 .pools {
+  overflow: auto;
   font-size: 12px;
   .pools-item {
     position: relative;
-    display: inline-flex;
-    width: 50%;
+    display: flex;
     box-sizing: border-box;
-
-    @media screen and (max-width: 580px) {
-      width: 100%;
-    }
 
     &_avator {
       margin-right: 12px;
     }
     &_info {
-      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around;
     }
   }
   .pools-line {
     display: flex;
     align-items: center;
     margin-bottom: 6px;
+    width: max-content;
     &_label {
       width: 5em;
       margin-right: 12px;

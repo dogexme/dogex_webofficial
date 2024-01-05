@@ -205,7 +205,7 @@ onActivated(() => {
                     <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                     <el-button class="mr-3" type="primary" :disabled="!!noticeMessage || currentPool.status != '0'" @click="showSwapDialog = true">Swap</el-button>
                     <el-button style="margin: 0; background-color: #ba77ff; border: 1px solid #ba77ff" type="warning" :disabled="!!noticeMessage" @click="showAddPools"
-                      >Add Liquidity<em class="beta" style="color: #ba77ff">BETA</em></el-button
+                      >Liquidity<em class="beta" style="color: #ba77ff">BETA</em></el-button
                     >
                   </div>
                 </template>
