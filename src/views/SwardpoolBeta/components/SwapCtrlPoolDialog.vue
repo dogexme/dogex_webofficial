@@ -264,7 +264,7 @@ function setSelectToken(transToken: any) {
           </el-badge>
         </div>
         <div class="pools">
-          <div class="pools-item" v-for="pi in poolsList" :key="pi.addBlockno">
+          <div class="pools-item mt-4" v-for="pi in poolsList" :key="pi.addBlockno">
             <div class="pools-item_avator">
               <el-image style="width: 86px; height: 86px; border-radius: 12px" :src="icons['dogim']"></el-image>
             </div>
@@ -293,8 +293,9 @@ function setSelectToken(transToken: any) {
                 <div class="pools-line_label">Out</div>
                 <span class="pools-line_item mr-4">{{ consumeToken(pi.outTokenA, pi.outTokenA, currentPool.tokenA, currentPool.tokenB) }}</span>
               </div>
-              <div class="pools-line flex justify-end">
-                <DogeButton type="warn" @click="removePool(pi)" style="margin-right: 12px; line-height: 1" v-if="pi.status == 1">Remove</DogeButton>
+              <div class="pools-line">
+                <div class="pools-line_label">Handle</div>
+                <DogeButton type="warn" @click="removePool(pi)" style="margin: 0; line-height: 1" v-if="pi.status == 1">Remove</DogeButton>
               </div>
             </div>
           </div>
