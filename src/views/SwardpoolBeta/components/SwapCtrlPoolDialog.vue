@@ -139,9 +139,9 @@ async function removePool(p: any) {
 
   try {
     if (liqtype == currentPool.value.tokenA) {
-      rs = await doge(removeAmount, removeTokenALiqAdr, 'swap')
+      rs = await doge(removeAmount, removeTokenALiqAdr, 'remove lp')
     } else {
-      rs = await doge(removeAmount, removeTokenBLiqAdr, 'swap')
+      rs = await doge(removeAmount, removeTokenBLiqAdr, 'remove lp')
     }
 
     if (rs?.txid) {
