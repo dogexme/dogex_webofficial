@@ -71,12 +71,7 @@ const isDisabledAddBtn = computed(() => {
 watch(visible, async (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
-    loading.value = true
-    const res = await getLiqPools({
-      address: address.value,
-    })
-    loading.value = false
-    poolsList.value = res.data?.data || []
+    queryPools()
   } else {
     doType.value = CtrlType.Nothing
     currentPackPool.value = {}
@@ -100,6 +95,18 @@ watch(isAToken, () => {
   })
   currentPackPool.value = {}
 })
+
+async function queryPools() {
+  loading.value = true
+  try {
+    const res = await getLiqPools({
+      address: address.value,
+    })
+    poolsList.value = res.data?.data || []
+  } finally {
+    loading.value = false
+  }
+}
 
 async function addPool() {
   doType.value = CtrlType.Add
@@ -223,6 +230,8 @@ async function add() {
       type: 'success',
     })
     loading.value = false
+    doType.value = CtrlType.Nothing
+    queryPools()
   } catch {
     ElMessage({
       message: 'Failed!',
@@ -259,7 +268,7 @@ function setSelectToken(transToken: any) {
   <el-dialog class="custom-dialog" v-model="visible" :width="inputDialogWidth" @close="emit('close')">
     <div class="swap-pool-dialog p-5" style="min-height: 500px" v-loading="loading">
       <template v-if="doType == CtrlType.Nothing">
-        <h2 class="swap-header m-0 pt-3 ml-3">Pools</h2>
+        <h2 class="swap-header m-0 pt-3 ml-3">Liquidity</h2>
         <el-divider />
         <div class="flex justify-end mt-4">
           <DogeButton type="warn" @click="addPool">+ Add</DogeButton>
