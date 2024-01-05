@@ -65,11 +65,9 @@ function changePool(poolid: string) {
   <div class="swap-pair_item">
     <div class="relative flex justify-between" style="height: 1em">
       <span class="swap-pair_item_title">{{ props.title }}</span>
-      <DogeButton class="absolute right-0 top-0" type="warn" border-color="#fff" v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">
-        <div class="flex items-center">
-          Select<el-icon><CaretRight /></el-icon>
-        </div>
-      </DogeButton>
+      <div class="swap-pair_select flex items-center" v-if="props.swapType == 'SWAP_B_A' && props.name == 'pay'" @click="emit('selectToken')">
+        Select<el-icon><CaretRight /></el-icon>
+      </div>
     </div>
     <section class="swap-pair_main">
       <div class="swap-pair_inputwrap">
