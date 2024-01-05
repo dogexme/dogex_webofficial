@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getBalanceByPoolAddress, getTokenInfo, queryPoolState, getKline } from '@/services/sword'
+import { getBalanceByPoolAddress, queryPoolState } from '@/services/sword'
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
@@ -9,16 +9,7 @@ import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
 import { SwordPool, TokenState } from '@/services/types'
-import VChart from 'vue-echarts'
-import ECharts from 'vue-echarts'
-import moment from 'moment'
-
-enum KlineType {
-  _10m = '10m',
-  _1h = '1h',
-  _12h = '12h',
-  _1d = '1d',
-}
+import { InitEchartParams, MoveTipParams } from './types'
 
 defineOptions({
   name: 'swap',
@@ -32,7 +23,6 @@ const showSwapDialog = ref(false)
 const poolid = ref('')
 const currentPool = ref<Partial<SwordPool>>({})
 const currentPoolState = ref<TokenState>()
-const tokenInfo = ref({})
 const noticeMessage = computed(() => appStore.noticeMessages.notice_message)
 const pools = computed(() => appStore.swordPools)
 const loading = ref(false)
@@ -42,7 +32,6 @@ const tabValue = ref('0')
 const showTransferDialog = ref(false)
 const showCtrlPoolDialog = ref(false)
 const isBalanceLoading = ref(false)
-const echatLoading = ref(false)
 const transferSelectList = [
   { label: 'Pool Transactions', value: 0 },
   { label: 'Holder', value: 1 },
@@ -52,28 +41,11 @@ const transferSelect = reactive({
   label: transferSelectList[0].label,
 })
 const showAddPoolsProtocol = ref(false)
-
-const klineOpts = [
-  {
-    label: '10m',
-    limit: 400,
-  },
-  {
-    label: '1h',
-    limit: 400,
-  },
-  {
-    label: '12h',
-    limit: 400,
-  },
-  {
-    label: '1d',
-    limit: 400,
-  },
-]
-
-const currentKline = ref(klineOpts[0])
-const curKlinePoint = ref()
+const TransactionsListRef = ref()
+const queryPoolStatusTimer = ref<number | undefined>(0)
+const showUpdownVal = ref(0)
+const showPriceVal = ref(0)
+const isShowTip = ref(false)
 
 const currentPrice = computed(() => {
   const { balanceA = 0, balanceB = 0 } = currentPoolState.value || {}
@@ -83,8 +55,6 @@ const currentPrice = computed(() => {
     price: np.round(price, 6),
   }
 })
-
-const queryPoolStatusTimer = ref<number | undefined>(0)
 
 async function queryPoolStatus(poolid: string, timer = false) {
   try {
@@ -145,11 +115,6 @@ function paySuccess() {
   getBalance(address.value)
 }
 
-const vchart = ref(ECharts)
-const showUpdownVal = ref(0)
-const showPriceVal = ref(0)
-const isShowTip = ref(false)
-
 function init() {
   poolid.value = pools.value[0].poolid
   currentPool.value = pools.value[0]
@@ -157,246 +122,6 @@ function init() {
   queryPoolStatus(poolid.value, false)
   if (address.value) {
     getBalance(address.value)
-  }
-}
-
-getTokenInfoHandle.isLoaded = false
-function getTokenInfoHandle() {
-  if (getTokenInfoHandle.isLoaded) {
-    transferSelect.value = 2
-    return
-  }
-  listLoading.value = true
-  getTokenInfo()
-    .then((res) => {
-      tokenInfo.value = res.data[0]
-      getTokenInfoHandle.isLoaded = true
-      transferSelect.value = 2
-    })
-    .finally(() => {
-      listLoading.value = false
-    })
-}
-const TransactionsListRef = ref()
-const TransferTop500Ref = ref()
-getHolderData.loaded = false
-async function getHolderData() {
-  if (getHolderData.loaded) {
-    transferSelect.value = 1
-    return
-  }
-  if (TransferTop500Ref.value) {
-    listLoading.value = true
-    TransferTop500Ref.value
-      .load()
-      .then((result: any) => {
-        if (result.status == 'success') {
-          transferSelect.value = 1
-          getHolderData.loaded = true
-        }
-      })
-      .finally(() => {
-        listLoading.value = false
-      })
-  }
-}
-
-onActivated(() => {
-  init()
-})
-
-const klineData = ref<any[]>([])
-
-async function loadKline() {
-  const { label, limit } = currentKline.value
-  try {
-    echatLoading.value = true
-    const res = await getKline({
-      interval: label,
-      limit: limit,
-    })
-    let data = res.data.data
-    let currentTime = moment()
-    let currentData = [] as any[]
-    let timeType = 'hours'
-    let timeNum = 1
-
-    data = klineData.value = data
-
-    if (label === KlineType._1h) {
-      currentTime = moment().minute(0).second(0)
-      timeType = 'hours'
-      timeNum = 1
-    } else if (label === KlineType._12h) {
-      currentTime = moment().minute(0).second(0)
-      timeType = 'hours'
-      timeNum = 12
-    } else if (label === KlineType._10m) {
-      currentTime = moment()
-        .minute(parseInt(String(moment().minute() / 10)) * 10)
-        .second(0)
-      timeNum = 10
-      timeType = 'minutes'
-    } else {
-      timeNum = 1
-      timeType = 'days'
-    }
-
-    const xLabels = Array.from({ length: limit }).map((_, i) => {
-      let formatTime = currentTime.format('YYYY-MM-DD HH:mm')
-      if (label == KlineType._1d) {
-        formatTime = currentTime.format('YYYY-MM-DD')
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      currentTime = currentTime.subtract(timeNum, timeType)
-
-      const prev = data[i + 1]
-      const cur = data[i]
-      const curPrice = cur?.c || 0
-      const prevPrice = prev?.c || 0
-
-      data[i] = cur ? Object.assign(cur, { r: (curPrice - prevPrice) / prevPrice }) : cur
-
-      currentData[i] = {
-        custom: cur,
-        value: [formatTime, curPrice],
-      }
-
-      return formatTime
-    })
-    showUpdownVal.value = klineData.value[0]?.r || 0
-    loadTransferData(xLabels.reverse(), currentData.reverse())
-  } finally {
-    echatLoading.value = false
-  }
-}
-
-function hideHideTipOrPointerEvent(e: Event) {
-  if ((e.target as HTMLElement).tagName != 'CANVAS') {
-    vchart.value.dispatchAction({
-      type: 'hideTip',
-    })
-    vchart.value.dispatchAction({
-      type: 'updateAxisPointer',
-      currTrigger: 'leave',
-    })
-  }
-}
-
-onMounted(() => {
-  document.documentElement.addEventListener('touchstart', hideHideTipOrPointerEvent)
-  loadKline()
-})
-
-onUnmounted(() => {
-  document.documentElement.removeEventListener('touchstart', hideHideTipOrPointerEvent)
-})
-
-function loadTransferData(xLabels: any[], data: any[]) {
-  vchart.value.setOption(
-    {
-      title: {
-        show: false,
-      },
-      grid: {
-        left: 40,
-        right: 10,
-        top: 20,
-        bottom: 20,
-      },
-      dataZoom: [
-        {
-          id: 'dataZoomX',
-          type: 'inside',
-          xAxisIndex: [0],
-          minSpan: 50,
-          start: 0,
-          end: 100,
-        },
-      ],
-      tooltip: {
-        trigger: 'axis',
-        formatter: function (params: any) {
-          const opts = params[0]
-          const [date, value] = opts.value
-          const { custom } = opts.data
-          curKlinePoint.value = custom
-          showPriceVal.value = value
-          showUpdownVal.value = custom?.r || 0
-          return `${date} Ð ${np.round(value, 6)}`
-        },
-      },
-      xAxis: {
-        type: 'category',
-        show: true,
-        data: xLabels,
-        splitLine: {
-          show: false,
-        },
-        scale: true,
-        axisLabel: {
-          showMinLabel: false,
-          showMaxLabel: false,
-          color: '#aeaeae',
-          fontSize: 10,
-          formatter(value: string) {
-            const { label } = currentKline.value
-            return label == KlineType._1d ? value : value.slice(0, -6)
-          },
-        },
-        axisTick: {
-          length: 2,
-          lineStyle: {
-            color: '#aeaeae',
-          },
-        },
-        axisLine: {
-          lineStyle: {
-            color: '#aeaeae',
-          },
-        },
-      },
-      yAxis: {
-        show: true,
-        type: 'value',
-        axisLabel: {
-          showMinLabel: false,
-          color: '#aeaeae',
-          fontSize: 10,
-        },
-        scale: true,
-        splitLine: {
-          show: false,
-        },
-      },
-      series: [
-        {
-          name: 'price',
-          type: 'line',
-          showSymbol: false,
-          animation: false,
-          lineStyle: {
-            color: '#ba77ff',
-          },
-          data,
-        },
-      ],
-    },
-    true
-  )
-}
-
-async function changeKline(k: any) {
-  currentKline.value = k
-  loadKline()
-}
-
-function hideTipHandle() {
-  isShowTip.value = false
-  showPriceVal.value = currentPrice.value.price
-  if (klineData.value.length > 0) {
-    showUpdownVal.value = klineData.value[0]?.r || 0
   }
 }
 
@@ -412,6 +137,25 @@ function showAddPools() {
     showCtrlPoolDialog.value = true
   }
 }
+
+function hideTip({ currentRate }: InitEchartParams) {
+  isShowTip.value = false
+  showPriceVal.value = currentPrice.value.price
+  showUpdownVal.value = currentRate
+}
+
+function tipMove({ price, rate }: MoveTipParams) {
+  showPriceVal.value = price
+  showUpdownVal.value = rate
+}
+
+function echartInit({ currentRate }: InitEchartParams) {
+  showUpdownVal.value = currentRate
+}
+
+onActivated(() => {
+  init()
+})
 </script>
 
 <template>
@@ -494,50 +238,7 @@ function showAddPools() {
               </el-col>
             </el-row>
           </el-col>
-          <el-col :span="24" :md="12" v-loading="echatLoading">
-            <div class="flex justify-between items-center mb-4">
-              <ul class="flex text-xs font-bold">
-                <li
-                  class="inline-block w-8 text-center rounded-md cursor-pointer py-2 mp ml-2 hover:bg-yellow-300"
-                  :style="[currentKline.label == k.label ? { 'background-color': 'rgb(255, 194, 0)', color: '#fff' } : {}]"
-                  v-for="k in klineOpts"
-                  @click="changeKline(k)"
-                  :key="k.label"
-                >
-                  {{ k.label }}
-                </li>
-              </ul>
-              <div class="text-center">
-                <el-link href="https://dogim.defieyes.io/" style="font-size: 12px; color: #a8a8a8" target="_blank"> dogim.defieyes.io </el-link>
-              </div>
-            </div>
-            <el-row
-              class="text-xs font-bold text-center"
-              flex
-              justify="center"
-              :gutter="12"
-              style="min-height: 20px"
-              :style="[{ color: (curKlinePoint?.r || 0) < 0 ? 'rgb(255, 90, 80)' : 'rgb(64, 180, 105)', visibility: curKlinePoint ? 'visible' : 'hidden' }]"
-            >
-              <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">
-                <span>O</span>:<span>{{ np.round(curKlinePoint?.o || 0, 4) }}</span>
-              </el-col>
-              <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">
-                <span>H</span>:<span>{{ np.round(curKlinePoint?.h || 0, 4) }}</span>
-              </el-col>
-              <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">
-                <span>L</span>:<span>{{ np.round(curKlinePoint?.l || 0, 4) }}</span>
-              </el-col>
-              <el-col class="mb-2" :span="6" :xs="{ span: 12 }">
-                <span>C</span>:<span>{{ np.round(curKlinePoint?.c || 0, 4) }}</span>
-                <span class="ml-2">{{ (curKlinePoint?.r || 0) < 0 ? '-' : '+' }}{{ Math.abs(np.round((curKlinePoint?.r || 0) * 100, 2)) }}%</span>
-              </el-col>
-              <el-col class="mb-2" :span="3" :xs="12">
-                <span>Vol</span>:<span>{{ np.round(curKlinePoint?.tav || 0, 4) }}</span>
-              </el-col>
-            </el-row>
-            <v-chart ref="vchart" class="chart" autoresize @hideTip="hideTipHandle" />
-          </el-col>
+          <Kline @init="echartInit" @move-tip="tipMove" @hide-tip="hideTip"></Kline>
         </el-row>
       </dog-card>
     </el-col>
@@ -576,9 +277,6 @@ function showAddPools() {
   color: rgb(255, 194, 0);
 }
 
-.chart {
-  height: 200px;
-}
 .swordpool-info {
   margin-top: 12px;
   :deep(.dog-tabmenu) {

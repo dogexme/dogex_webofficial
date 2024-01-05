@@ -54,7 +54,7 @@ export default defineComponent({
       type: Object as PropType<SwordPool>,
     },
   },
-  setup(props) {
+  setup(props, { expose }) {
     const { loading, dataSource, total, page, query, disabledSlide } = useTable({
       first: false,
       api: getData,
@@ -197,6 +197,18 @@ export default defineComponent({
         balance.value = 0
       }
     }
+
+    let isLoaded = false
+
+    expose({
+      load: async () => {
+        if (isLoaded) {
+          return
+        }
+        await query(1, true)
+        isLoaded = true
+      },
+    })
 
     return () => (
       <DogTable

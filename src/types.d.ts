@@ -33,3 +33,10 @@ export type TokenMarketInfo = {
   price: number
   upordown: number
 }
+
+export enum KlineType {
+  _10m = '10m',
+  _1h = '1h',
+  _12h = '12h',
+  _1d = '1d',
+}
