@@ -68,7 +68,7 @@ async function queryStatusLoop(data: any) {
       // }
 
       if (res.data.status == 'success' && resData) {
-        resData?.status = 1
+        resData.status = 1
         Object.assign(data[i], resData)
       }
 
