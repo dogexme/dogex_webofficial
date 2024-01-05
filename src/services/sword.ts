@@ -136,7 +136,7 @@ export const isCheckAddLiq = (params: any) => {
  * @returns
  */
 export const getLiqPools = (params: any) => {
-  return axios.get('https://drc20.dogex.me/api/v1/pooltest/liqs?address=DDwwSNzKCdw9ZCLWtouLWor6YEmBFxzSGf', {
+  return axios.get('https://drc20.dogex.me/api/v1/pooltest/liqs', {
     params,
   })
 }

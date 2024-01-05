@@ -36,6 +36,7 @@ const visible = computed({
   },
 })
 const appStore = useAppStore()
+const transferLoadingCount = computed(() => appStore.transferLoadingCount)
 const { transferD20, multiDoge, doge } = useDoge()
 const currentPool = computed(() => props.currentPool)
 const maxInputDialogWidth = 1000
@@ -52,6 +53,7 @@ const isAToken = ref(true)
 const currentPackPool = ref<any>({})
 const loading = ref(false)
 const transferListLoading = ref(false)
+const showTransferDialog = ref(false)
 
 const address = computed(() => appStore.address)
 const isDisabledAddBtn = computed(() => {
@@ -106,6 +108,7 @@ async function isAddLiq(type = 1) {
 }
 
 async function removePool(p: any) {
+  const T_TYPE_REMOVELIQ = 'REMOVELIQ'
   const { removeAmount, removeTokenALiqAdr, removeTokenBLiqAdr } = currentPool.value
   const { liqtype } = p
   let rs: any = {}
@@ -116,7 +119,7 @@ async function removePool(p: any) {
     await isAddLiq(2)
   } catch {
     return ElMessage({
-      message: 'Failed!',
+      message: 'The pool cannot be removed.!',
       type: 'error',
     })
   }
@@ -133,6 +136,18 @@ async function removePool(p: any) {
         message: 'Successful!',
         type: 'success',
       })
+
+      appStore.updateTransferList({
+        txid: rs.txid,
+        status: 2,
+        swapType: T_TYPE_REMOVELIQ,
+        inTokenA: 0,
+        inTokenB: 0,
+        outTokenA: 0,
+        outTokenB: 0,
+        date: dateFormat(new Date()),
+      })
+
       console.log('删除流动性：txid: ' + rs.txid)
     } else {
       ElMessage({
@@ -152,26 +167,48 @@ async function add() {
     return
   }
 
+  const T_TYPE_ADDLIQ_LP = 'ADDLIQ_LP'
   const { amountA, amountB } = token
   const { txid } = currentPackPool.value
   const { poolid, addTokenALiqAdr, pooladdress, addfees, tokenB } = currentPool.value
   let id = ''
-  // try {
-  //   await isAddLiq(1)
-  // } catch {
-  //   return ElMessage({
-  //     message: 'Failed!',
-  //     type: 'error',
-  //   })
-  // }
+
+  try {
+    await isAddLiq(1)
+  } catch {
+    return ElMessage({
+      message: 'You can add up to 2 different pools.!',
+      type: 'error',
+    })
+  }
 
   loading.value = true
 
   try {
     if (isAToken.value) {
       id = await multiDoge([pooladdress, addTokenALiqAdr].join(), [amountA, addfees].join(), 'add doge LP')
+      appStore.updateTransferList({
+        txid,
+        status: 1,
+        swapType: T_TYPE_ADDLIQ_LP,
+        inTokenA: amountA,
+        inTokenB: 0,
+        outTokenA: 0,
+        outTokenB: 0,
+        date: dateFormat(new Date()),
+      })
     } else {
       id = await transferD20(txid, address.value, amountB, tokenB, '1', true, poolid)
+      appStore.updateTransferList({
+        txid,
+        status: 1,
+        swapType: T_TYPE_ADDLIQ_LP,
+        inTokenA: 0,
+        inTokenB: amountB,
+        outTokenA: 0,
+        outTokenB: 0,
+        date: dateFormat(new Date()),
+      })
     }
     ElMessage({
       message: 'Successful!',
@@ -217,7 +254,10 @@ function setSelectToken(transToken: any) {
         <h2 class="swap-header m-0 pt-3 ml-3">Pools</h2>
         <el-divider />
         <div class="flex justify-end mt-4">
-          <DogeButton @click="addPool">+ Add</DogeButton>
+          <DogeButton type="warn" @click="addPool">+ Add</DogeButton>
+          <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount">
+            <DogeButton @click="showTransferDialog = true">history</DogeButton>
+          </el-badge>
         </div>
         <div class="pools">
           <div class="pools-item" v-for="pi in poolsList" :key="pi.addBlockno">
@@ -252,6 +292,7 @@ function setSelectToken(transToken: any) {
               </div>
             </div>
           </div>
+          <el-empty v-if="poolsList.length < 1" description="To add liquidity." />
         </div>
       </template>
       <template v-else-if="doType == CtrlType.Add">
@@ -307,6 +348,7 @@ function setSelectToken(transToken: any) {
       </template>
     </div>
   </el-dialog>
+  <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool"></SwapTransferList>
   <SwapSelectTokenDialog v-model:visible="showSelectTokenDialog" :list="transferList" @select="setSelectToken" :loading="transferListLoading" :icon="icons.dogim"></SwapSelectTokenDialog>
 </template>
 
