@@ -291,7 +291,7 @@ function setSelectToken(transToken: any) {
               </div>
               <div class="pools-line">
                 <div class="pools-line_label">Out</div>
-                <span class="pools-line_item mr-4">{{ consumeToken(pi.outTokenA, pi.outTokenA, currentPool.tokenA, currentPool.tokenB) }}</span>
+                <span class="pools-line_item mr-4">{{ consumeToken(pi.outTokenA, pi.outTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
               </div>
               <div class="pools-line">
                 <div class="pools-line_label">Handle</div>
