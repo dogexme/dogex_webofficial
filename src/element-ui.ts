@@ -1,5 +1,5 @@
 import { App } from 'vue'
-import { ElLoading, ElEmpty, ElDialog } from 'element-plus'
+import { ElLoading, ElEmpty } from 'element-plus'
 
 export default {
   install(app: App) {
