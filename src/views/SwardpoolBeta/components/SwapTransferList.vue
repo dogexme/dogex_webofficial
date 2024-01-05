@@ -61,9 +61,13 @@ async function queryStatusLoop(data: any) {
       const res = await queryTransferStatus(data[i].txid)
       const resData = res.data.data
 
-      if (res.data.status == 'failed') {
-        data[i].status = '0'
-      } else if (resData.status != '0') {
+      // if (res.data.status == 'failed') {
+      //   data[i].status = '0'
+      // } else if (resData.status != '0') {
+      //   Object.assign(data[i], resData)
+      // }
+
+      if (res.data.status == 'success') {
         Object.assign(data[i], resData)
       }
 

@@ -4,11 +4,11 @@ import icons from '@/config/payIcons'
 import { Back, CaretRight, Right } from '@element-plus/icons-vue'
 import { omitCenterString } from '@/utils'
 import { consumeToken } from './TransferTable'
-import { getLiqPools, getTransferList, isCheckAddLiq } from '@/services/sword'
+import { getLiqPools, getTransferList } from '@/services/sword'
 import { useAppStore } from '@/store'
 import { ElMessage } from 'element-plus'
 import { calculateOutA, calculateOutB } from '../computePrice'
-import { PoolCtrlType } from '../types.d.ts'
+// import { PoolCtrlType } from '../types.d'
 
 enum CtrlType {
   Nothing,
@@ -112,13 +112,13 @@ async function addPool() {
   doType.value = CtrlType.Add
 }
 
-async function isAddLiq(type = 1) {
-  const res = await isCheckAddLiq({
-    address: address.value,
-    type,
-  })
-  return res.data.data ? Promise.resolve(true) : Promise.reject(false)
-}
+// async function isAddLiq(type = 1) {
+//   const res = await isCheckAddLiq({
+//     address: address.value,
+//     type,
+//   })
+//   return res.data.data ? Promise.resolve(true) : Promise.reject(false)
+// }
 
 async function removePool(p: any) {
   const T_TYPE_REMOVELIQ = 'REMOVELIQ'
@@ -128,14 +128,14 @@ async function removePool(p: any) {
 
   loading.value = true
 
-  try {
-    await isAddLiq(liqtype == currentPool.value.tokenA ? PoolCtrlType.removea : PoolCtrlType.removeb)
-  } catch {
-    return ElMessage({
-      message: 'The pool cannot be removed.!',
-      type: 'error',
-    })
-  }
+  // try {
+  //   await isAddLiq(liqtype == currentPool.value.tokenA ? PoolCtrlType.removea : PoolCtrlType.removeb)
+  // } catch {
+  //   return ElMessage({
+  //     message: 'The pool cannot be removed.!',
+  //     type: 'error',
+  //   })
+  // }
 
   try {
     if (liqtype == currentPool.value.tokenA) {
@@ -189,15 +189,15 @@ async function add() {
 
   loading.value = true
 
-  try {
-    await isAddLiq(isAToken.value ? PoolCtrlType.adda : PoolCtrlType.addb)
-  } catch {
-    loading.value = false
-    return ElMessage({
-      message: 'You can only add up to 2 different lp!',
-      type: 'error',
-    })
-  }
+  // try {
+  //   await isAddLiq(isAToken.value ? PoolCtrlType.adda : PoolCtrlType.addb)
+  // } catch {
+  //   loading.value = false
+  //   return ElMessage({
+  //     message: 'You can only add up to 2 different lp!',
+  //     type: 'error',
+  //   })
+  // }
 
   try {
     if (isAToken.value) {
@@ -278,8 +278,8 @@ function setSelectToken(transToken: any) {
         </div>
         <div class="pools">
           <div class="pools-item mt-4" v-for="pi in poolsList" :key="pi.addBlockno">
-            <div class="pools-item_avator">
-              <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
+            <div class="pools-item_avator flex items-center">
+              <el-image style="width: 48px; height: 48px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
             </div>
             <div class="pools-item_info">
               <div class="pools-line">
@@ -414,6 +414,9 @@ function setSelectToken(transToken: any) {
     position: relative;
     display: flex;
     box-sizing: border-box;
+    padding: 12px 15px;
+    background-color: rgb(255, 240, 240);
+    border-radius: 13px;
 
     &_avator {
       margin-right: 12px;
@@ -427,7 +430,6 @@ function setSelectToken(transToken: any) {
   .pools-line {
     display: flex;
     align-items: center;
-    margin-bottom: 6px;
     width: max-content;
     &_label {
       width: 5em;

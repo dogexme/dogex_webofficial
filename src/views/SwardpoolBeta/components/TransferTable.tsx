@@ -11,7 +11,7 @@ import icon from '@/config/payIcons'
 import NP from 'number-precision'
 
 export function consumeNumFormat(num: number, tokenName?: string) {
-  return `${numberFormat(num)} ${tokenName}`
+  return !Number(num) ? 0 : `${numberFormat(num)} ${tokenName}`
 }
 
 export const StatusType = {
