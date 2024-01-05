@@ -8,6 +8,7 @@ import { getLiqPools, getTransferList, isCheckAddLiq } from '@/services/sword'
 import { useAppStore } from '@/store'
 import { ElMessage } from 'element-plus'
 import { calculateOutA, calculateOutB } from '../computePrice'
+import { PoolCtrlType } from '../types.d.ts'
 
 enum CtrlType {
   Nothing,
@@ -121,7 +122,7 @@ async function removePool(p: any) {
   loading.value = true
 
   try {
-    await isAddLiq(2)
+    await isAddLiq(liqtype == currentPool.value.tokenA ? PoolCtrlType.removea : PoolCtrlType.removeb)
   } catch {
     return ElMessage({
       message: 'The pool cannot be removed.!',
@@ -179,16 +180,17 @@ async function add() {
   const { balanceA, balanceB } = poolState.value
   let id = ''
 
+  loading.value = true
+
   try {
-    await isAddLiq(1)
+    await isAddLiq(isAToken.value ? PoolCtrlType.adda : PoolCtrlType.addb)
   } catch {
+    loading.value = false
     return ElMessage({
-      message: 'You can add up to 2 different pools.!',
+      message: 'You can only add up to 2 different lp!',
       type: 'error',
     })
   }
-
-  loading.value = true
 
   try {
     if (isAToken.value) {
@@ -289,11 +291,11 @@ function setSelectToken(transToken: any) {
               </div>
               <div class="pools-line">
                 <div class="pools-line_label">In</div>
-                <span class="pools-line_item mr-4">{{ consumeToken(pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
+                <span class="pools-line_item mr-4">{{ consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
               </div>
               <div class="pools-line">
                 <div class="pools-line_label">Out</div>
-                <span class="pools-line_item mr-4">{{ consumeToken(pi.outTokenA, pi.outTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
+                <span class="pools-line_item mr-4">{{ consumeToken('', pi.outTokenA, pi.outTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
               </div>
               <div class="pools-line">
                 <div class="pools-line_label">Handle</div>

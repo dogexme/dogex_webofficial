@@ -4,3 +4,10 @@ export type MoveTipParams = {
 }
 
 export type InitEchartParams = { currentRate: number }
+
+export enum PoolCtrlType {
+  adda = 1,
+  addb,
+  removea,
+  removeb,
+}
