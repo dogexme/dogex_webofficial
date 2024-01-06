@@ -59,7 +59,7 @@ async function queryStatusLoop(data: any) {
     waitReqData.map(async (d: any) => {
       const res = await queryTransferStatus(d.txid)
       const resData = res.data.data
-      if (res.data.status == 'success' && resData?.txid) {
+      if (res.data.status == 'success' && resData?.hash) {
         resData.status = 1
         return Object.assign(d, resData)
       } else {
