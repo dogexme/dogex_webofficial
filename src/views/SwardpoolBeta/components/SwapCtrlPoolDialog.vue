@@ -4,7 +4,7 @@ import icons from '@/config/payIcons'
 import { Back, CaretRight, Right } from '@element-plus/icons-vue'
 import { omitCenterString } from '@/utils'
 import { consumeToken } from './TransferTable'
-import { getLiqPools, getTransferList } from '@/services/sword'
+import { getLiqPools, getTransferList, queryTransferStatus } from '@/services/sword'
 import { useAppStore } from '@/store'
 import { ElMessage } from 'element-plus'
 import { calculateOutA, calculateOutB } from '../computePrice'
@@ -38,8 +38,12 @@ const visible = computed({
     emit('update:visible', isVisible)
   },
 })
+
+const T_TYPE_REMOVELIQ = 'REMOVELIQ'
+
 const appStore = useAppStore()
 const transferLoadingCount = computed(() => appStore.transferLoadingCount)
+const transferHistoryList = computed(() => appStore.transferList)
 const { transferD20, multiDoge, doge } = useDoge()
 const currentPool = computed(() => props.currentPool)
 const poolState = computed(() => props.poolState)
@@ -112,6 +116,27 @@ async function addPool() {
   doType.value = CtrlType.Add
 }
 
+async function isDisabledRemove() {
+  const removeLiqs = transferHistoryList.value.filter((t: any) => t.swapType == T_TYPE_REMOVELIQ && t.status == 0)
+
+  if (removeLiqs.length < 1) {
+    return
+  }
+
+  return Promise.all(
+    removeLiqs.map(async (d: any) => {
+      const res = await queryTransferStatus(d.txid)
+      const resData = res.data.data
+
+      if (res.data.status == 'success' && resData?.hash) {
+        return true
+      }
+
+      throw 0
+    })
+  )
+}
+
 // async function isAddLiq(type = 1) {
 //   const res = await isCheckAddLiq({
 //     address: address.value,
@@ -121,7 +146,6 @@ async function addPool() {
 // }
 
 async function removePool(p: any) {
-  const T_TYPE_REMOVELIQ = 'REMOVELIQ'
   const { removeAmount, removeTokenALiqAdr, removeTokenBLiqAdr } = currentPool.value
   const { liqtype } = p
   let rs: any = {}
@@ -136,6 +160,16 @@ async function removePool(p: any) {
   //     type: 'error',
   //   })
   // }
+
+  try {
+    await isDisabledRemove()
+  } catch {
+    loading.value = false
+    return ElMessage({
+      message: 'Unconfirmed liquidity cannot be deleted.',
+      type: 'error',
+    })
+  }
 
   try {
     if (liqtype == currentPool.value.tokenA) {
@@ -271,7 +305,7 @@ function setSelectToken(transToken: any) {
         <h2 class="swap-header m-0 pt-3 ml-3">Liquidity</h2>
         <el-divider />
         <div class="flex justify-end mt-4">
-          <DogeButton type="warn" @click="addPool">+ Add</DogeButton>
+          <DogeButton type="warn" @click="addPool">+ Supply</DogeButton>
           <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount">
             <DogeButton @click="showTransferDialog = true">History</DogeButton>
           </el-badge>
@@ -328,7 +362,7 @@ function setSelectToken(transToken: any) {
       <template v-else-if="doType == CtrlType.Add">
         <div class="flex items-center pt-2">
           <el-icon class="cursor-pointer p-2" @click="doType = CtrlType.Nothing"><Back /></el-icon>
-          <h2 class="swap-header m-0 ml-2">Add liquidity</h2>
+          <h2 class="swap-header m-0 ml-2">Supply</h2>
         </div>
         <el-divider />
         <div class="flex justify-center">
