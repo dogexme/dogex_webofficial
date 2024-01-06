@@ -10,6 +10,7 @@ import vueJsx from '@vitejs/plugin-vue-jsx'
 import viteCompression from 'vite-plugin-compression'
 import { viteMockServe } from 'vite-plugin-mock'
 import requireTransform from 'vite-plugin-require-transform'
+import commonjs from '@rollup/plugin-commonjs'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -41,6 +42,7 @@ export default defineConfig(({ mode }) => {
         enable: process.env.NODE_ENV === 'development',
         watchFiles: false,
       }),
+      commonjs(),
       requireTransform({
         fileRegex: /.[tj]sx?$|.vue$/,
       }),

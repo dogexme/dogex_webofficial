@@ -66,11 +66,17 @@ export function useDoge() {
     throw 1
   }
 
+  function isMultiDoge() {
+    const doge = window?.DogeApi
+    return !!doge.useMultiDoge
+  }
+
   return {
     connectDpal,
     payPool,
     transferD20,
     multiDoge,
     doge,
+    isMultiDoge,
   }
 }

@@ -70,7 +70,7 @@ const maxDialogWidth = 1000
 const maxInputDialogWidth = 500
 
 const appStore = useAppStore()
-const { payPool, transferD20 } = useDoge()
+const { payPool, transferD20, isMultiDoge } = useDoge()
 
 const currentSwapType = ref<SwapType>(SwapTypeEnum.AB)
 const dialogWidth = ref(maxDialogWidth)
@@ -227,6 +227,18 @@ async function pay() {
           date: dateFormat(new Date()),
         }
       } else {
+        if (!isMultiDoge()) {
+          return ElMessageBox.confirm('DpalWallet version is too low.', 'Install DpalWallet', {
+            confirmButtonText: 'Upgrade',
+            cancelButtonText: 'Cancel',
+            customClass: 'messageBox-dialog',
+          })
+            .then(() => {
+              window.open('https://dpalwallet.io')
+            })
+            .catch(() => {})
+        }
+
         txid = await transferD20(payToken.value.txid as string, props.currentPool.pooladdress, amount, props.currentPool.tokenB)
         payData.value = {
           txid,
