@@ -154,7 +154,7 @@ async function isDisabledRemove() {
 
 async function computedOut(amount: number, tokenName: string) {
   const { balanceA, balanceB } = poolState.value
-  const { tokenA, tokenB } = currentPool.value
+  const { tokenA } = currentPool.value
 
   try {
     const res = await computedExpcetout({
@@ -164,13 +164,7 @@ async function computedOut(amount: number, tokenName: string) {
       balance_b: balanceB,
     })
 
-    const out = res.data.data
-
-    if (tokenName == tokenA) {
-      return `${out} ${tokenB}`
-    } else {
-      return `${out} ${tokenA}`
-    }
+    return res.data.data
   } catch {
     return 'UNKNOWN'
   }
@@ -338,7 +332,7 @@ function setSelectToken(transToken: any) {
           </el-badge>
         </div>
         <div class="liq flex flex-wrap justify-between mx-12 mt-4">
-          <div class="liq-card relative flex w-6/12 box-border p-3 rounded-xl mb-4 odd:mr-2" v-for="pi in poolsList" :key="pi.addBlockno" v-loading="pi.loading">
+          <div class="liq-card relative flex w-6/12 box-border cursor-pointer p-3 rounded-xl mb-4 odd:mr-2" v-for="pi in poolsList" :key="pi.addBlockno" v-loading="pi.loading">
             <div class="flex items-center">
               <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
             </div>
