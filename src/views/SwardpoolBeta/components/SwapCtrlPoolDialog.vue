@@ -152,7 +152,7 @@ async function removePool(p: any) {
 
       appStore.updateTransferList({
         txid: rs.txid,
-        status: 2,
+        status: 0,
         swapType: T_TYPE_REMOVELIQ,
         inTokenA: 0,
         inTokenB: 0,
