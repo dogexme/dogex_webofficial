@@ -31,7 +31,19 @@ const currentPool = computed(() => props.currentPool)
 const maxInputDialogWidth = 1000
 const inputDialogWidth = ref(maxInputDialogWidth)
 const appStore = useAppStore()
-const transferList = computed(() => appStore.transferList)
+const transferList = computed(() => {
+  return appStore.transferList.map((d: any) => {
+    let out = ''
+    if (d.swapType === 'ADDLIQ_LP') {
+      out = '-'
+    } else {
+      out = consumeToken(d.swapType, d.outTokenA, d.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB, false) as string
+    }
+    return Object.assign(d, {
+      out,
+    })
+  })
+})
 const pageSize = 10
 const page = ref(1)
 const curTransferList = computed(() => transferList.value.slice((page.value - 1) * pageSize, pageSize + pageSize * (page.value - 1)))
@@ -119,7 +131,7 @@ async function clearAllHistory() {
         </el-table-column>
         <el-table-column :label="outField" width="200px">
           <template #default="s">
-            {{ consumeToken(s.row.swapType, s.row.outTokenA, s.row.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB, false) }}
+            {{ s.row.out }}
           </template>
         </el-table-column>
         <el-table-column label="Date" prop="date" width="190px"></el-table-column>

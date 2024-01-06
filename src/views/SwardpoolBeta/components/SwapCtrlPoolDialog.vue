@@ -191,7 +191,7 @@ async function removePool(p: any) {
   } catch {
     loading.value = false
     return ElMessage({
-      message: 'Unconfirmed liquidity cannot be deleted.',
+      message: 'There is an ongoing liquidity removal being processed, please wait for the completion.',
       type: 'error',
     })
   }
