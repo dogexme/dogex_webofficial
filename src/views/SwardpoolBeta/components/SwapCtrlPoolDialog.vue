@@ -237,7 +237,7 @@ async function add() {
     return
   }
 
-  const T_TYPE_ADDLIQ_LP = 'ADDLIQ_LP'
+  const T_TYPE_ADDLIQ_LP = 'ADDLIQ'
   const { amountA, amountB } = token
   const { txid } = currentPackPool.value
   const { poolid, addTokenALiqAdr, pooladdress, addfees, tokenB } = currentPool.value
@@ -334,7 +334,7 @@ function setSelectToken(transToken: any) {
         <div class="liq flex flex-wrap justify-between mx-12 mt-4">
           <div class="liq-card relative flex w-6/12 box-border cursor-pointer p-3 rounded-xl mb-4 odd:mr-2" v-for="pi in poolsList" :key="pi.addBlockno" v-loading="pi.loading">
             <div class="flex items-center">
-              <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
+              <el-image style="width: 42px; height: 42px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
             </div>
             <div class="flex flex-col justify-around ml-5">
               <div>

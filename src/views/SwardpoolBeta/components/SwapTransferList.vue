@@ -34,7 +34,7 @@ const appStore = useAppStore()
 const transferList = computed(() => {
   return appStore.transferList.map((d: any) => {
     let out = ''
-    if (d.swapType === 'ADDLIQ_LP') {
+    if (d.swapType === 'ADDLIQ') {
       out = '-'
     } else {
       out = consumeToken(d.swapType, d.outTokenA, d.outTokenB, props.currentPool?.tokenA, props.currentPool?.tokenB, false) as string
