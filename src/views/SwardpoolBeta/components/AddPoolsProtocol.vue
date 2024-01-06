@@ -45,16 +45,25 @@ function confirm() {
 }
 </script>
 <template>
-  <el-dialog class="custom-dialog" style="background-color: #fff; height: 500px; overflow: auto" v-model="visible" :width="inputDialogWidth" append-to-body>
-    <v-md-preview :text="text"></v-md-preview>
-    <template #footer>
-      <div class="dialog-footer">
+  <el-dialog class="custom-dialog" style="overflow: auto" v-model="visible" :width="inputDialogWidth" append-to-body>
+    <div style="background-color: #fff; border-radius: 20px; overflow: hidden; padding: 50px 20px 20px">
+      <p class="text-base" style="text-indent: 2em">
+        Liquidity management is currently in the beta stage. Please be aware of the risks, and before that, please read our rules link carefully. Thank you for your understanding.
+      </p>
+      <div class="flex flex-col items-end">
+        <!-- <p><el-link type="primary">Swordpool Rule</el-link></p> -->
+        <el-link href="https://github.com/dpalwallet/swordpool" style="font-size: 14px; font-weight: bold" target="_blank">
+          <img class="mr-2" style="width: 18px" src="@/assets/img/logo32.png" alt="" />
+          Swordpool Rule
+        </el-link>
         <p>
           <el-checkbox v-model="isAgree" label="I already know."></el-checkbox>
         </p>
-        <el-button @click="visible = false">No</el-button>
-        <el-button type="primary" @click="confirm" :disabled="!isAgree"> Yes </el-button>
+        <div class="flex">
+          <el-button @click="visible = false">No</el-button>
+          <el-button type="primary" @click="confirm" :disabled="!isAgree"> Yes </el-button>
+        </div>
       </div>
-    </template>
+    </div>
   </el-dialog>
 </template>
