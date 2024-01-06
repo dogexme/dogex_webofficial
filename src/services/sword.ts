@@ -15,7 +15,7 @@ export const queryPools = () => {
  * 获取代币最新金额
  */
 export const queryPoolState = (poolid: string) => {
-  return req.get<ResultToken<TokenState>>('/api/v1/pooltest/state', {
+  return req.get<ResultToken<TokenState>>('/api/v1/pooltest20xx/state', {
     params: { poolid },
   })
 }
@@ -42,7 +42,7 @@ export const queryPoolTransactionList = (params: { pair: string } & PageResult) 
  * 查询池子交易记录
  */
 export const queryPoolTransfers = (params: { address?: string } & PageResult) => {
-  return req.get('/api/v1/pooltest/transaction/list', {
+  return req.get('/api/v1/pooltest20xx/transaction/list', {
     params,
   })
 }
@@ -64,7 +64,7 @@ export const getTransferList = (address: string) => {
  * @returns
  */
 export const queryTransferStatus = (hash: string) => {
-  return req.get('/api/v1/pooltest/transaction', {
+  return req.get('/api/v1/pooltest20xx/transaction', {
     params: { hash },
   })
 }
@@ -101,7 +101,7 @@ export const getTokenInfo = () => {
  * @returns
  */
 export const getTokenTransferData = () => {
-  return req.get('/api/v1/pooltest/tvl')
+  return req.get('/api/v1/pooltest20xx/tvl')
 }
 
 /**
@@ -125,7 +125,7 @@ export const getKline = (params: any) => {
  * @returns
  */
 export const isCheckAddLiq = (params: any) => {
-  return axios.get('https://drc20.dogex.me/api/v1/pooltest/checkliq', {
+  return axios.get('https://drc20.dogex.me/api/v1/pooltest20xx/checkliq', {
     params,
   })
 }
@@ -136,7 +136,8 @@ export const isCheckAddLiq = (params: any) => {
  * @returns
  */
 export const getLiqPools = (params: any) => {
-  return axios.get('https://drc20.dogex.me/api/v1/pooltest/liqs', {
+  // params.address = 'DRGssUYww69oKMJHeXBJZjB46cCkEhwxia'
+  return axios.get('https://drc20.dogex.me/api/v1/pooltest20xx/liqs', {
     params,
   })
 }
