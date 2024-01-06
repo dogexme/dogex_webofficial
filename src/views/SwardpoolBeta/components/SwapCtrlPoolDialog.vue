@@ -299,19 +299,19 @@ function setSelectToken(transToken: any) {
             </div>
             <div class="flex flex-col flex-1 items-center justify-center mx-5">
               <div>
-                <div class="pools-line">
+                <div class="pools-line mb-3">
                   <div class="pools-line_label">Status:</div>
                   <span class="pools-line_item"
                     ><el-tag :type="pi.status == 1 ? 'success' : 'danger'">{{ pi.status == 1 ? 'Add' : 'Reduce' }}</el-tag></span
                   >
                 </div>
                 <div class="flex flex-1 justify-center items-center whitespace-nowrap">
-                  <p>
+                  <p class="m-0">
                     <span>In: </span>
                     <span class="text-sm text-black">{{ consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
                   </p>
                   <el-icon style="font-size: 14px; margin: 0 12px"><Right /></el-icon>
-                  <p>
+                  <p class="m-0">
                     <span>Out: </span>
                     <span class="text-sm text-black">{{ consumeToken('', pi.outTokenA, pi.outTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
                   </p>

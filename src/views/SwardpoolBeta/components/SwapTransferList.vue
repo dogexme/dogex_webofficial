@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { queryTransferStatus } from '@/services/sword'
 import { consumeToken } from './TransferTable'
-import { omitCenterString, delay } from '@/utils'
+import { omitCenterString } from '@/utils'
 import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
 
@@ -48,43 +48,27 @@ watch(visible, async (isVisible) => {
 })
 
 async function queryStatusLoop(data: any) {
-  let loadingCount = data.length
+  const waitReqData = data.filter((d: any) => d.status == 0)
 
-  for (let i = 0; i < data.length; i++) {
-    try {
-      if (data[i].status != '0') {
-        loadingCount--
-        continue
-      }
-
-      await delay(300)
-      const res = await queryTransferStatus(data[i].txid)
-      const resData = res.data.data
-
-      // if (res.data.status == 'failed') {
-      //   data[i].status = '0'
-      // } else if (resData.status != '0') {
-      //   Object.assign(data[i], resData)
-      // }
-
-      if (res.data.status == 'success' && resData) {
-        resData.status = 1
-        Object.assign(data[i], resData)
-      }
-
-      if (data[i].status != '0') {
-        loadingCount--
-        continue
-      }
-    } catch {
-      loadingCount--
-      continue
-    }
-  }
-
-  if (loadingCount == 0) {
+  if (waitReqData.length < 1) {
     outField.value = 'Out'
+    return
   }
+
+  Promise.all(
+    waitReqData.map(async (d: any) => {
+      const res = await queryTransferStatus(d.txid)
+      const resData = res.data.data
+      if (res.data.status == 'success' && resData?.txid) {
+        resData.status = 1
+        return Object.assign(d, resData)
+      } else {
+        throw res.data.status
+      }
+    })
+  ).then(() => {
+    outField.value = 'Out'
+  })
 }
 
 async function next(num: number) {

@@ -5,7 +5,7 @@ import { PropType } from 'vue'
 export default {
   props: {
     status: {
-      type: String as PropType<'0' | '1' | '2'>,
+      type: [String, Number] as PropType<'0' | '1' | '2'>,
       required: true,
     },
   },
