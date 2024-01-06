@@ -3,7 +3,7 @@ import SwapInput from '@/views/Swap/components/SwapInput.vue'
 import icons from '@/config/payIcons'
 import { Back, CaretRight } from '@element-plus/icons-vue'
 import { consumeToken } from './TransferTable'
-import { getLiqPools, getTransferList, queryTransferStatus } from '@/services/sword'
+import { computedExpcetout, getLiqPools, getTransferList, queryTransferStatus } from '@/services/sword'
 import { useAppStore } from '@/store'
 import { ElMessage } from 'element-plus'
 import { calculateOutA, calculateOutB } from '../computePrice'
@@ -105,7 +105,15 @@ async function queryPools() {
     const res = await getLiqPools({
       address: address.value,
     })
-    poolsList.value = res.data?.data || []
+    if (res.data?.data) {
+      poolsList.value = res.data?.data.map((pi: any) => {
+        return Object.assign(pi, { out: 0, loading: true })
+      })
+      poolsList.value.forEach(async (pi: any) => {
+        const out = await computedOut(pi.inTokenA == 0 ? pi.inTokenB : pi.inTokenA, pi.liqtype)
+        Object.assign(pi, { out, loading: false })
+      })
+    }
   } finally {
     loading.value = false
   }
@@ -144,14 +152,27 @@ async function isDisabledRemove() {
 //   return res.data.data ? Promise.resolve(true) : Promise.reject(false)
 // }
 
-function computedOut(amount: number, tokenName: string) {
+async function computedOut(amount: number, tokenName: string) {
   const { balanceA, balanceB } = poolState.value
   const { tokenA, tokenB } = currentPool.value
 
-  if (tokenName == tokenA) {
-    return `${calculateOutB(amount, balanceA, balanceB, 0)} ${tokenB}`
-  } else {
-    return `${calculateOutA(amount, balanceA, balanceB, 0)} ${tokenA}`
+  try {
+    const res = await computedExpcetout({
+      amount,
+      type: tokenName == tokenA ? 1 : 2,
+      balance_a: balanceA,
+      balance_b: balanceB,
+    })
+
+    const out = res.data.data
+
+    if (tokenName == tokenA) {
+      return `${out} ${tokenB}`
+    } else {
+      return `${out} ${tokenA}`
+    }
+  } catch {
+    return 'UNKNOWN'
   }
 }
 
@@ -204,8 +225,6 @@ async function removePool(p: any) {
         outTokenB: 0,
         date: dateFormat(new Date()),
       })
-
-      console.log('删除流动性：txid: ' + rs.txid)
     } else {
       ElMessage({
         message: 'Failed!',
@@ -283,8 +302,6 @@ async function add() {
     })
     loading.value = false
   }
-
-  console.log('添加流动性：txid: ' + id)
 }
 
 async function selectToken() {
@@ -321,7 +338,7 @@ function setSelectToken(transToken: any) {
           </el-badge>
         </div>
         <div class="liq flex flex-wrap justify-between mx-12 mt-4">
-          <div class="liq-card relative flex w-6/12 box-border p-3 rounded-xl mb-4 odd:mr-2" v-for="pi in poolsList" :key="pi.addBlockno">
+          <div class="liq-card relative flex w-6/12 box-border p-3 rounded-xl mb-4 odd:mr-2" v-for="pi in poolsList" :key="pi.addBlockno" v-loading="pi.loading">
             <div class="flex items-center">
               <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
             </div>
@@ -338,7 +355,7 @@ function setSelectToken(transToken: any) {
                 <!-- <el-icon style="font-size: 14px; margin: 0 12px"><Right /></el-icon> -->
                 <p class="m-0">
                   <span class="text-xs">Expect Out: </span>
-                  <span class="text-sm text-black">{{ computedOut(pi.inTokenA == 0 ? pi.inTokenB : pi.inTokenA, pi.liqtype) }}</span>
+                  <span class="text-sm text-black">{{ pi.out }}</span>
                 </p>
               </div>
             </div>
@@ -446,6 +463,11 @@ function setSelectToken(transToken: any) {
   @media screen and (max-width: 800px) {
     width: 100%;
     margin-right: 0;
+  }
+  &:hover {
+    box-shadow:
+      inset 0 -5px 0 0 rgba(0, 0, 0, 0.1),
+      4px 4px 10px 1px rgba(0, 0, 0, 0.1);
   }
 }
 </style>

@@ -142,6 +142,18 @@ export const getLiqPools = (params: any) => {
   })
 }
 
+/**
+ * 获取交易规则
+ * @returns
+ */
 export const getSwordProtocol = () => {
   return axios.get('https://raw.githubusercontent.com/dpalwallet/swordpool/main/README.md')
+}
+
+/**
+ * 计算预计out
+ * @returns
+ */
+export const computedExpcetout = (params: { balance_a: number; balance_b: number; type: number; amount: number }) => {
+  return req.get('/api/v1/pooltest20xx/expcetout', { params })
 }
