@@ -1,8 +1,7 @@
 <script setup lang="ts">
 import SwapInput from '@/views/Swap/components/SwapInput.vue'
 import icons from '@/config/payIcons'
-import { Back, CaretRight, Right } from '@element-plus/icons-vue'
-import { omitCenterString } from '@/utils'
+import { Back, CaretRight } from '@element-plus/icons-vue'
 import { consumeToken } from './TransferTable'
 import { getLiqPools, getTransferList, queryTransferStatus } from '@/services/sword'
 import { useAppStore } from '@/store'
@@ -74,7 +73,7 @@ const isDisabledAddBtn = computed(() => {
 
 watch(visible, async (isVisible) => {
   if (isVisible) {
-    inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+    inputDialogWidth.value = Math.min(maxInputDialogWidth, document.documentElement.offsetWidth - 20)
     queryPools()
   } else {
     doType.value = CtrlType.Nothing
@@ -144,6 +143,17 @@ async function isDisabledRemove() {
 //   })
 //   return res.data.data ? Promise.resolve(true) : Promise.reject(false)
 // }
+
+function computedOut(amount: number, tokenName: string) {
+  const { balanceA, balanceB } = poolState.value
+  const { tokenA, tokenB } = currentPool.value
+
+  if (tokenName == tokenA) {
+    return `${calculateOutB(amount, balanceA, balanceB, 0)} ${tokenB}`
+  } else {
+    return `${calculateOutA(amount, balanceA, balanceB, 0)} ${tokenA}`
+  }
+}
 
 async function removePool(p: any) {
   const { removeAmount, removeTokenALiqAdr, removeTokenBLiqAdr } = currentPool.value
@@ -310,53 +320,33 @@ function setSelectToken(transToken: any) {
             <DogeButton @click="showTransferDialog = true">History</DogeButton>
           </el-badge>
         </div>
-        <div class="pools">
-          <div class="pools-item mt-4" v-for="pi in poolsList" :key="pi.addBlockno">
-            <div class="pools-item_avator flex items-center">
-              <el-image style="width: 48px; height: 48px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
+        <div class="liq flex flex-wrap justify-between mx-12 mt-4">
+          <div class="liq-card relative flex w-6/12 box-border p-3 rounded-xl mb-4 odd:mr-2" v-for="pi in poolsList" :key="pi.addBlockno">
+            <div class="flex items-center">
+              <el-image style="width: 64px; height: 64px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
             </div>
-            <div class="pools-item_info">
-              <div class="pools-line">
-                <div class="pools-line_label">Type:</div>
-                <span class="pools-line_item">{{ pi.liqtype }}</span>
-              </div>
-              <div class="pools-line">
-                <div class="pools-line_label">blockNo:</div>
-                <span class="pools-line_item">{{ pi.status == 1 ? pi.addBlockno : pi.removeBlockno }}</span>
-              </div>
-              <div class="pools-line">
-                <div class="pools-line_label">Address:</div>
-                <span class="pools-line_item">
-                  <DogLink is-copy :label="omitCenterString(pi.address, 12)" :value="pi.address"></DogLink>
-                </span>
-              </div>
-            </div>
-            <div class="flex flex-col flex-1 items-center justify-center mx-5">
+            <div class="flex flex-col justify-around ml-5">
               <div>
-                <div class="pools-line mb-3">
-                  <div class="pools-line_label">Status:</div>
-                  <span class="pools-line_item"
-                    ><el-tag :type="pi.status == 1 ? 'success' : 'danger'">{{ pi.status == 1 ? 'Add' : 'Reduce' }}</el-tag></span
-                  >
-                </div>
-                <div class="flex flex-1 justify-center items-center whitespace-nowrap">
-                  <p class="m-0">
-                    <span>In: </span>
-                    <span class="text-sm text-black">{{ consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
-                  </p>
-                  <el-icon style="font-size: 14px; margin: 0 12px"><Right /></el-icon>
-                  <p class="m-0">
-                    <span>Out: </span>
-                    <span class="text-sm text-black">{{ consumeToken('', pi.outTokenA, pi.outTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
-                  </p>
-                </div>
+                <span class="text-xs">Block No: </span>
+                <span class="text-black text-sm">{{ pi.addBlockno }}</span>
+              </div>
+              <div class="flex flex-col whitespace-nowrap">
+                <p class="m-0">
+                  <span class="text-xs">In: </span>
+                  <span class="text-sm text-black">{{ consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
+                </p>
+                <!-- <el-icon style="font-size: 14px; margin: 0 12px"><Right /></el-icon> -->
+                <p class="m-0">
+                  <span class="text-xs">Expect Out: </span>
+                  <span class="text-sm text-black">{{ computedOut(pi.inTokenA == 0 ? pi.inTokenB : pi.inTokenA, pi.liqtype) }}</span>
+                </p>
               </div>
             </div>
-            <div class="pools-line">
-              <DogeButton type="warn" @click="removePool(pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.status == 1">Remove</DogeButton>
-            </div>
+            <DogeButton class="remove-btn absolute right-2 top-2" type="warn" @click="removePool(pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.status == 1"
+              >Remove</DogeButton
+            >
           </div>
-          <el-empty v-if="poolsList.length < 1" description="To add liquidity." />
+          <el-empty class="w-full" v-if="poolsList.length < 1" description="To add liquidity." />
         </div>
       </template>
       <template v-else-if="doType == CtrlType.Add">
@@ -441,34 +431,21 @@ function setSelectToken(transToken: any) {
   background-color: #d6d6d6;
 }
 
-.pools {
-  overflow: auto;
-  font-size: 12px;
-  .pools-item {
-    position: relative;
-    display: flex;
-    box-sizing: border-box;
-    padding: 12px 15px;
-    background-color: rgb(255, 240, 240);
-    border-radius: 13px;
-
-    &_avator {
-      margin-right: 12px;
-    }
-    &_info {
-      display: flex;
-      flex-direction: column;
-      justify-content: space-around;
-    }
+.liq {
+  @media screen and (max-width: 800px) {
+    margin-left: 0;
+    margin-right: 0;
   }
-  .pools-line {
-    display: flex;
-    align-items: center;
-    width: max-content;
-    &_label {
-      width: 5em;
-      margin-right: 12px;
-    }
+}
+
+.liq-card {
+  width: calc(50% - 0.5rem);
+  overflow: hidden;
+  box-shadow: inset 0 -5px 0 0 rgba(0, 0, 0, 0.1);
+  background-color: rgb(255, 165, 0, 0.35);
+  @media screen and (max-width: 800px) {
+    width: 100%;
+    margin-right: 0;
   }
 }
 </style>

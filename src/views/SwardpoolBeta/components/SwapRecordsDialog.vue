@@ -32,7 +32,7 @@ const visible = computed({
 
 watch(visible, (isVisible) => {
   if (isVisible) {
-    inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+    inputDialogWidth.value = Math.min(maxInputDialogWidth, document.documentElement.offsetWidth - 20)
   }
 })
 

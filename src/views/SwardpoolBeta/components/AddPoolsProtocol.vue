@@ -30,7 +30,7 @@ const isAgree = ref(false)
 
 watch(visible, async (visible) => {
   if (visible) {
-    inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+    inputDialogWidth.value = Math.min(maxInputDialogWidth, document.documentElement.offsetWidth - 20)
     if (!text.value) {
       const markdown = await getSwordProtocol()
       text.value = markdown.data

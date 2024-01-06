@@ -50,7 +50,7 @@ export default defineComponent({
 
     function openBuy() {
       visible.value = true
-      dialogWidth.value = Math.min(minDialogWidth, window.screen.width - 20)
+      dialogWidth.value = Math.min(minDialogWidth, document.documentElement.offsetWidth - 20)
     }
 
     function handleConnectDpal() {

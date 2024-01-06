@@ -100,7 +100,7 @@ const isDisabledPay = computed(() => isLimitAmount.value || payToken.value.amoun
 
 watch(visible, (isVisible) => {
   if (isVisible) {
-    inputDialogWidth.value = Math.min(maxInputDialogWidth, window.screen.width - 20)
+    inputDialogWidth.value = Math.min(maxInputDialogWidth, document.documentElement.offsetWidth - 20)
     revToken.value.pools = props.pools
   } else {
     payToken.value = resetPayToken()
@@ -147,7 +147,7 @@ watch(
 
 watch(showSelectTokenDialog, async (isVisible) => {
   if (isVisible) {
-    dialogWidth.value = Math.min(maxDialogWidth, window.screen.width - 20)
+    dialogWidth.value = Math.min(maxDialogWidth, document.documentElement.offsetWidth - 20)
     try {
       transferListLoading.value = true
       const res = await getTransferList(address.value)
