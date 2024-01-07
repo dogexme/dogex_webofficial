@@ -46,7 +46,7 @@ export default {
 
 <template>
   <div class="flex justify-center items-center">
-    <div class="tokenIcon flex justify-center items-center tokenIcon--flag" :style="{ background: type == 0 ? 'rgb(64, 180, 105)' : 'rgb(255, 90, 80)' }">
+    <div class="tokenIcon flex justify-center items-center tokenIcon--flag" :style="{ background: type == 0 ? '#FFC107' : '#FF9800' }">
       <el-icon color="#fff"><Plus v-if="type == 0" /><Minus v-if="type == 1" /></el-icon>
     </div>
     <el-icon style="font-size: 18px; margin: 0 6px"><Right /></el-icon>
