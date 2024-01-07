@@ -102,6 +102,7 @@ async function clearAllHistory() {
 <template>
   <el-dialog class="custom-dialog" v-model="visible" :width="inputDialogWidth" @close="emit('close')">
     <div class="doge-tokenlist">
+      <DialogTitle title="History"></DialogTitle>
       <div style="display: flex; justify-content: flex-end">
         <DogTableMenuItem label="Clear All" value="0" @click="clearAllHistory"></DogTableMenuItem>
       </div>
@@ -148,6 +149,6 @@ async function clearAllHistory() {
   background-color: #fff;
   border-radius: 20px;
   overflow: hidden;
-  padding: 50px 20px 20px;
+  padding: 20px;
 }
 </style>

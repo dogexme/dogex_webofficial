@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SwapInput from '@/views/Swap/components/SwapInput.vue'
 import icons from '@/config/payIcons'
-import { Back, CaretRight } from '@element-plus/icons-vue'
+import { CaretRight } from '@element-plus/icons-vue'
 import { consumeToken } from './TransferTable'
 import { computedExpcetout, getLiqPools, getTransferList, queryTransferStatus } from '@/services/sword'
 import { useAppStore } from '@/store'
@@ -344,8 +344,7 @@ function setSelectToken(transToken: any) {
   <el-dialog class="custom-dialog" v-model="visible" :width="inputDialogWidth" @close="emit('close')">
     <div class="swap-pool-dialog p-5" style="min-height: 500px" v-loading="loading">
       <template v-if="doType == CtrlType.Nothing">
-        <h2 class="swap-header m-0 pt-3 ml-3">Liquidity</h2>
-        <el-divider />
+        <DialogTitle title="Liquidity"></DialogTitle>
         <div class="flex justify-end mt-4">
           <DogeButton type="warn" @click="addPool">+ Supply</DogeButton>
           <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount">
@@ -363,11 +362,7 @@ function setSelectToken(transToken: any) {
         </div>
       </template>
       <template v-else-if="doType == CtrlType.Add">
-        <div class="flex items-center pt-2">
-          <el-icon class="cursor-pointer p-2" @click="doType = CtrlType.Nothing"><Back /></el-icon>
-          <h2 class="swap-header m-0 ml-2">Supply</h2>
-        </div>
-        <el-divider />
+        <DialogTitle title="Supply" back @back="doType = CtrlType.Nothing"></DialogTitle>
         <div class="flex justify-center">
           <div class="swappool-wrapper mt-5">
             <div class="flex mb-4">
@@ -424,9 +419,6 @@ function setSelectToken(transToken: any) {
 <style lang="scss" scoped>
 .swap-pool-dialog {
   background-color: #fff;
-}
-.swap-header {
-  font-size: 16px;
 }
 .swappool-wrapper {
   width: 100%;
