@@ -1,7 +1,7 @@
 import DogTable, { ColumnProps } from '@/components/DogTable/DogTable'
 import DogLink from '@/components/DogLink.vue'
-import SwapIconExchange from '@/components/SwapIconExchange.vue'
 import SwapStatusIcon from '@/components/SwapStatusIcon.vue'
+import SwapTypeIcon from '@/components/SwapTypeIcon'
 import DogSearch from '@/components/DogSearch.vue'
 import { getBalanceByPoolAddress, queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
@@ -69,18 +69,6 @@ export default defineComponent({
       return <SwapStatusIcon status={text}></SwapStatusIcon>
     }
 
-    function SwapType(swapType: string, tokenA: string, tokenB: string) {
-      if (swapType == 'SWAP_B_A') {
-        return <SwapIconExchange iconA={tokenB} iconB={tokenA} />
-      } else if (swapType == 'SWAP_A_B') {
-        return <SwapIconExchange iconA={tokenA} iconB={tokenB} />
-      } else if (swapType == 'ROLLBACK_A' || swapType == 'ROLLBACK_B') {
-        return 'ROLLBACK'
-      } else {
-        return swapType
-      }
-    }
-
     const originColumns: ColumnProps[] = [
       {
         title: 'Block No',
@@ -88,8 +76,9 @@ export default defineComponent({
       },
       {
         title: 'Swap',
+        align: 'center',
         render(_text: any, r: any) {
-          return SwapType(r.swapType, props.currentPool!.tokenA, props.currentPool!.tokenB)
+          return <SwapTypeIcon swapType={r.swapType} record={r} tokenA={props.currentPool!.tokenA} tokenB={props.currentPool!.tokenB}></SwapTypeIcon>
         },
       },
       {

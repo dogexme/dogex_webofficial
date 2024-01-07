@@ -69,27 +69,13 @@ export default defineComponent({
           <ElButton icon={Refresh} circle onClick={() => emit('refresh')}></ElButton>
         </div>
         {!!props.dataSource.length && pages.value > 1 && (
-          <DogPagination
-            style="margin-bottom: 20px"
-            totalText={props.totalText}
-            currentPage={currentPage.value}
-            pages={pages.value}
-            total={props.total}
-            onChange={pageChange}
-          />
+          <DogPagination style="margin-bottom: 20px" totalText={props.totalText} currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
         )}
 
         {slots.default?.(props.dataSource)}
         {!props.dataSource.length && <el-empty></el-empty>}
         {!!props.dataSource.length && pages.value > 1 && (
-          <DogPagination
-            style="margin-top: 20px"
-            totalText=" "
-            currentPage={currentPage.value}
-            pages={pages.value}
-            total={props.total}
-            onChange={pageChange}
-          />
+          <DogPagination style="margin-top: 20px" totalText=" " currentPage={currentPage.value} pages={pages.value} total={props.total} onChange={pageChange} />
         )}
       </div>
     )

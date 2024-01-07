@@ -107,12 +107,9 @@ async function clearAllHistory() {
         <DogTableMenuItem label="Clear All" value="0" @click="clearAllHistory"></DogTableMenuItem>
       </div>
       <el-table :data="curTransferList">
-        <el-table-column label="Swap" width="100px">
+        <el-table-column label="Swap" align="center" width="100px">
           <template #default="s">
-            <SwapIconExchange :icon-a="currentPool.tokenA" :icon-b="currentPool.tokenB" v-if="s.row.swapType == 'SWAP_A_B'"></SwapIconExchange>
-            <SwapIconExchange :icon-a="currentPool.tokenB" :icon-b="currentPool.tokenA" v-else-if="s.row.swapType == 'SWAP_B_A'"></SwapIconExchange>
-            <span v-else-if="s.row.swapType == 'ROLLBACK_A' || s.row.swapType == 'ROLLBACK_B'">ROLLBACK</span>
-            <span v-else>{{ s.row.swapType }}</span>
+            <SwapTypeIcon :record="s.row" :swap-type="s.row.swapType" :token-a="currentPool.tokenA" :token-b="currentPool.tokenB"></SwapTypeIcon>
           </template>
         </el-table-column>
         <el-table-column prop="status" align="center" label="Status">

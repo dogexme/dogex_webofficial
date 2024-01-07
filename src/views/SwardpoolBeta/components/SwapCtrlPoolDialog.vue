@@ -122,9 +122,9 @@ async function queryPools() {
       list.doge = list.all.filter((pi: any) => pi.liqtype === 'doge')
       list.token = list.all.filter((pi: any) => pi.liqtype !== 'doge')
 
-      if (list.doge.length < 1) {
-        const oldTokens = list.token
-        list.token = []
+      if (list.doge.length < 1 || list.token.length < 1) {
+        const oldTokens = list.doge.length < 1 ? list.token : list.doge
+        list.doge = list.token = []
         oldTokens.forEach((t: any, i) => (i % 2 == 0 ? list.doge.push(t) : list.token.push(t)))
       }
 
