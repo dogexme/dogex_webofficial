@@ -216,10 +216,12 @@ async function removePool(p: any) {
   }
 
   try {
+    let tokenLetter = 'A'
     if (liqtype == currentPool.value.tokenA) {
       rs = await doge(removeAmount, removeTokenALiqAdr, 'remove lp')
     } else {
       rs = await doge(removeAmount, removeTokenBLiqAdr, 'remove lp')
+      tokenLetter = 'B'
     }
 
     if (rs?.txid) {
@@ -231,7 +233,7 @@ async function removePool(p: any) {
       appStore.updateTransferList({
         txid: rs.txid,
         status: 0,
-        swapType: T_TYPE_REMOVELIQ,
+        swapType: T_TYPE_REMOVELIQ + '_' + tokenLetter,
         inTokenA: 0,
         inTokenB: 0,
         outTokenA: 0,
