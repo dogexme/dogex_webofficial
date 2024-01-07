@@ -122,6 +122,12 @@ async function queryPools() {
       list.doge = list.all.filter((pi: any) => pi.liqtype === 'doge')
       list.token = list.all.filter((pi: any) => pi.liqtype !== 'doge')
 
+      if (list.doge.length < 1) {
+        const oldTokens = list.token
+        list.token = []
+        oldTokens.forEach((t: any, i) => (i % 2 == 0 ? list.doge.push(t) : list.token.push(t)))
+      }
+
       list.all.forEach(async (pi: any) => {
         const out = await computedOut(pi.inTokenA == 0 ? pi.inTokenB : pi.inTokenA, pi.liqtype)
         Object.assign(pi, { out, loading: false })
@@ -351,7 +357,7 @@ function setSelectToken(transToken: any) {
           <div class="liq-card w-6/12">
             <LiqItem v-for="pi in list.token" :key="pi.addBlockno" :item="pi" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
           </div>
-          <el-empty class="w-full" v-if="!list.doge.length || !list.token.length" description="To add liquidity." />
+          <el-empty class="w-full" v-if="!list.doge.length && !list.token.length" description="To add liquidity." />
         </div>
       </template>
       <template v-else-if="doType == CtrlType.Add">
