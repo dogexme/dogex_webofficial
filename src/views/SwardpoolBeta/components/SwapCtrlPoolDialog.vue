@@ -55,12 +55,16 @@ const token = reactive({
   amountB: 0,
 })
 const transferList = ref<any>([])
-const poolsList = ref<any>([])
 const isAToken = ref(true)
 const currentPackPool = ref<any>({})
 const loading = ref(false)
 const transferListLoading = ref(false)
 const showTransferDialog = ref(false)
+const list = reactive<{ [k: string]: any[] }>({
+  doge: [],
+  token: [],
+  all: [],
+})
 
 const address = computed(() => appStore.address)
 const isDisabledAddBtn = computed(() => {
@@ -105,11 +109,20 @@ async function queryPools() {
     const res = await getLiqPools({
       address: address.value,
     })
-    if (res.data?.data) {
-      poolsList.value = res.data?.data.map((pi: any) => {
-        return Object.assign(pi, { out: 0, loading: true })
+
+    const data = res.data?.data
+
+    if (data) {
+      list.all = data.map((pi: any) => {
+        return Object.assign(pi, { in: consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.value.tokenA, currentPool.value.tokenB), out: 0, loading: true })
       })
-      poolsList.value.forEach(async (pi: any) => {
+
+      list.all.sort((a: any, b: any) => a.addBlockno - b.addBlockno)
+
+      list.doge = list.all.filter((pi: any) => pi.liqtype === 'doge')
+      list.token = list.all.filter((pi: any) => pi.liqtype !== 'doge')
+
+      list.all.forEach(async (pi: any) => {
         const out = await computedOut(pi.inTokenA == 0 ? pi.inTokenB : pi.inTokenA, pi.liqtype)
         Object.assign(pi, { out, loading: false })
       })
@@ -332,32 +345,13 @@ function setSelectToken(transToken: any) {
           </el-badge>
         </div>
         <div class="liq flex flex-wrap justify-between mx-12 mt-4">
-          <div class="liq-card relative flex w-6/12 box-border cursor-pointer p-3 rounded-xl mb-4 odd:mr-2" v-for="pi in poolsList" :key="pi.addBlockno" v-loading="pi.loading">
-            <div class="flex items-center">
-              <el-image style="width: 42px; height: 42px; border-radius: 12px" :src="icons[pi.liqtype]"></el-image>
-            </div>
-            <div class="flex flex-col justify-around ml-5">
-              <div>
-                <span class="text-xs">Block No: </span>
-                <span class="text-black text-sm">{{ pi.addBlockno }}</span>
-              </div>
-              <div class="flex flex-col whitespace-nowrap">
-                <p class="m-0">
-                  <span class="text-xs">In: </span>
-                  <span class="text-sm text-black">{{ consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.tokenA, currentPool.tokenB) }}</span>
-                </p>
-                <!-- <el-icon style="font-size: 14px; margin: 0 12px"><Right /></el-icon> -->
-                <p class="m-0">
-                  <span class="text-xs">Expect Out: </span>
-                  <span class="text-sm text-black">{{ pi.out }}</span>
-                </p>
-              </div>
-            </div>
-            <DogeButton class="remove-btn absolute right-2 top-2" type="warn" @click="removePool(pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.status == 1"
-              >Remove</DogeButton
-            >
+          <div class="liq-card w-6/12 mr-2">
+            <LiqItem v-for="pi in list.doge" :key="pi.addBlockno" :item="pi" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
           </div>
-          <el-empty class="w-full" v-if="poolsList.length < 1" description="To add liquidity." />
+          <div class="liq-card w-6/12">
+            <LiqItem v-for="pi in list.token" :key="pi.addBlockno" :item="pi" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
+          </div>
+          <el-empty class="w-full" v-if="!list.doge.length || !list.token.length" description="To add liquidity." />
         </div>
       </template>
       <template v-else-if="doType == CtrlType.Add">
@@ -451,17 +445,9 @@ function setSelectToken(transToken: any) {
 
 .liq-card {
   width: calc(50% - 0.5rem);
-  overflow: hidden;
-  box-shadow: inset 0 -5px 0 0 rgba(0, 0, 0, 0.1);
-  background-color: rgb(255, 165, 0, 0.35);
   @media screen and (max-width: 800px) {
     width: 100%;
     margin-right: 0;
-  }
-  &:hover {
-    box-shadow:
-      inset 0 -5px 0 0 rgba(0, 0, 0, 0.1),
-      4px 4px 10px 1px rgba(0, 0, 0, 0.1);
   }
 }
 </style>
