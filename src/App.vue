@@ -14,14 +14,29 @@ onMounted(async () => {
 <style lang="scss">
 @import url('./reset.css');
 @import url('./assets/font/iconfont.css');
+
 @font-face {
   font-family: 'SistemnyjC';
   src: url('./assets/font/SistemnyjC.otf') format('opentype');
 }
 
 @font-face {
-  font-family: 'FiraCode';
-  src: url('./assets/font/FiraCode-Regular.ttf') format('truetype');
+  font-family: Basel;
+  font-weight: 535;
+  font-style: normal;
+  font-display: block;
+  src:
+    url('./assets/font/Basel-Medium.woff2') format('woff2'),
+    url('./assets/font/Basel-Medium.woff') format('woff');
+}
+@font-face {
+  font-family: Basel;
+  font-weight: 485;
+  font-style: normal;
+  font-display: block;
+  src:
+    url('./assets/font/Basel-Book.woff2') format('woff2'),
+    url('./assets/font/Basel-Book.woff') format('woff');
 }
 
 .el-pagination {
