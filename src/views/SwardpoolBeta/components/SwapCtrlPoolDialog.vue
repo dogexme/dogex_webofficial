@@ -114,13 +114,16 @@ async function queryPools() {
 
     if (data) {
       list.all = data.map((pi: any) => {
-        return Object.assign(pi, { in: consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.value.tokenA, currentPool.value.tokenB), out: 0, loading: true })
+        return Object.assign(pi, { isRemove: false, in: consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.value.tokenA, currentPool.value.tokenB), out: 0, loading: true })
       })
 
       list.all.sort((a: any, b: any) => a.addBlockno - b.addBlockno)
 
       list.doge = list.all.filter((pi: any) => pi.liqtype === 'doge')
       list.token = list.all.filter((pi: any) => pi.liqtype !== 'doge')
+
+      list.doge[0] && (list.doge[0].isRemove = true)
+      list.token[0] && (list.token[0].isRemove = true)
 
       if (list.doge.length < 1 || list.token.length < 1) {
         const oldTokens = list.doge.length < 1 ? list.token : list.doge

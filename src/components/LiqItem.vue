@@ -35,7 +35,7 @@ const pi = computed(() => props.item)
         </p>
       </div>
     </div>
-    <DogeButton class="remove-btn" type="warn" @click="emit('remove', pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.status == 1">Remove</DogeButton>
+    <DogeButton class="remove-btn" type="warn" @click="emit('remove', pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.isRemove">Remove</DogeButton>
   </div>
 </template>
 
