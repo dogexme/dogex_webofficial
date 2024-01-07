@@ -33,7 +33,7 @@ export default defineComponent({
         return 'ROLLBACK'
       } else if (isLiqType) {
         const token = props.record?.inTokenA > 0 ? props.tokenA : props.tokenB
-        return <SwapIconPool iconA={props.tokenA} iconB={props.tokenB} token={token} type={isAddLiq ? 0 : 1} v-slots={{ default: swapType }}></SwapIconPool>
+        return <SwapIconPool iconA={props.tokenA} iconB={props.tokenB} token={token} type={isAddLiq ? 0 : 1}></SwapIconPool>
       } else if (swapType == 'DUST') {
         return (
           <div class="flex flex-col items-center">
