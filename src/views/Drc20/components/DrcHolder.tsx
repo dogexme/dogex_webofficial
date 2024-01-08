@@ -18,11 +18,6 @@ export default defineComponent({
       first: false,
     })
 
-    watch(
-      () => props.tickInfo.tick,
-      (tick) => tick && query(1, true)
-    )
-
     const columns = [
       {
         title: 'Address',
