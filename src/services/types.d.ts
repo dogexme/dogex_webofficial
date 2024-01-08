@@ -36,4 +36,6 @@ export interface SwordPool {
   status: string
   tokenA: string
   tokenB: string
+  liq_avaiable: boolean
+  swap_avaiable: boolean
 }
