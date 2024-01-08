@@ -8,7 +8,7 @@ import req from './request'
  * 获取代币池
  */
 export const queryPools = () => {
-  return axios.get('https://raw.githubusercontent.com/dpalwallet/conf/main/swardpool.json')
+  return axios.get('https://raw.githubusercontent.com/dpalwallet/conf/main/testpool.json')
 }
 
 /**
