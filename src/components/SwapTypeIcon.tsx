@@ -33,6 +33,11 @@ export default defineComponent({
         return 'ROLLBACK'
       } else if (isLiqType) {
         const token = props.record?.inTokenA > 0 ? props.tokenA : props.tokenB
+
+        if (isRemoveLiq) {
+          return <SwapIconPool iconA={props.tokenA} iconB={props.tokenB} token={props.record?.outTokenA > 0 ? props.tokenB : props.tokenA} type={isAddLiq ? 0 : 1}></SwapIconPool>
+        }
+
         return <SwapIconPool iconA={props.tokenA} iconB={props.tokenB} token={token} type={isAddLiq ? 0 : 1}></SwapIconPool>
       } else if (swapType == 'DUST') {
         return (
@@ -43,7 +48,7 @@ export default defineComponent({
                 fill="black"
               ></path>
             </svg>
-            <span class="text-xs">DUST</span>
+            <span class="text-xs text-gray-500">DUST</span>
           </div>
         )
       } else {
