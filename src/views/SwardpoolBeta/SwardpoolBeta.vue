@@ -58,11 +58,11 @@ const currentPrice = computed(() => {
 
 const disabledSwap = computed(() => {
   const { balanceA = 0, balanceB = 0 } = currentPoolState.value || {}
-  return !!noticeMessage.value || currentPool.value.status != '0' || balanceA == 0 || balanceB == 0
+  return currentPool.value.status != '0' || balanceA == 0 || balanceB == 0
 })
 
-const liqAvaiable = computed(() => appStore.swordPoolInfo.liq_avaiable)
-const swapAvaiable = computed(() => appStore.swordPoolInfo.swap_avaiable)
+const liqAvaiable = computed(() => currentPool.value.liq_avaiable)
+const swapAvaiable = computed(() => currentPool.value.swap_avaiable)
 
 async function queryPoolStatus(poolid: string, timer = false) {
   try {
@@ -196,7 +196,7 @@ onActivated(() => {
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
-                        <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="!!noticeMessage || item.status != 0">
+                        <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
                           <img class="token-icon rounded-full" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
                           <img class="token-icon rounded-full" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
                         </el-dropdown-item>
