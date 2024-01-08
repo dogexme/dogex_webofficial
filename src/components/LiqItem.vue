@@ -49,9 +49,9 @@ const pi = computed(() => props.item)
       inset 0 -5px 0 0 rgba(0, 0, 0, 0.1),
       4px 4px 10px 1px rgba(0, 0, 0, 0.1);
 
-    // .remove-btn {
-    //   transform: translateX(0);
-    // }
+    .remove-btn {
+      transform: translateX(0);
+    }
   }
 }
 
@@ -59,6 +59,6 @@ const pi = computed(() => props.item)
   position: absolute;
   right: 12px;
   top: 12px;
-  // transform: translateX(calc(150%));
+  transform: translateX(calc(150%));
 }
 </style>
