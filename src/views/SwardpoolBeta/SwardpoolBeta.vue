@@ -212,7 +212,7 @@ onActivated(() => {
                     <el-button :loading="isBalanceLoading" :icon="Refresh" circle @click="getBalance(address)" />
                     <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                     <el-button class="mr-3" type="primary" :disabled="disabledSwap || !swapAvaiable" @click="showSwapDialog = true">Swap</el-button>
-                    <el-button style="margin: 0; background-color: #ba77ff; border: 1px solid #ba77ff" type="warning" :disabled="disabledSwap || !liqAvaiable" @click="showAddPools"
+                    <el-button style="margin: 0; background-color: #ba77ff; border: 1px solid #ba77ff" type="warning" :disabled="!liqAvaiable" @click="showAddPools"
                       >Liquidity<em class="beta" style="color: #ba77ff">BETA</em></el-button
                     >
                   </div>
