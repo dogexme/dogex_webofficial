@@ -8,14 +8,14 @@ import req from './request'
  * 获取代币池
  */
 export const queryPools = () => {
-  return axios.get('https://raw.githubusercontent.com/dpalwallet/conf/main/testpool.json')
+  return axios.get('https://raw.githubusercontent.com/dpalwallet/conf/main/swardpool.json')
 }
 
 /**
  * 获取代币最新金额
  */
 export const queryPoolState = (poolid: string) => {
-  return req.get<ResultToken<TokenState>>('/api/v1/pooltest20xx/state', {
+  return req.get<ResultToken<TokenState>>('/api/v1/pool/state', {
     params: { poolid },
   })
 }
@@ -42,7 +42,7 @@ export const queryPoolTransactionList = (params: { pair: string } & PageResult) 
  * 查询池子交易记录
  */
 export const queryPoolTransfers = (params: { address?: string } & PageResult) => {
-  return req.get('/api/v1/pooltest20xx/transaction/list', {
+  return req.get('/api/v1/pool/transaction/list', {
     params,
   })
 }
@@ -64,7 +64,7 @@ export const getTransferList = (address: string) => {
  * @returns
  */
 export const queryTransferStatus = (hash: string) => {
-  return req.get('/api/v1/pooltest20xx/transaction', {
+  return req.get('/api/v1/pool/transaction', {
     params: { hash },
   })
 }
@@ -101,7 +101,7 @@ export const getTokenInfo = () => {
  * @returns
  */
 export const getTokenTransferData = () => {
-  return req.get('/api/v1/pooltest20xx/tvl')
+  return req.get('/api/v1/pool/tvl')
 }
 
 /**
@@ -125,7 +125,7 @@ export const getKline = (params: any) => {
  * @returns
  */
 export const isCheckAddLiq = (params: any) => {
-  return axios.get('https://drc20.dogex.me/api/v1/pooltest20xx/checkliq', {
+  return axios.get('https://drc20.dogex.me/api/v1/pool/checkliq', {
     params,
   })
 }
@@ -136,8 +136,7 @@ export const isCheckAddLiq = (params: any) => {
  * @returns
  */
 export const getLiqPools = (params: any) => {
-  // params.address = 'DRGssUYww69oKMJHeXBJZjB46cCkEhwxia'
-  return axios.get('https://drc20.dogex.me/api/v1/pooltest20xx/liqs', {
+  return axios.get('https://drc20.dogex.me/api/v1/pool/liqs', {
     params,
   })
 }
@@ -155,5 +154,5 @@ export const getSwordProtocol = () => {
  * @returns
  */
 export const computedExpcetout = (params: { balance_a: number; balance_b: number; type: number; amount: number }) => {
-  return req.get('/api/v1/pooltest20xx/expcetout', { params })
+  return req.get('/api/v1/pool/expcetout', { params })
 }
