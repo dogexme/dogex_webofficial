@@ -213,10 +213,10 @@ onActivated(() => {
                     <!-- 生成环境需增加禁用属性 :disabled="!!noticeMessage" -->
                     <el-button class="mr-3" type="primary" :disabled="disabledSwap || !swapAvaiable" @click="showSwapDialog = true">Swap</el-button>
                     <el-button
-                      :style="[disabledSwap || !liqAvaiable ? { filter: 'grayscale(.5)' } : {}]"
+                      :style="[!liqAvaiable ? { filter: 'grayscale(.5)' } : {}]"
                       style="margin: 0; background-color: #ba77ff; border: 1px solid #ba77ff"
                       type="warning"
-                      :disabled="disabledSwap || !liqAvaiable"
+                      :disabled="!liqAvaiable"
                       @click="showAddPools"
                       >Liquidity<em class="beta" style="color: #ba77ff">BETA</em></el-button
                     >
