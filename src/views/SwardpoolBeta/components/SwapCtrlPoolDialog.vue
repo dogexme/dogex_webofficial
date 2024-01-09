@@ -43,7 +43,7 @@ const T_TYPE_REMOVELIQ = 'REMOVELIQ'
 const appStore = useAppStore()
 const transferLoadingCount = computed(() => appStore.transferLoadingCount)
 const transferHistoryList = computed(() => appStore.transferList)
-const { transferD20, multiDoge, doge } = useDoge()
+const { transferD20, multiDoge, doge, isMultiDoge } = useDoge()
 const currentPool = computed(() => props.currentPool)
 const poolState = computed(() => props.poolState)
 const maxInputDialogWidth = 1000
@@ -79,6 +79,18 @@ watch(visible, async (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, document.documentElement.offsetWidth - 20)
     queryPools()
+    if (!isMultiDoge()) {
+      visible.value = false
+      return ElMessageBox.confirm('DpalWallet version is too low.', 'Install DpalWallet', {
+        confirmButtonText: 'Upgrade',
+        cancelButtonText: 'Cancel',
+        customClass: 'messageBox-dialog',
+      })
+        .then(() => {
+          window.open('https://dpalwallet.io')
+        })
+        .catch(() => {})
+    }
   } else {
     doType.value = CtrlType.Nothing
     currentPackPool.value = {}
