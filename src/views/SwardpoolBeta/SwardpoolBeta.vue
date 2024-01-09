@@ -16,7 +16,7 @@ defineOptions({
 })
 
 const appStore = useAppStore()
-const { connectDpal } = appStore
+const { connectDpal, getSwordPools } = appStore
 const address = computed(() => appStore.address)
 const transferLoadingCount = computed(() => appStore.transferLoadingCount)
 const showSwapDialog = ref(false)
@@ -96,20 +96,34 @@ function connect() {
   })
 }
 
-function changePool(poolid: string) {
-  if (poolid === currentPool.value.poolid) {
+function changePool(pid: string) {
+  if (pid === currentPool.value.poolid) {
     return
   }
-  const pool = pools.value.find((p: any) => p.poolid === poolid)
-  queryPoolStatus(poolid)
+  const pool = pools.value.find((p: any) => p.poolid === pid)
   if (pool) {
+    queryPoolStatus(pid)
     currentPool.value = pool
+    poolid.value = pid
   }
 }
 
-function getBalance(pooladdress: string) {
+async function updatePool(timer = false) {
+  if (currentPool.value?.poolid) {
+    const pool = pools.value.find((p: any) => p.poolid === currentPool.value.poolid)
+    poolid.value = pool.poolid
+    currentPool.value = pool
+  } else {
+    poolid.value = pools.value[0].poolid
+    currentPool.value = pools.value[0]
+  }
+  queryPoolStatus(poolid.value, timer)
+}
+
+async function getBalance(pooladdress: string) {
   isBalanceLoading.value = true
-  queryPoolStatus(poolid.value)
+  await getSwordPools()
+  updatePool()
   getBalanceByPoolAddress(pooladdress)
     .then(async (res: any) => {
       if (res.data[0]) {
@@ -124,10 +138,8 @@ function paySuccess() {
 }
 
 function init() {
-  poolid.value = pools.value[0].poolid
-  currentPool.value = pools.value[0]
-  // 第二个参数开启实时金额
-  queryPoolStatus(poolid.value, false)
+  // 第一个参数开启实时金额
+  updatePool()
   if (address.value) {
     getBalance(address.value)
   }
