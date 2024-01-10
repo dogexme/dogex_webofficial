@@ -159,7 +159,7 @@ async function addPool() {
 }
 
 async function isDisabledRemove() {
-  const removeLiqs = transferHistoryList.value.filter((t: any) => t.swapType.include(T_TYPE_REMOVELIQ) && t.status == 0)
+  const removeLiqs = transferHistoryList.value.filter((t: any) => t.swapType.includes(T_TYPE_REMOVELIQ) && t.status == 0)
 
   if (removeLiqs.length < 1) {
     return
