@@ -35,7 +35,14 @@ export default defineComponent({
         const token = props.record?.inTokenA > 0 ? props.tokenA : props.tokenB
 
         if (isRemoveLiq) {
-          return <SwapIconPool iconA={props.tokenA} iconB={props.tokenB} token={props.record?.outTokenA > 0 ? props.tokenB : props.tokenA} type={isAddLiq ? 0 : 1}></SwapIconPool>
+          return (
+            <SwapIconPool
+              iconA={props.tokenA}
+              iconB={props.tokenB}
+              token={props.record?.outTokenA > 0 ? props.tokenB : props.tokenA}
+              type={isAddLiq ? 0 : 1}
+            ></SwapIconPool>
+          )
         }
 
         return <SwapIconPool iconA={props.tokenA} iconB={props.tokenB} token={token} type={isAddLiq ? 0 : 1}></SwapIconPool>

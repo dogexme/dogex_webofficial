@@ -226,7 +226,7 @@ async function computedOut(amount: number, tokenName: string) {
 
 async function removePool(p: any) {
   const { removeAmount, removeTokenALiqAdr, removeTokenBLiqAdr } = currentPool.value
-  const { liqtype } = p
+  const { liqtype, out } = p
   let rs: any = {}
 
   loading.value = true
@@ -251,8 +251,10 @@ async function removePool(p: any) {
   }
 
   try {
+    const isTokenA = liqtype == currentPool.value.tokenA
     let tokenLetter = 'A'
-    if (liqtype == currentPool.value.tokenA) {
+
+    if (isTokenA) {
       rs = await doge(removeAmount, removeTokenALiqAdr, 'remove lp')
     } else {
       rs = await doge(removeAmount, removeTokenBLiqAdr, 'remove lp')
@@ -260,6 +262,8 @@ async function removePool(p: any) {
     }
 
     if (rs?.txid) {
+      const outAmount = parseFloat(out) || 1
+
       ElMessage({
         message: 'Successful!',
         type: 'success',
@@ -271,8 +275,8 @@ async function removePool(p: any) {
         swapType: T_TYPE_REMOVELIQ + '_' + tokenLetter,
         inTokenA: 0,
         inTokenB: 0,
-        outTokenA: 0,
-        outTokenB: 0,
+        outTokenA: !isTokenA ? outAmount : 0,
+        outTokenB: isTokenA ? outAmount : 0,
         date: dateFormat(new Date()),
       })
     } else {
