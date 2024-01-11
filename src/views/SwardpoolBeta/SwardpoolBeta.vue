@@ -375,7 +375,7 @@ section {
   display: inline-block;
   text-align: center;
   padding: 5px 10px;
-  border-radius: 20px;
+  border-radius: 8px;
   cursor: pointer;
   border: 2px solid #fff;
   background-color: #1e90ff;

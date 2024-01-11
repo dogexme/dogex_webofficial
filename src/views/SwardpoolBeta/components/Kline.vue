@@ -211,11 +211,11 @@ onUnmounted(() => {
       </div>
     </div>
     <el-row
-      class="text-xs font-bold text-center"
+      class="text-xs text-center"
       flex
       justify="center"
       :gutter="12"
-      style="min-height: 20px; letter-spacing: 1px"
+      style="min-height: 20px"
       :style="[{ color: (k.r || 0) < 0 ? 'rgb(255, 90, 80)' : 'rgb(64, 180, 105)', visibility: curKlinePoint ? 'visible' : 'hidden' }]"
     >
       <el-col class="mb-2" :span="3" :xs="8" :md="8" :lg="3">

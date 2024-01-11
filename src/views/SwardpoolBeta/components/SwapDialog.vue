@@ -399,7 +399,6 @@ function setSelectToken(t: { txid: string; amt: number }) {
 .swap-container {
   max-width: 500px;
   background-color: #fff;
-  border-radius: 20px;
   overflow: hidden;
   padding: 50px 20px 20px;
 }

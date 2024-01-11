@@ -60,7 +60,7 @@ onMounted(async () => {
   }
   .el-dialog__body {
     padding: 0;
-    border-radius: 20px;
+    border-radius: 8px;
     overflow: hidden;
   }
   .el-dialog__headerbtn {
@@ -75,7 +75,7 @@ onMounted(async () => {
 }
 
 .messageBox-dialog {
-  border-radius: 15px;
+  border-radius: 8px;
 }
 
 .loading-body {
@@ -114,6 +114,10 @@ onMounted(async () => {
 
 .el-alert--info.is-dark {
   background-color: var(--el-color-primary-light-3) !important;
+}
+
+.el-divider--horizontal {
+  margin: 16px 0 !important;
 }
 
 .beta {

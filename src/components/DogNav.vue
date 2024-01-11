@@ -236,7 +236,7 @@ function triggerDrawer(direction: DrawerDirection) {
 .nav-active-item {
   position: relative;
   display: inline-block;
-  border-radius: 20px;
+  border-radius: 8px;
   border: 1px solid #333;
   margin: 0 3px;
   overflow: hidden;
