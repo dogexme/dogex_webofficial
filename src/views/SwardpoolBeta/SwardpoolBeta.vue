@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getBalanceByPoolAddress, queryPoolState } from '@/services/sword'
+import { getBalanceByPoolAddress } from '@/services/sword'
 import TransferTable from './components/TransferTable'
 import np from 'number-precision'
 import { useAppStore } from '@/store'
@@ -8,21 +8,19 @@ import { ArrowDown, Tickets, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
 import icons from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
-import { SwordPool, TokenState } from '@/services/types'
+import { SwordPool } from '@/services/types'
 import { InitEchartParams, MoveTipParams } from './types'
+import { storeToRefs } from 'pinia'
 
 defineOptions({
   name: 'swap',
 })
 
 const appStore = useAppStore()
-const { connectDpal, getSwordPools } = appStore
-const address = computed(() => appStore.address)
-const transferLoadingCount = computed(() => appStore.transferLoadingCount)
+const { connectDpal, getSwordPools, getStorePoolStatus } = appStore
 const showSwapDialog = ref(false)
-const poolid = ref('')
+const { poolid, address, transferLoadingCount, currentPoolState } = storeToRefs(appStore)
 const currentPool = ref<Partial<SwordPool>>({})
-const currentPoolState = ref<TokenState>()
 const noticeMessage = computed(() => appStore.noticeMessages.notice_message)
 const pools = computed(() => appStore.swordPools)
 const loading = ref(false)
@@ -67,13 +65,9 @@ const swapAvaiable = computed(() => currentPool.value.swap_avaiable)
 async function queryPoolStatus(poolid: string, timer = false) {
   try {
     loading.value = true
-    const res = await queryPoolState(poolid)
-    const { status, data } = res.data
-    if (status == 'success') {
-      currentPoolState.value = data
-      if (!isShowTip.value) {
-        showPriceVal.value = currentPrice.value.price
-      }
+    await getStorePoolStatus()
+    if (!isShowTip.value) {
+      showPriceVal.value = currentPrice.value.price
     }
   } finally {
     loading.value = false
@@ -102,9 +96,9 @@ function changePool(pid: string) {
   }
   const pool = pools.value.find((p: any) => p.poolid === pid)
   if (pool) {
-    queryPoolStatus(pid)
     currentPool.value = pool
     poolid.value = pid
+    queryPoolStatus(pid)
   }
 }
 
@@ -256,10 +250,10 @@ onActivated(() => {
                 <el-statistic title="Processed Blocks" :value="currentPoolState?.blockno" />
               </el-col>
               <el-col :span="12">
-                <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="+currentPoolState?.balanceA" />
+                <el-statistic :title="`Current ${currentPool?.tokenA} Balance`" :precision="5" :value="+currentPoolState?.balanceA || 0" />
               </el-col>
               <el-col :span="12">
-                <el-statistic :title="`Current ${currentPool?.tokenB} Balance`" :precision="5" :value="+currentPoolState?.balanceB" />
+                <el-statistic :title="`Current ${currentPool?.tokenB} Balance`" :precision="5" :value="+currentPoolState?.balanceB || 0" />
               </el-col>
             </el-row>
           </el-col>

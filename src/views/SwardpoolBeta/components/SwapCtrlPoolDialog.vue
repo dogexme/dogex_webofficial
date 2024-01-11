@@ -7,7 +7,9 @@ import { computedExpcetout, getLiqPools, getTransferList, queryTransferStatus } 
 import { useAppStore } from '@/store'
 import { ElMessage } from 'element-plus'
 import { calculateOutA, calculateOutB } from '../computePrice'
-// import { PoolCtrlType } from '../types.d'
+import { storeToRefs } from 'pinia'
+import { oversellStyle } from '../tools'
+import np from 'number-precision'
 
 enum CtrlType {
   Nothing,
@@ -41,7 +43,8 @@ const visible = computed({
 const T_TYPE_REMOVELIQ = 'REMOVELIQ'
 
 const appStore = useAppStore()
-const transferLoadingCount = computed(() => appStore.transferLoadingCount)
+const { getStorePoolStatus } = appStore
+const { transferLoadingCount, currentPoolState } = storeToRefs(appStore)
 const transferHistoryList = computed(() => appStore.transferList)
 const { transferD20, multiDoge, doge, isMultiDoge } = useDoge()
 const currentPool = computed(() => props.currentPool)
@@ -78,7 +81,6 @@ const isDisabledAddBtn = computed(() => {
 watch(visible, async (isVisible) => {
   if (isVisible) {
     inputDialogWidth.value = Math.min(maxInputDialogWidth, document.documentElement.offsetWidth - 20)
-    queryPools()
     if (!isMultiDoge()) {
       visible.value = false
       return ElMessageBox.confirm('DpalWallet version is too low.', 'Install DpalWallet', {
@@ -91,6 +93,7 @@ watch(visible, async (isVisible) => {
         })
         .catch(() => {})
     }
+    queryPools()
   } else {
     doType.value = CtrlType.Nothing
     currentPackPool.value = {}
@@ -122,11 +125,20 @@ async function queryPools() {
       address: address.value,
     })
 
+    await getStorePoolStatus()
+
     const data = res.data?.data
+    const { balanceA, balanceB } = currentPoolState.value
 
     if (data) {
       list.all = data.map((pi: any) => {
-        return Object.assign(pi, { isRemove: false, in: consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.value.tokenA, currentPool.value.tokenB), out: 0, loading: true })
+        return Object.assign(pi, {
+          isRemove: false,
+          in: consumeToken('', pi.inTokenA, pi.inTokenB, currentPool.value.tokenA, currentPool.value.tokenB),
+          out: 0,
+          loading: true,
+          outProportion: 0,
+        })
       })
 
       list.all.sort((a: any, b: any) => a.addBlockno - b.addBlockno)
@@ -146,7 +158,15 @@ async function queryPools() {
 
       list.all.forEach(async (pi: any) => {
         const out = await computedOut(pi.inTokenA == 0 ? pi.inTokenB : pi.inTokenA, pi.liqtype)
-        Object.assign(pi, { out, loading: false })
+        const outAmount = parseFloat(out)
+        const outProportion = (pi.liqtype === 'doge' ? outAmount / balanceA : outAmount / balanceB) || 1
+        Object.assign(pi, {
+          out,
+          loading: false,
+          outProportion,
+          outProportionFormat: np.round(outProportion * 100, 4) + '%',
+          bg: oversellStyle(outProportion),
+        })
       })
     }
   } finally {
@@ -207,8 +227,15 @@ async function computedOut(amount: number, tokenName: string) {
 
 async function removePool(p: any) {
   const { removeAmount, removeTokenALiqAdr, removeTokenBLiqAdr } = currentPool.value
-  const { liqtype } = p
+  const { liqtype, outProportion } = p
   let rs: any = {}
+
+  if (!outProportion || outProportion >= 1) {
+    return ElMessage({
+      message: `Lines exceeding oversell cannot be removed.`,
+      type: 'error',
+    })
+  }
 
   loading.value = true
 
@@ -369,10 +396,10 @@ function setSelectToken(transToken: any) {
         </div>
         <div class="liq flex flex-wrap justify-between mx-12 mt-4">
           <div class="liq-card w-6/12 mr-2">
-            <LiqItem v-for="pi in list.doge" :key="pi.addBlockno" :item="pi" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
+            <LiqItem v-for="pi in list.doge" :key="pi.addBlockno" :item="pi" :bg="pi.bg" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
           </div>
           <div class="liq-card w-6/12">
-            <LiqItem v-for="pi in list.token" :key="pi.addBlockno" :item="pi" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
+            <LiqItem v-for="pi in list.token" :key="pi.addBlockno" :item="pi" :bg="pi.bg" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
           </div>
           <el-empty class="w-full" v-if="!list.doge.length && !list.token.length" description="To add liquidity." />
         </div>
@@ -400,14 +427,32 @@ function setSelectToken(transToken: any) {
               </div>
             </div>
             <div style="min-height: 200px">
-              <SwapInput v-model="token.amountA" title="Add doge" name="pay" :price="4" :min="currentPool.minLiqTokenA" swap-type="SWAP_A_B" v-if="isAToken">
+              <SwapInput
+                v-model="token.amountA"
+                title="Add doge"
+                name="pay"
+                :price="4"
+                :min="currentPool.minLiqTokenA"
+                swap-type="SWAP_A_B"
+                v-if="isAToken"
+              >
                 <template #right>
                   <div>
                     <div class="limit-btn">Min: {{ currentPool.minLiqTokenA }}</div>
                   </div>
                 </template>
               </SwapInput>
-              <SwapInput disabled v-model="token.amountB" :price="0" :min="currentPool.minLiqTokenB" title="Add dogim" name="pay" swap-type="SWAP_A_B" @selectToken="selectToken" v-else>
+              <SwapInput
+                disabled
+                v-model="token.amountB"
+                :price="0"
+                :min="currentPool.minLiqTokenB"
+                title="Add dogim"
+                name="pay"
+                swap-type="SWAP_A_B"
+                @selectToken="selectToken"
+                v-else
+              >
                 <template #right>
                   <div class="flex flex-col items-end">
                     <DogeButton type="warn" border-color="#fff" @click="selectToken">
@@ -429,7 +474,13 @@ function setSelectToken(transToken: any) {
     </div>
   </el-dialog>
   <SwapTransferList v-model:visible="showTransferDialog" :current-pool="currentPool"></SwapTransferList>
-  <SwapSelectTokenDialog v-model:visible="showSelectTokenDialog" :list="transferList" @select="setSelectToken" :loading="transferListLoading" :icon="icons.dogim"></SwapSelectTokenDialog>
+  <SwapSelectTokenDialog
+    v-model:visible="showSelectTokenDialog"
+    :list="transferList"
+    @select="setSelectToken"
+    :loading="transferListLoading"
+    :icon="icons.dogim"
+  ></SwapSelectTokenDialog>
 </template>
 
 <style lang="scss" scoped>

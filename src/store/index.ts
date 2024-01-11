@@ -5,7 +5,8 @@ import { ElMessageBox } from 'element-plus'
 import { getBlocksCount } from '@/services/nft'
 import { getMenuAuth } from '@/services/drc'
 import menuList from '@/config/navlist'
-import { queryPools } from '@/services/sword'
+import { queryPoolState, queryPools } from '@/services/sword'
+import { TokenState } from '@/services/types'
 
 const store = createPinia()
 const { connectDpal } = useDoge()
@@ -20,6 +21,8 @@ export const useAppStore = defineStore('app', {
     transferList: JSON.parse(localStorage.getItem('transfer_list') || '[]'),
     menus: JSON.parse(localStorage.getItem('menus') || '[]') as typeof menuList,
     swordPoolInfo: {} as any,
+    poolid: '',
+    currentPoolState: {} as TokenState,
   }),
   actions: {
     connectDpal() {
@@ -76,6 +79,15 @@ export const useAppStore = defineStore('app', {
       return queryPools().then((res) => {
         this.swordPoolInfo = res.data
       })
+    },
+    async getStorePoolStatus() {
+      const res = await queryPoolState(this.poolid)
+      const { status, data } = res.data
+      if (status == 'success') {
+        this.currentPoolState = data
+        return data
+      }
+      throw status
     },
   },
   getters: {

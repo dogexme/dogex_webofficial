@@ -3,6 +3,7 @@ const props = withDefaults(
   defineProps<{
     item: any
     icon: string
+    bg: string
   }>(),
   {}
 )
@@ -12,6 +13,7 @@ const emit = defineEmits<{
 }>()
 
 const pi = computed(() => props.item)
+const LINE_NUM = 10
 </script>
 
 <template>
@@ -33,8 +35,23 @@ const pi = computed(() => props.item)
           <span class="text-xs">Expect Out: </span>
           <span class="text-sm text-black">{{ pi.out }}</span>
         </p>
+        <p class="m-0">
+          <span class="text-xs">Position: </span>
+          <span class="text-sm text-black" :style="{ color: bg }">{{ pi.outProportionFormat }}</span>
+        </p>
       </div>
     </div>
+    <el-tooltip content="Lines exceeding oversell cannot be removed." placement="left">
+      <div class="prop-wrapper flex h-4" :style="{ color: bg }">
+        <div
+          class="prop-wrapper_item h-full"
+          style="width: 2px; background-color: currentColor"
+          :style="{ opacity: Math.max(LINE_NUM * (pi.outProportion * 100), 1) < n ? 0.5 : 1 }"
+          v-for="n in LINE_NUM"
+          :key="n"
+        ></div>
+      </div>
+    </el-tooltip>
     <DogeButton class="remove-btn" type="warn" @click="emit('remove', pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.isRemove">Remove</DogeButton>
   </div>
 </template>
@@ -60,5 +77,20 @@ const pi = computed(() => props.item)
   right: 12px;
   top: 12px;
   transform: translateX(calc(150%));
+}
+
+.prop-wrapper {
+  position: absolute;
+  right: 12px;
+  bottom: 12px;
+  padding: 4px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 4px;
+  &_item {
+    margin-right: 1px;
+    &:last-child {
+      margin: 0;
+    }
+  }
 }
 </style>
