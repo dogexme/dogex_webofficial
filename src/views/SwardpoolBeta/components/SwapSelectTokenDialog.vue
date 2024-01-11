@@ -68,7 +68,6 @@ watch(visible, (isVisible) => {
 .doge-tokenlist {
   background-color: #fff;
   min-height: 350px;
-  border-radius: 20px;
   overflow: hidden;
   padding: 50px 20px 20px;
 }

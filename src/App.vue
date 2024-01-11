@@ -60,7 +60,7 @@ onMounted(async () => {
   }
   .el-dialog__body {
     padding: 0;
-    border-radius: 8px;
+    border-radius: $dialog-border-radius;
     overflow: hidden;
   }
   .el-dialog__headerbtn {
@@ -75,7 +75,7 @@ onMounted(async () => {
 }
 
 .messageBox-dialog {
-  border-radius: 8px;
+  border-radius: $dialog-border-radius;
 }
 
 .loading-body {

@@ -150,7 +150,6 @@ async function clearAllHistory() {
 <style lang="scss" scoped>
 .doge-tokenlist {
   background-color: #fff;
-  border-radius: 20px;
   overflow: hidden;
   padding: 20px;
 }
