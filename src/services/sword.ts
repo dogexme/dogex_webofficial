@@ -30,15 +30,6 @@ export const queryTransaction = (params: { blockno: number; hash: string }) => {
 }
 
 /**
- * 查询某个交易池子的所有交易数据
- */
-export const queryPoolTransactionList = (params: { pair: string } & PageResult) => {
-  return axios.get('/api/sword/queryTransaction', {
-    params,
-  })
-}
-
-/**
  * 查询池子交易记录
  */
 export const queryPoolTransfers = (params: { address?: string } & PageResult) => {
@@ -78,22 +69,6 @@ export const getBalanceByPoolAddress = (address: string, options = {}) => {
     params: { address },
     ...options,
   })
-}
-
-/**
- * 查询top500
- * @returns
- */
-export const queryTop500 = () => {
-  return axios.get('https://vckist48l2.execute-api.ap-northeast-1.amazonaws.com/pool-beta/api?method=top500')
-}
-
-/**
- * 获取代币信息
- * @returns
- */
-export const getTokenInfo = () => {
-  return axios.get('https://py7xjcgpe9.execute-api.ap-east-1.amazonaws.com/beta/api/drcinfo')
 }
 
 /**
