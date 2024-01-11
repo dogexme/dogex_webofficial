@@ -3,7 +3,7 @@ const props = withDefaults(
   defineProps<{
     item: any
     icon: string
-    bg: string
+    bg?: string
   }>(),
   {}
 )
@@ -55,6 +55,7 @@ const LINE_NUM = 10
     <DogeButton
       class="remove-btn"
       type="warn"
+      :disabled="pi.outProportion >= 1"
       @click="emit('remove', pi)"
       style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)"
       v-if="pi.isRemove"

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import SwapInput from '@/views/Swap/components/SwapInput.vue'
 import icons from '@/config/payIcons'
-import { CaretRight } from '@element-plus/icons-vue'
+import { CaretRight, RefreshRight } from '@element-plus/icons-vue'
 import { consumeToken } from './TransferTable'
 import { computedExpcetout, getLiqPools, getTransferList, queryTransferStatus } from '@/services/sword'
 import { useAppStore } from '@/store'
@@ -226,15 +226,8 @@ async function computedOut(amount: number, tokenName: string) {
 
 async function removePool(p: any) {
   const { removeAmount, removeTokenALiqAdr, removeTokenBLiqAdr } = currentPool.value
-  const { liqtype, outProportion } = p
+  const { liqtype } = p
   let rs: any = {}
-
-  if (!outProportion || outProportion >= 1) {
-    return ElMessage({
-      message: `Lines exceeding oversell cannot be removed.`,
-      type: 'error',
-    })
-  }
 
   loading.value = true
 
@@ -389,6 +382,10 @@ function setSelectToken(transToken: any) {
         <DialogTitle title="Liquidity"></DialogTitle>
         <div class="flex justify-end mt-4">
           <DogeButton type="warn" @click="addPool">+ Supply</DogeButton>
+          <DogeButton @click="queryPools">
+            <el-icon style="vertical-align: middle"><RefreshRight /></el-icon>
+            <span class="ml-1" style="vertical-align: middle">Refresh</span>
+          </DogeButton>
           <el-badge :value="transferLoadingCount" :hidden="!transferLoadingCount">
             <DogeButton @click="showTransferDialog = true">History</DogeButton>
           </el-badge>

@@ -20,9 +20,13 @@ const emit = defineEmits<{
 <template>
   <div
     class="doge-button"
-    :class="[`doge-button--${props.type}`]"
-    :style="[!props.border ? { border: 'none' } : {}, props.borderColor ? { borderColor: props.borderColor } : {}]"
-    @click="emit('click')"
+    :class="[`doge-button--${props.type}`, disabled && 'doge-button--disabled']"
+    :style="[
+      !props.border ? { border: 'none' } : {},
+      props.borderColor ? { borderColor: props.borderColor } : {},
+      disabled ? { cursor: 'not-allowed' } : {},
+    ]"
+    @click="!disabled && emit('click')"
   >
     <slot></slot>
   </div>
@@ -49,6 +53,9 @@ const emit = defineEmits<{
     &:hover {
       background-color: rgb(255, 181, 44);
     }
+  }
+  &--disabled {
+    filter: grayscale(1);
   }
 }
 </style>
