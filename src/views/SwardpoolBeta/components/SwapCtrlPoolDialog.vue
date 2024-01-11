@@ -158,8 +158,7 @@ async function queryPools() {
 
       list.all.forEach(async (pi: any) => {
         const out = await computedOut(pi.inTokenA == 0 ? pi.inTokenB : pi.inTokenA, pi.liqtype)
-        const outAmount = parseFloat(out)
-        const outProportion = (pi.liqtype === 'doge' ? outAmount / balanceA : outAmount / balanceB) || 1
+        const outProportion = (pi.liqtype === 'doge' ? pi.inTokenA / balanceA : pi.inTokenB / balanceB) || 1
         Object.assign(pi, {
           out,
           loading: false,

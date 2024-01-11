@@ -46,7 +46,7 @@ const LINE_NUM = 10
         <div
           class="prop-wrapper_item h-full"
           style="width: 2px; background-color: currentColor"
-          :style="{ opacity: Math.max(LINE_NUM * (pi.outProportion * 100), 1) < n ? 0.5 : 1 }"
+          :style="{ opacity: Math.max(LINE_NUM * pi.outProportion, 1) < n ? 0.5 : 1 }"
           v-for="n in LINE_NUM"
           :key="n"
         ></div>
