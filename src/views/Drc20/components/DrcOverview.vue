@@ -19,7 +19,9 @@ const props = withDefaults(
         <div class="coll-logo-wrap">
           <el-image
             class="coll-logo-img"
-            :src="`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${props.tickInfo.tick == 'dogi' ? 'dogim' : props.tickInfo.tick}.png`"
+            :src="`https://raw.githubusercontent.com/dpalwallet/logoasserts/main/asserts/${
+              props.tickInfo.tick == 'dogi' ? 'dogim' : props.tickInfo.tick
+            }.png`"
             fit="cover"
           >
             <template #error>
@@ -52,7 +54,13 @@ const props = withDefaults(
     <div class="coll-info_item" v-if="props.tickInfo.deployer">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Deployer</div>
       <div class="coll-info_item_value">
-        <DogLink route :to="`/address/${props.tickInfo.deployer}`" is-copy :label="omitCenterString(props.tickInfo.deployer)" :value="props.tickInfo.deployer"></DogLink>
+        <DogLink
+          route
+          :to="`/address/${props.tickInfo.deployer}`"
+          is-copy
+          :label="omitCenterString(props.tickInfo.deployer)"
+          :value="props.tickInfo.deployer"
+        ></DogLink>
       </div>
     </div>
     <div class="coll-info_item" v-if="props.tickInfo.block">
@@ -61,7 +69,9 @@ const props = withDefaults(
     </div>
     <div class="coll-info_item" v-if="props.tickInfo.txid">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Txid</div>
-      <div class="coll-info_item_value"><DogLink is-copy style="cursor: pointer" :label="omitCenterString(props.tickInfo.txid, 24)" :value="props.tickInfo.txid"></DogLink></div>
+      <div class="coll-info_item_value">
+        <DogLink is-copy style="cursor: pointer" :label="omitCenterString(props.tickInfo.txid, 24)" :value="props.tickInfo.txid"></DogLink>
+      </div>
     </div>
   </div>
 </template>

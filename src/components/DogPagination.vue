@@ -60,18 +60,45 @@ function handlerJumpPage() {
   <form @submit.prevent class="dog-page">
     <div class="dog-page_total">{{ props.totalText || `A total of ${props.total} data found` }}</div>
     <div class="dog-page_control">
-      <div class="dog-page_control_item dog-page_control_first" @click="currentPage > 1 && (currentPage = 1)" :class="[currentPage == 1 && 'dog-page_control_item--disabled']">First</div>
-      <div class="dog-page_control_item dog-page_control_prev" @click="currentPage > 1 && currentPage--" :class="[currentPage == 1 && 'dog-page_control_item--disabled']">
+      <div
+        class="dog-page_control_item dog-page_control_first"
+        @click="currentPage > 1 && (currentPage = 1)"
+        :class="[currentPage == 1 && 'dog-page_control_item--disabled']"
+      >
+        First
+      </div>
+      <div
+        class="dog-page_control_item dog-page_control_prev"
+        @click="currentPage > 1 && currentPage--"
+        :class="[currentPage == 1 && 'dog-page_control_item--disabled']"
+      >
         <i class="dog-icon dog-icon_jiantou-left"></i>
       </div>
       <div class="dog-page_control_item dog-page_control_input-item dog-page_control_page" style="cursor: none; padding: 0 8px">
-        <input ref="inputTarget" v-model="jumpPage" class="dog-page_control_input" :placeholder="`Page 1 of ${pages}`" type="text" @keydown.enter="handlerJumpPage" />
+        <input
+          ref="inputTarget"
+          v-model="jumpPage"
+          class="dog-page_control_input"
+          :placeholder="`Page 1 of ${pages}`"
+          type="text"
+          @keydown.enter="handlerJumpPage"
+        />
       </div>
       <div class="dog-page_control_item dog-page_control_item--disabled" style="font-size: 12px">{{ currentPage }}/{{ pages }}</div>
-      <div class="dog-page_control_item dog-page_control_next" @click="currentPage < pages && currentPage++" :class="[currentPage == pages && 'dog-page_control_item--disabled']">
+      <div
+        class="dog-page_control_item dog-page_control_next"
+        @click="currentPage < pages && currentPage++"
+        :class="[currentPage == pages && 'dog-page_control_item--disabled']"
+      >
         <i class="dog-icon dog-icon_jiantou-right"></i>
       </div>
-      <div class="dog-page_control_item dog-page_control_last" @click="currentPage < pages && (currentPage = pages)" :class="[currentPage == pages && 'dog-page_control_item--disabled']">Last</div>
+      <div
+        class="dog-page_control_item dog-page_control_last"
+        @click="currentPage < pages && (currentPage = pages)"
+        :class="[currentPage == pages && 'dog-page_control_item--disabled']"
+      >
+        Last
+      </div>
     </div>
   </form>
 </template>

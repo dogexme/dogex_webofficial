@@ -136,7 +136,14 @@ onBeforeRouteUpdate((route) => {
           <Overview :ref="(ref) => (tables['holders'] = ref)" v-loading="loadingSearch" :collInfo="collInfo"></Overview>
         </DogTabsItem>
         <DogTabsItem value="holders">
-          <HolderTable :ref="(ref) => (tables['holders'] = ref)" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></HolderTable>
+          <HolderTable
+            :ref="(ref) => (tables['holders'] = ref)"
+            v-model:isLoading="loadingSearch"
+            :collInfo="collInfo!"
+            :txid="txidCopy"
+            :tabVal="curTabValue"
+            :error="handleNotFount"
+          ></HolderTable>
         </DogTabsItem>
         <DogTabsItem value="transfers">
           <TransfersTable
@@ -149,7 +156,14 @@ onBeforeRouteUpdate((route) => {
           ></TransfersTable>
         </DogTabsItem>
         <DogTabsItem value="assets">
-          <AssetsTable :ref="(ref) => (tables['assets'] = ref)" v-model:isLoading="loadingSearch" :collInfo="collInfo!" :txid="txidCopy" :tabVal="curTabValue" :error="handleNotFount"></AssetsTable>
+          <AssetsTable
+            :ref="(ref) => (tables['assets'] = ref)"
+            v-model:isLoading="loadingSearch"
+            :collInfo="collInfo!"
+            :txid="txidCopy"
+            :tabVal="curTabValue"
+            :error="handleNotFount"
+          ></AssetsTable>
         </DogTabsItem>
       </DogTabs>
       <el-empty v-else></el-empty>

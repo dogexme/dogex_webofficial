@@ -52,7 +52,14 @@ const LINE_NUM = 10
         ></div>
       </div>
     </el-tooltip>
-    <DogeButton class="remove-btn" type="warn" @click="emit('remove', pi)" style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)" v-if="pi.isRemove">Remove</DogeButton>
+    <DogeButton
+      class="remove-btn"
+      type="warn"
+      @click="emit('remove', pi)"
+      style="margin: 0; line-height: 1.5; background-color: rgb(186, 119, 255)"
+      v-if="pi.isRemove"
+      >Remove</DogeButton
+    >
   </div>
 </template>
 

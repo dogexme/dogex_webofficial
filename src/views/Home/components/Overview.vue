@@ -39,7 +39,13 @@ const props = withDefaults(
     <div class="coll-info_item">
       <div class="coll-info_item_label"><i class="dog-icon dog-icon_jiantou-right"></i>Deployer</div>
       <div class="coll-info_item_value">
-        <DogLink route :to="`/address/${props.collInfo.deployer}`" is-copy :label="omitCenterString(props.collInfo.deployer)" :value="props.collInfo.deployer"></DogLink>
+        <DogLink
+          route
+          :to="`/address/${props.collInfo.deployer}`"
+          is-copy
+          :label="omitCenterString(props.collInfo.deployer)"
+          :value="props.collInfo.deployer"
+        ></DogLink>
       </div>
     </div>
     <div class="coll-info_item">

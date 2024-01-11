@@ -48,7 +48,8 @@ function confirm() {
   <el-dialog class="custom-dialog" style="overflow: auto" v-model="visible" :width="inputDialogWidth" append-to-body>
     <div style="background-color: #fff; border-radius: 20px; overflow: hidden; padding: 50px 20px 20px">
       <p class="text-base" style="text-indent: 2em">
-        Liquidity management is currently in the beta stage. Please be aware of the risks, and before that, please read our rules link carefully. Thank you for your understanding.
+        Liquidity management is currently in the beta stage. Please be aware of the risks, and before that, please read our rules link carefully.
+        Thank you for your understanding.
       </p>
       <div class="flex flex-col items-end">
         <!-- <p><el-link type="primary">Swordpool Rule</el-link></p> -->

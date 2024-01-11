@@ -26,7 +26,12 @@ export default {
 </script>
 
 <template>
-  <el-icon v-if="iconComp" style="font-size: 16px" :class="{ 'is-loading': status == '0' }" :style="[status == '1' && { color: '#67C23A' }, status == '2' && { color: '#F56C6C' }]">
+  <el-icon
+    v-if="iconComp"
+    style="font-size: 16px"
+    :class="{ 'is-loading': status == '0' }"
+    :style="[status == '1' && { color: '#67C23A' }, status == '2' && { color: '#F56C6C' }]"
+  >
     <component :is="iconComp"></component>
   </el-icon>
   <span v-else>-</span>

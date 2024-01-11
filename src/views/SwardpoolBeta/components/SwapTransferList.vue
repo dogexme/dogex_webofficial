@@ -119,7 +119,13 @@ async function clearAllHistory() {
         </el-table-column>
         <el-table-column prop="txid" label="Txid" width="200px">
           <template #default="s">
-            <DogLink v-if="s.row.txid" is-copy :to="`https://chain.so/tx/DOGE/${s.row.txid}`" :label="omitCenterString(s.row.txid, 12)" :value="s.row.txid"></DogLink>
+            <DogLink
+              v-if="s.row.txid"
+              is-copy
+              :to="`https://chain.so/tx/DOGE/${s.row.txid}`"
+              :label="omitCenterString(s.row.txid, 12)"
+              :value="s.row.txid"
+            ></DogLink>
           </template>
         </el-table-column>
         <el-table-column label="In" width="150px">

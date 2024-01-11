@@ -185,7 +185,16 @@ onActivated(() => {
             </el-link>
           </div>
         </div>
-        <el-alert class="mb-3" v-if="noticeMessage" title="Notice" :description="noticeMessage" type="info" effect="dark" show-icon :closable="false" />
+        <el-alert
+          class="mb-3"
+          v-if="noticeMessage"
+          title="Notice"
+          :description="noticeMessage"
+          type="info"
+          effect="dark"
+          show-icon
+          :closable="false"
+        />
         <el-row style="margin-top: 12px">
           <el-col :span="24" :md="12">
             <el-row :span="24">
@@ -193,23 +202,37 @@ onActivated(() => {
                 <div class="inline-block mb-2">
                   <el-dropdown class="inline-block mr-2" style="vertical-align: middle" trigger="click" @command="changePool">
                     <el-button>
-                      <img class="token-icon rounded-full" v-if="currentPool.tokenA && icons[currentPool.tokenA]" :src="icons[currentPool.tokenA]" alt="" />{{ currentPool?.tokenA
-                      }}<span class="split-word">/</span> <img class="token-icon rounded-full" v-if="currentPool.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" /><span
-                        v-if="address"
-                        >{{ balance }}&nbsp;</span
-                      >{{ currentPool?.tokenB }}
+                      <img
+                        class="token-icon rounded-full"
+                        v-if="currentPool.tokenA && icons[currentPool.tokenA]"
+                        :src="icons[currentPool.tokenA]"
+                        alt=""
+                      />{{ currentPool?.tokenA }}<span class="split-word">/</span>
+                      <img
+                        class="token-icon rounded-full"
+                        v-if="currentPool.tokenB && icons[currentPool.tokenB]"
+                        :src="icons[currentPool.tokenB]"
+                        alt=""
+                      /><span v-if="address">{{ balance }}&nbsp;</span>{{ currentPool?.tokenB }}
                       <el-icon class="ml-2"><ArrowDown /></el-icon>
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
-                          <img class="token-icon rounded-full" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA }}<span class="split-word">/</span>
+                          <img class="token-icon rounded-full" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA
+                          }}<span class="split-word">/</span>
                           <img class="token-icon rounded-full" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
                         </el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
                   </el-dropdown>
-                  <el-badge style="font-size: 0" class="inline-block mr-2" :value="transferLoadingCount" :hidden="!transferLoadingCount" v-if="address">
+                  <el-badge
+                    style="font-size: 0"
+                    class="inline-block mr-2"
+                    :value="transferLoadingCount"
+                    :hidden="!transferLoadingCount"
+                    v-if="address"
+                  >
                     <el-icon style="color: #666; font-size: 24px; cursor: pointer" @click="showTransferDialog = true"><Tickets /></el-icon>
                   </el-badge>
                 </div>
@@ -238,11 +261,31 @@ onActivated(() => {
                 <h4 style="font-size: 26px; margin: 0"><span style="margin-right: 6px; font-size: 30px">Ð</span>{{ np.round(showPriceVal, 6) }}</h4>
                 <p class="m-0 mt-2" style="font-size: 16px; color: #777; vertical-align: middle">
                   <span style="margin-right: 4px">{{ Math.abs(np.round(showUpdownVal * 100, 2)) }}%</span>
-                  <svg v-show="showUpdownVal >= 0" style="vertical-align: middle" width="18" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M573.056 272l308.8 404.608A76.8 76.8 0 0 1 820.736 800H203.232a76.8 76.8 0 0 1-61.056-123.392L450.976 272a76.8 76.8 0 0 1 122.08 0z" fill="rgb(64, 180, 105)" />
+                  <svg
+                    v-show="showUpdownVal >= 0"
+                    style="vertical-align: middle"
+                    width="18"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M573.056 272l308.8 404.608A76.8 76.8 0 0 1 820.736 800H203.232a76.8 76.8 0 0 1-61.056-123.392L450.976 272a76.8 76.8 0 0 1 122.08 0z"
+                      fill="rgb(64, 180, 105)"
+                    />
                   </svg>
-                  <svg v-show="showUpdownVal < 0" style="vertical-align: middle" width="18" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M573.056 752l308.8-404.608A76.8 76.8 0 0 0 820.736 224H203.232a76.8 76.8 0 0 0-61.056 123.392l308.8 404.608a76.8 76.8 0 0 0 122.08 0z" fill="rgb(255, 90, 80)" />
+                  <svg
+                    v-show="showUpdownVal < 0"
+                    style="vertical-align: middle"
+                    width="18"
+                    viewBox="0 0 1024 1024"
+                    version="1.1"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M573.056 752l308.8-404.608A76.8 76.8 0 0 0 820.736 224H203.232a76.8 76.8 0 0 0-61.056 123.392l308.8 404.608a76.8 76.8 0 0 0 122.08 0z"
+                      fill="rgb(255, 90, 80)"
+                    />
                   </svg>
                 </p>
               </el-col>
@@ -269,7 +312,11 @@ onActivated(() => {
         </div>
         <div>
           <TransferTable v-show="transferSelect.value == 0" :current-pool="currentPool as SwordPool"></TransferTable>
-          <TransactionsList ref="TransactionsListRef" v-show="transferSelect.value == 3" :current-pool="currentPool as SwordPool"></TransactionsList>
+          <TransactionsList
+            ref="TransactionsListRef"
+            v-show="transferSelect.value == 3"
+            :current-pool="currentPool as SwordPool"
+          ></TransactionsList>
         </div>
       </dog-card>
     </el-col>

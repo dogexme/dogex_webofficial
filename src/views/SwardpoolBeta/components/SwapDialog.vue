@@ -356,7 +356,9 @@ function setSelectToken(t: { txid: string; amt: number }) {
           :disabled="payToken.swapType == SwapTypeEnum.BA"
           :swap-type="revToken.swapType"
         ></SwapInput>
-        <div style="color: red; margin-top: 10px; text-align: center" v-if="isLimitAmount && payToken.amount != ''">The minimum doge currency is 10.</div>
+        <div style="color: red; margin-top: 10px; text-align: center" v-if="isLimitAmount && payToken.amount != ''">
+          The minimum doge currency is 10.
+        </div>
         <div style="color: red; margin-top: 10px; text-align: center" v-if="isSelectLimit">Please select transferable utxo.</div>
         <div class="swap-sub-btn" :class="{ 'swap-sub-btn--disabled': isDisabledPay }" @click="pay">Swap</div>
         <div class="flex justify-center mt-2">
@@ -368,7 +370,13 @@ function setSelectToken(t: { txid: string; amt: number }) {
       </div>
     </div>
   </el-dialog>
-  <SwapSelectTokenDialog v-model:visible="showSelectTokenDialog" :list="transferList" @select="setSelectToken" :loading="transferListLoading" :icon="icons.dogim"></SwapSelectTokenDialog>
+  <SwapSelectTokenDialog
+    v-model:visible="showSelectTokenDialog"
+    :list="transferList"
+    @select="setSelectToken"
+    :loading="transferListLoading"
+    :icon="icons.dogim"
+  ></SwapSelectTokenDialog>
   <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
 </template>
 <style lang="scss">

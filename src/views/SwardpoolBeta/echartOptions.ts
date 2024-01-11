@@ -2,7 +2,12 @@ import { KlineType } from '@/types.d'
 import np from 'number-precision'
 import { MoveTipParams } from './types'
 
-export default (xLabels: string[], data: any[], { curKlinePoint, currentKline }: { [k: string]: Ref<any> }, tipMove: ({ price, rate }: MoveTipParams) => void) => {
+export default (
+  xLabels: string[],
+  data: any[],
+  { curKlinePoint, currentKline }: { [k: string]: Ref<any> },
+  tipMove: ({ price, rate }: MoveTipParams) => void
+) => {
   return {
     title: {
       show: false,

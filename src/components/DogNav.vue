@@ -53,7 +53,16 @@ function triggerDrawer(direction: DrawerDirection) {
           <span class="nav-logo" @click="router.replace('/')"></span>
           <!-- <a href="/" class="nav-title">dogex.me</a> -->
         </div>
-        <el-menu class="nav-menu" @select="selectItem" router :default-active="activePath" mode="horizontal" background-color="#fff" text-color="#333" active-text-color="#333">
+        <el-menu
+          class="nav-menu"
+          @select="selectItem"
+          router
+          :default-active="activePath"
+          mode="horizontal"
+          background-color="#fff"
+          text-color="#333"
+          active-text-color="#333"
+        >
           <component v-for="n in navlist" :is="n.children ? ElSubMenu : ElMenuItem" :index="n.path" :key="n.title">
             <template v-if="n.children" #title>{{ n.title }}</template>
             <template v-if="n.children">
@@ -71,7 +80,8 @@ function triggerDrawer(direction: DrawerDirection) {
           <li style="margin-left: 12px" v-else>
             <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to assets" placement="bottom">
               <router-link :to="`/address/${address}?type=token`" style="display: flex; align-items: center"
-                >{{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" :src="require('@/assets/img/dogim_logo.png')" /></router-link
+                >{{ omitCenterString(address) }}
+                <el-avatar style="margin-left: 12px" :size="24" :src="require('@/assets/img/dogim_logo.png')" /></router-link
               >''
             </el-tooltip>
           </li>
@@ -79,8 +89,26 @@ function triggerDrawer(direction: DrawerDirection) {
         <a class="nav-active-more" @click="triggerDrawer('rtl')" href="javascript:void(0)">&#xeb10;</a>
       </div>
     </nav>
-    <el-drawer append-to-body :show-close="false" :with-header="false" size="70%" v-model="isShowDrawer" :direction="drawerDirection" modal-class="nav-drawer">
-      <el-menu v-if="drawerDirection == 'ltr'" route @select="selectItem" router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical">
+    <el-drawer
+      append-to-body
+      :show-close="false"
+      :with-header="false"
+      size="70%"
+      v-model="isShowDrawer"
+      :direction="drawerDirection"
+      modal-class="nav-drawer"
+    >
+      <el-menu
+        v-if="drawerDirection == 'ltr'"
+        route
+        @select="selectItem"
+        router
+        :default-active="activePath"
+        background-color="#fff"
+        text-color="#333"
+        active-text-color="#333"
+        mode="vertical"
+      >
         <component v-for="n in navlist" :is="n.children ? ElSubMenu : ElMenuItem" :index="n.path" :key="n.title">
           <template v-if="n.children" #title>{{ n.title }}</template>
           <template v-if="n.children">
@@ -91,7 +119,16 @@ function triggerDrawer(direction: DrawerDirection) {
           </template>
         </component>
       </el-menu>
-      <el-menu v-else router :default-active="activePath" background-color="#fff" text-color="#333" active-text-color="#333" mode="vertical" @select="selectItem">
+      <el-menu
+        v-else
+        router
+        :default-active="activePath"
+        background-color="#fff"
+        text-color="#333"
+        active-text-color="#333"
+        mode="vertical"
+        @select="selectItem"
+      >
         <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address }, query: { type: 'token' } }">
           {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" :src="require('@/assets/img/dogim_logo.png')" />
         </el-menu-item>
