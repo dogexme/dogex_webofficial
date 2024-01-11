@@ -11,6 +11,7 @@ import viteCompression from 'vite-plugin-compression'
 import { viteMockServe } from 'vite-plugin-mock'
 import requireTransform from 'vite-plugin-require-transform'
 import commonjs from '@rollup/plugin-commonjs'
+import vitestConfig from './vitestConfig'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -66,6 +67,9 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
         },
       },
+    },
+    test: {
+      ...vitestConfig,
     },
   }
 })

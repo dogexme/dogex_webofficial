@@ -9,7 +9,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["node", "element-plus/global.d.ts", "./src/types.d.ts"],
+    "types": ["node", "element-plus/global.d.ts", "./src/types.d.ts", "vitest/globals"],
     /* Bundler mode */
     "moduleResolution": "bundler",
     "allowImportingTsExtensions": true,
