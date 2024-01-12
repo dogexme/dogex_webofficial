@@ -3,7 +3,7 @@ import { ElNotification } from 'element-plus'
 import { getTransferList } from '@/services/sword'
 import NP from 'number-precision'
 import { useAppStore } from '@/store'
-import icons from '@/config/payIcons'
+import { getTokenIcon } from '@/config/payIcons'
 import { SwordPool, TokenState, TokenInfo, TokenInputName } from '@/services/types'
 import { calculateOutA, calculateOutB } from '../computePrice'
 
@@ -375,7 +375,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
     :list="transferList"
     @select="setSelectToken"
     :loading="transferListLoading"
-    :icon="icons.dogim"
+    :icon="getTokenIcon(props.currentPool.tokenB)"
   ></SwapSelectTokenDialog>
   <SwapRecordsDialog v-model:visible="showRecordDialog" :currentPool="currentPool" :payData="payData"></SwapRecordsDialog>
 </template>

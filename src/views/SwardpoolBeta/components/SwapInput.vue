@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import icons from '@/config/payIcons'
+import { getTokenIcon } from '@/config/payIcons'
 import { TokenSwapInfo, TokenInputName } from '@/services/types'
 import { CaretRight } from '@element-plus/icons-vue'
 
@@ -94,19 +94,18 @@ function changePool(poolid: string) {
           v-if="props.pools.length && currentPool"
         >
           <div class="swap-pair_token">
-            <img class="token-icon" v-if="currentPool?.tokenB && icons[currentPool.tokenB]" :src="icons[currentPool.tokenB]" alt="" />{{
-              currentPool?.tokenB
+            <img class="token-icon" v-if="currentPool?.tokenB" :src="getTokenIcon(currentPool.tokenB)" alt="" />{{ currentPool?.tokenB
             }}<span class="nft ml-1" style="font-size: 12px">&#xeb6d;</span>
           </div>
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
-                <img class="token-icon" v-if="item?.tokenB && icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
+                <img class="token-icon" v-if="item?.tokenB" :src="getTokenIcon(item.tokenB)" alt="" />{{ item?.tokenB }}
               </el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
-        <div class="swap-pair_token" style="cursor: default" v-else><img class="token-icon" :src="icons.doge" alt="" />doge</div>
+        <div class="swap-pair_token" style="cursor: default" v-else><img class="token-icon" :src="getTokenIcon('doge')" alt="" />doge</div>
       </slot>
     </section>
   </div>

@@ -1,5 +1,5 @@
 <script lang="ts">
-import TokenIcons from '@/config/payIcons'
+import { getTokenIcon } from '@/config/payIcons'
 
 export default {
   props: {
@@ -13,7 +13,7 @@ export default {
     },
   },
   setup(props) {
-    const icon = computed(() => TokenIcons[props.tokenName])
+    const icon = computed(() => getTokenIcon(props.tokenName))
     const price = computed(() => props.price)
     return {
       icon,

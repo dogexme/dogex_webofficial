@@ -7,7 +7,7 @@ import { getBalanceByPoolAddress, queryPoolTransfers } from '@/services/sword'
 import { PropType } from 'vue'
 import { numberFormat } from '@/utils'
 import { SwordPool } from '@/services/types'
-import icon from '@/config/payIcons'
+import { getTokenIcon } from '@/config/payIcons'
 import NP from 'number-precision'
 
 export function consumeNumFormat(num: number, tokenName?: string) {
@@ -78,7 +78,9 @@ export default defineComponent({
         title: 'Swap',
         align: 'center',
         render(_text: any, r: any) {
-          return <SwapTypeIcon swapType={r.swapType} record={r} tokenA={props.currentPool!.tokenA} tokenB={props.currentPool!.tokenB}></SwapTypeIcon>
+          return (
+            <SwapTypeIcon swapType={r.swapType} record={r} tokenA={props.currentPool!.tokenA} tokenB={props.currentPool!.tokenB}></SwapTypeIcon>
+          )
         },
       },
       {
@@ -124,7 +126,9 @@ export default defineComponent({
         title: 'Processed Txid',
         dataIndex: 'processedTxid',
         render(text: string) {
-          return <>{text ? <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink> : '-'}</>
+          return (
+            <>{text ? <DogLink is-copy to={`https://chain.so/tx/DOGE/${text}`} label={omitCenterString(text, 12)} value={text}></DogLink> : '-'}</>
+          )
         },
       },
       {
@@ -232,7 +236,7 @@ export default defineComponent({
                 ></DogSearch>
                 {balance.value > 0 && (
                   <div class="flex flex-1 items-center ml-3 text-xs">
-                    <img class="mr-2" style={{ borderRadius: '50%', width: '16px' }} src={icon.dogim} alt="" />
+                    <img class="mr-2" style={{ borderRadius: '50%', width: '16px' }} src={getTokenIcon('dogim')} alt="" />
                     {numberFormat(balance.value)}
                   </div>
                 )}

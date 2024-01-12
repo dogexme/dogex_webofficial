@@ -1,6 +1,6 @@
 <script lang="ts">
 import { Right } from '@element-plus/icons-vue'
-import TokenIcons from '@/config/payIcons'
+import { getTokenIcon } from '@/config/payIcons'
 
 export default {
   components: {
@@ -17,8 +17,8 @@ export default {
     },
   },
   setup(props) {
-    const iconASrc = computed(() => TokenIcons[props.iconA])
-    const iconBSrc = computed(() => TokenIcons[props.iconB])
+    const iconASrc = computed(() => getTokenIcon(props.iconA))
+    const iconBSrc = computed(() => getTokenIcon(props.iconB))
     return {
       iconASrc,
       iconBSrc,

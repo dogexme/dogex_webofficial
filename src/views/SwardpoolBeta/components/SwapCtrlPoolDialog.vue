@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import icons from '@/config/payIcons'
+import { getTokenIcon } from '@/config/payIcons'
 import { CaretRight, RefreshRight } from '@element-plus/icons-vue'
 import { consumeToken } from './TransferTable'
 import { computedExpcetout, getLiqPools, getTransferList, queryTransferStatus } from '@/services/sword'
@@ -395,10 +395,24 @@ function setSelectToken(transToken: any) {
         </div>
         <div class="liq flex flex-wrap justify-between mx-12 mt-4">
           <div class="liq-card w-6/12 mr-2">
-            <LiqItem v-for="pi in list.doge" :key="pi.addBlockno" :item="pi" :bg="pi.bg" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
+            <LiqItem
+              v-for="pi in list.doge"
+              :key="pi.addBlockno"
+              :item="pi"
+              :bg="pi.bg"
+              :icon="getTokenIcon(pi.liqtype)"
+              @remove="removePool"
+            ></LiqItem>
           </div>
           <div class="liq-card w-6/12">
-            <LiqItem v-for="pi in list.token" :key="pi.addBlockno" :item="pi" :bg="pi.bg" :icon="icons[pi.liqtype]" @remove="removePool"></LiqItem>
+            <LiqItem
+              v-for="pi in list.token"
+              :key="pi.addBlockno"
+              :item="pi"
+              :bg="pi.bg"
+              :icon="getTokenIcon(pi.liqtype)"
+              @remove="removePool"
+            ></LiqItem>
           </div>
           <el-empty class="w-full" v-if="!list.doge.length && !list.token.length" description="To add liquidity." />
         </div>
@@ -413,22 +427,22 @@ function setSelectToken(transToken: any) {
                 :style="[isAToken ? { border: '1px solid #ffa21e', backgroundColor: '#ffa21e40' } : {}]"
                 @click="isAToken = true"
               >
-                <img class="w-6 mr-2" style="border-radius: 50%" :src="icons.doge" alt="" />
-                doge
+                <img class="w-6 mr-2" style="border-radius: 50%" :src="getTokenIcon(currentPool.tokenA)" alt="" />
+                {{ currentPool.tokenA }}
               </div>
               <div
                 class="flex items-center ml-3 py-2 px-4 rounded-3xl overflow-hidden bg-white border border-gray-400 border-solid cursor-pointer"
                 @click="isAToken = false"
                 :style="[!isAToken ? { border: '1px solid #ffa21e', backgroundColor: '#ffa21e40' } : {}]"
               >
-                <img class="w-6 mr-2" style="border-radius: 50%" :src="icons.dogim" alt="" />
-                dogim
+                <img class="w-6 mr-2" style="border-radius: 50%" :src="getTokenIcon(currentPool.tokenB)" alt="" />
+                {{ currentPool.tokenB }}
               </div>
             </div>
             <div style="min-height: 200px">
               <SwapInput
                 v-model="token.amountA"
-                title="Add doge"
+                :title="`Add ${currentPool.tokenA}`"
                 name="pay"
                 :price="4"
                 :min="currentPool.minLiqTokenA"
@@ -446,7 +460,7 @@ function setSelectToken(transToken: any) {
                 v-model="token.amountB"
                 :price="0"
                 :min="currentPool.minLiqTokenB"
-                title="Add dogim"
+                :title="`Add ${currentPool.tokenB}`"
                 name="pay"
                 swap-type="SWAP_A_B"
                 @selectToken="selectToken"
@@ -478,7 +492,7 @@ function setSelectToken(transToken: any) {
     :list="transferList"
     @select="setSelectToken"
     :loading="transferListLoading"
-    :icon="icons.dogim"
+    :icon="getTokenIcon(currentPool.tokenB)"
   ></SwapSelectTokenDialog>
 </template>
 

@@ -6,7 +6,7 @@ import { useAppStore } from '@/store'
 import { ElMessageBox } from 'element-plus'
 import { ArrowDown, Tickets, Refresh } from '@element-plus/icons-vue'
 import SwapDialog from './components/SwapDialog.vue'
-import icons from '@/config/payIcons'
+import { getTokenIcon } from '@/config/payIcons'
 import SwapTransferList from './components/SwapTransferList.vue'
 import { SwordPool } from '@/services/types'
 import { InitEchartParams, MoveTipParams } from './types'
@@ -199,26 +199,22 @@ onActivated(() => {
                 <div class="inline-block mb-2">
                   <el-dropdown class="inline-block mr-2" style="vertical-align: middle" trigger="click" @command="changePool">
                     <el-button>
-                      <img
-                        class="token-icon rounded-full"
-                        v-if="currentPool.tokenA && icons[currentPool.tokenA]"
-                        :src="icons[currentPool.tokenA]"
-                        alt=""
-                      />{{ currentPool?.tokenA }}<span class="split-word">/</span>
-                      <img
-                        class="token-icon rounded-full"
-                        v-if="currentPool.tokenB && icons[currentPool.tokenB]"
-                        :src="icons[currentPool.tokenB]"
-                        alt=""
-                      /><span v-if="address">{{ balance }}&nbsp;</span>{{ currentPool?.tokenB }}
+                      <img class="token-icon rounded-full" v-if="currentPool.tokenA" :src="getTokenIcon(currentPool.tokenA)" alt="" />{{
+                        currentPool?.tokenA
+                      }}<span class="split-word">/</span>
+                      <img class="token-icon rounded-full" v-if="currentPool.tokenB" :src="getTokenIcon(currentPool.tokenB)" alt="" /><span
+                        v-if="address"
+                        >{{ balance }}&nbsp;</span
+                      >{{ currentPool?.tokenB }}
                       <el-icon class="ml-2"><ArrowDown /></el-icon>
                     </el-button>
                     <template #dropdown>
                       <el-dropdown-menu>
                         <el-dropdown-item v-for="item in pools" :key="item.poolid" :command="item.poolid" :disabled="item.status != 0">
-                          <img class="token-icon rounded-full" v-if="icons[item.tokenA]" :src="icons[item.tokenA]" alt="" />{{ item?.tokenA
-                          }}<span class="split-word">/</span>
-                          <img class="token-icon rounded-full" v-if="icons[item.tokenB]" :src="icons[item.tokenB]" alt="" />{{ item?.tokenB }}
+                          <img class="token-icon rounded-full" :src="getTokenIcon(item.tokenA)" alt="" />{{ item?.tokenA
+                          }}<span class="split-word">/</span> <img class="token-icon rounded-full" :src="getTokenIcon(item.tokenB)" alt="" />{{
+                            item?.tokenB
+                          }}
                         </el-dropdown-item>
                       </el-dropdown-menu>
                     </template>
