@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import SwapInput from '@/views/Swap/components/SwapInput.vue'
 import icons from '@/config/payIcons'
 import { CaretRight, RefreshRight } from '@element-plus/icons-vue'
 import { consumeToken } from './TransferTable'
