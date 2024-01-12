@@ -405,7 +405,7 @@ function setSelectToken(t: { txid: string; amt: number }) {
 .swap-pair {
   padding: 10px;
   background-color: #dadada;
-  border-radius: 20px;
+  border-radius: $dialog-border-radius;
   &_title {
     margin: 12px 5px;
     color: #2c2c2c;

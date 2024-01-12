@@ -118,7 +118,7 @@ function changePool(poolid: string) {
     padding: 12px 12px;
     border: 1px solid #ccc;
     // box-shadow: 0px 0px 6px 1px#fff;
-    border-radius: 10px;
+    border-radius: $dialog-border-radius;
     background-color: #fff;
   }
   &_item_title {

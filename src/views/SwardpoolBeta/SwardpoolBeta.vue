@@ -80,7 +80,7 @@ async function queryPoolStatus(poolid: string, timer = false) {
 }
 
 function connect() {
-  ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect DpalWallet', {
+  ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect Wallet', {
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
     customClass: 'messageBox-dialog',
@@ -252,7 +252,7 @@ onActivated(() => {
                   </div>
                 </template>
                 <div class="inline-block" style="font-size: 14px" v-else-if="currentPool.pooladdress && !address">
-                  <div class="swap-pair_buy swap-pair_buy--connect size" @click="connect">Connect DpalWallet</div>
+                  <div class="swap-pair_buy swap-pair_buy--connect size" @click="connect">Connect Wallet</div>
                 </div>
               </el-col>
             </el-row>

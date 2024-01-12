@@ -125,7 +125,7 @@ export default defineComponent({
                       <ElButton onClick={() => (visible.value = false)}>Cancel</ElButton>
                       {!address.value ? (
                         <ElButton type="primary" onClick={handleConnectDpal}>
-                          Connect DpalWallet
+                          Connect Wallet
                         </ElButton>
                       ) : (
                         <ElButton type="primary" loading={isBuyLoading.value} onClick={buy}>

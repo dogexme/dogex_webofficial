@@ -21,7 +21,7 @@ function selectItem() {
 }
 
 function connect() {
-  ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect DpalWallet', {
+  ElMessageBox.confirm('Is it connected to the DpalWallet?', 'Connect Wallet', {
     confirmButtonText: 'OK',
     cancelButtonText: 'Cancel',
     customClass: 'messageBox-dialog',
@@ -75,7 +75,7 @@ function triggerDrawer(direction: DrawerDirection) {
         </el-menu>
         <ul class="nav-active">
           <li class="nav-active-item nav-active-item--weblink" v-if="!address">
-            <a href="javascript:void(0)" @click="connect">Connect DpalWallet</a>
+            <a href="javascript:void(0)" @click="connect">Connect Wallet</a>
           </li>
           <li style="margin-left: 12px" v-else>
             <el-tooltip popper-class="nav-popper" :hide-after="0" effect="dark" content="Click to assets" placement="bottom">
@@ -132,7 +132,7 @@ function triggerDrawer(direction: DrawerDirection) {
         <el-menu-item v-if="address" index="/address" :route="{ name: 'address', params: { address }, query: { type: 'token' } }">
           {{ omitCenterString(address) }} <el-avatar style="margin-left: 12px" :size="24" :src="require('@/assets/img/dogim_logo.png')" />
         </el-menu-item>
-        <el-menu-item v-else @click="connect"> Connect DpalWallet </el-menu-item>
+        <el-menu-item v-else @click="connect"> Connect Wallet </el-menu-item>
       </el-menu>
     </el-drawer>
   </div>
@@ -243,7 +243,7 @@ function triggerDrawer(direction: DrawerDirection) {
   box-shadow: inset 0 -4px 0 0 rgba(0, 0, 0, 0.1);
   a {
     display: block;
-    padding: 4px 12px;
+    padding: 6px 12px;
   }
   &--weblink {
     background-color: currentColor;
