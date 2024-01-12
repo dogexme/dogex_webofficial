@@ -134,9 +134,6 @@ function paySuccess() {
 function init() {
   // 第一个参数开启实时金额
   updatePool()
-  if (address.value) {
-    getBalance(address.value)
-  }
 }
 
 function getAddressTransList() {
